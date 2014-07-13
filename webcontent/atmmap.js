@@ -3,278 +3,276 @@ var ATMMAP = {};
 
 (function() {
 
-    // dependencies
-    utils = UTILS;
+	// dependencies
+	utils = UTILS;
 
-    /* private attributes */
+	/* private attributes */
 
-    // contains the node id of the OSM objects
-    var nodeIds = {};
-    var wayNodeIds = {};
-    var namedGroup = {};
-    var operatorLayers;
-    var operatorCategories = [ "Volksbanken", "Sparkassen", "Cashgroup",
-	    "andere Banken" ];
-    var cashGroup = [ /Commerzbank/i, /Deutsche Bank/i, /Postbank/i,
-	    /Dresdner Bank/, /Comdirekt/i, /Norisbank/i, /Berliner Bank/i ];
+	// contains the node id of the OSM objects
+	var nodeIds = {};
+	var wayNodeIds = {};
+	var namedGroup = {};
+	var operatorLayers;
+	var operatorCategories = [ "Volksbanken", "Sparkassen", "Cashgroup",
+			"andere Banken" ];
+	var cashGroup = [ /Commerzbank/i, /Deutsche Bank/i, /Postbank/i,
+			/Dresdner Bank/, /Comdirekt/i, /Norisbank/i, /Berliner Bank/i ];
 
-    var map = null;
+	var map = null;
 
-    // building the api call for atms (automated teller machine)
-    // the overpass api URL
-    var ovpCall = 'http://overpass-api.de/api/interpreter?';
+	// building the api call for atms (automated teller machine)
+	// the overpass api URL
+	var ovpCall = 'http://overpass-api.de/api/interpreter?';
 
-    // setting the output format to json
-    ovpCall += 'data=[out:json];';
+	// setting the output format to json
+	ovpCall += 'data=[out:json];';
 
-    // nodes with "amenity"="atm", meaning a single atm
-    // nodes with "amenity"="bank", meaning point mapped as a bank
-    ovpCall += '(node["amenity"="atm"]BOUNDINGBOX;';
-    ovpCall += 'node["amenity"="bank"]BOUNDINGBOX;';
+	// nodes with "amenity"="atm", meaning a single atm
+	// nodes with "amenity"="bank", meaning point mapped as a bank
+	ovpCall += '(node["amenity"="atm"]BOUNDINGBOX;';
+	ovpCall += 'node["amenity"="bank"]BOUNDINGBOX;';
 
-    // for ways (most buildings) which mapped with "amenity"="bank"
-    // these ways will be send to the set bank (by '->.bank')
-    ovpCall += '(way["amenity"="bank"]BOUNDINGBOX->.bank;';
-    // then all nodes contained by found ways will be fetched (by
-    // 'node(w.bank)')
-    ovpCall += 'node(w.bank););';
+	// for ways (most buildings) which mapped with "amenity"="bank"
+	// these ways will be send to the set bank (by '->.bank')
+	ovpCall += '(way["amenity"="bank"]BOUNDINGBOX->.bank;';
+	// then all nodes contained by found ways will be fetched (by
+	// 'node(w.bank)')
+	ovpCall += 'node(w.bank););';
 
-    // sometimes "atm"="true" could be found with other attributes than
-    // "amenity"="bank", following statement looks for such atms
-    ovpCall += '(';
-    // all things mapped with "atm"="yes"
-    ovpCall += '(node["atm"="yes"]BOUNDINGBOX; way["atm"="yes"]BOUNDINGBOX; relation["atm"="yes"]BOUNDINGBOX;);';
-    // but not with "amenity"="bank"
-    ovpCall += '- (node["amenity"="bank"]BOUNDINGBOX; way["amenity"="bank"]BOUNDINGBOX; relation["amenity"="bank"]BOUNDINGBOX;);';
-    ovpCall += ');';
+	// sometimes "atm"="true" could be found with other attributes than
+	// "amenity"="bank", following statement looks for such atms
+	ovpCall += '(';
+	// all things mapped with "atm"="yes"
+	ovpCall += '(node["atm"="yes"]BOUNDINGBOX; way["atm"="yes"]BOUNDINGBOX; relation["atm"="yes"]BOUNDINGBOX;);';
+	// but not with "amenity"="bank"
+	ovpCall += '- (node["amenity"="bank"]BOUNDINGBOX; way["amenity"="bank"]BOUNDINGBOX; relation["amenity"="bank"]BOUNDINGBOX;);';
+	ovpCall += ');';
 
-    // closes the atm set statement
-    ovpCall += ')';
+	// closes the atm set statement
+	ovpCall += ')';
 
-    // output statement
-    ovpCall += ';out body;';
+	// output statement
+	ovpCall += ';out body;';
 
-    /**
-     * private methods
-     */
+	/**
+	 * private methods
+	 */
 
-    var loadPois = function() {
-	var overpassCall;
+	var loadPois = function() {
+		var overpassCall;
 
-	if (map.getZoom() < 13) {
-	    return;
-	}
-
-	// note: g in /BOUNDINGBOX/g means replace all occurrences of
-	// BOUNDINGBOX not just first occurrence
-	overpassCall = ovpCall.replace(/BOUNDINGBOX/g, utils
-		.latLongToString(map.getBounds()));
-
-	console.log("calling overpass-api: " + overpassCall);
-
-	// using JQuery executing overpass api
-	$.getJSON(overpassCall, function(data) {
-
-	    // first store all node from any ways
-	    $.each(data.elements, function(index, node) {
-
-		if ("tags" in node) {
-		    return;
-		}
-
-		// all way-nodes without any tags
-		else {
-		    wayNodeIds[node.id] = node;
-		}
-	    });
-
-	    // overpass returns a list with elements, which contains the nodes
-	    $.each(data.elements, function(index, node) {
-
-		if ("tags" in node) {
-
-		    if (node.id in nodeIds)
+		if (map.getZoom() < 13) {
 			return;
-
-		    nodeIds[node.id] = true;
-
-		    // bank (or anything else) with atm
-		    if (node.tags.atm == "yes") {
-			addBankWithAtmToMap(node);
-		    }
-		    // an atm
-		    else if (node.tags.amenity == "atm") {
-			addSingleAtmToMap(node);
-		    }
-		    // bank without atm (or anything else without atm, but this
-		    // case should be very rare)
-		    else if (node.tags.atm == "no") {
-			addBankWithNoAtmToMap(node);
-		    }
-		    // bank with unknown atm state
-		    else {
-			addBankWithUnknownAtmToMap(node);
-		    }
 		}
-	    });
-	});
-    };
 
-    var addBankWithNoAtmToMap = function(bank) {
-	var name, marker;
+		// note: g in /BOUNDINGBOX/g means replace all occurrences of
+		// BOUNDINGBOX not just first occurrence
+		overpassCall = ovpCall.replace(/BOUNDINGBOX/g, utils
+				.latLongToString(map.getBounds()));
 
-	name = utils.createNameFromeTags(bank);
-	marker = createMarker(bank, name, utils.noAtm);
+		console.log("calling overpass-api: " + overpassCall);
 
-	addToNamedGroup(name, marker);
-    };
+		// using JQuery executing overpass api
+		$.getJSON(overpassCall, function(data) {
 
-    var addBankWithUnknownAtmToMap = function(bank) {
-	var name, marker;
+			// first store all node from any ways
+			$.each(data.elements, function(index, node) {
 
-	name = utils.createNameFromeTags(bank);
-	marker = createMarker(bank, name, utils.unknownAtm);
+				if ("tags" in node) {
+					return;
+				}
 
-	addToNamedGroup(name, marker);
-    };
+				// all way-nodes without any tags
+				else {
+					wayNodeIds[node.id] = node;
+				}
+			});
 
-    var addBankWithAtmToMap = function(bank) {
-	var name, marker;
+			// overpass returns a list with elements, which contains the nodes
+			$.each(data.elements, function(index, node) {
 
-	name = utils.createNameFromeTags(bank);
-	marker = createMarker(bank, name, utils.yesAtm);
+				if ("tags" in node) {
 
-	addToNamedGroup(name, marker);
-    };
+					if (node.id in nodeIds)
+						return;
 
-    var createMarker = function(bank, name, atmIcon) {
+					nodeIds[node.id] = true;
 
-	if (bank.type == "node") {
-	    var marker = L.marker([ bank.lat, bank.lon ], {
-		icon : atmIcon
-	    });
+					// bank (or anything else) with atm
+					if (node.tags.atm == "yes") {
+						addBankWithAtmToMap(node);
+					}
+					// an atm
+					else if (node.tags.amenity == "atm") {
+						addSingleAtmToMap(node);
+					}
+					// bank without atm (or anything else without atm, but this
+					// case should be very rare)
+					else if (node.tags.atm == "no") {
+						addBankWithNoAtmToMap(node);
+					}
+					// bank with unknown atm state
+					else {
+						addBankWithUnknownAtmToMap(node);
+					}
+				}
+			});
+		});
+	};
 
-	    marker.bindPopup(name);
+	var addBankWithNoAtmToMap = function(bank) {
+		var name, marker;
 
-	    return marker;
+		name = utils.createNameFromeTags(bank);
+		marker = createMarker(bank, name, utils.noAtm);
 
-	} else if (bank.type == "way") {
-	    var areaNodes = new Array();
-	    var bankArea;
-	    var marker = null;
-	    var bounds;
-	    var center;
+		addToNamedGroup(name, marker);
+	};
 
-	    $.each(bank.nodes, function(index, nodeId) {
-		areaNodes.push(L.latLng(wayNodeIds[nodeId].lat,
-			wayNodeIds[nodeId].lon));
-	    });
+	var addBankWithUnknownAtmToMap = function(bank) {
+		var name, marker;
 
-	    bankArea = L.polygon(areaNodes, {
-		clickable : false
-	    });
-	    bounds = bankArea.getBounds();
-	    center = bounds.getCenter();
+		name = utils.createNameFromeTags(bank);
+		marker = createMarker(bank, name, utils.unknownAtm);
 
-	    marker = L.marker([ center.lat, center.lng ], {
-		icon : atmIcon
-	    });
+		addToNamedGroup(name, marker);
+	};
 
-	    marker.bindPopup(name);
+	var addBankWithAtmToMap = function(bank) {
+		var name, marker;
 
-	    return L.layerGroup([ bankArea, marker ]);
-	}
-    };
+		name = utils.createNameFromeTags(bank);
+		marker = createMarker(bank, name, utils.yesAtm);
 
-    var addSingleAtmToMap = function(atm) {
-	var name, marker;
+		addToNamedGroup(name, marker);
+	};
 
-	name = utils.createNameFromeTags(atm);
-	marker = L.marker([ atm.lat, atm.lon ], {
-	    icon : utils.atm
-	}).bindPopup(name);
+	var createMarker = function(bank, name, atmIcon) {
 
-	addToNamedGroup(name, marker);
-    };
+		if (bank.type == "node") {
+			var marker = L.marker([ bank.lat, bank.lon ], {
+				icon : atmIcon
+			});
 
-    var addToNamedGroup = function(name, marker) {
-	var group, agregatedName;
+			marker.bindPopup(name);
 
-	agregatedName = agregateName(name);
+			return marker;
 
-	try {
-	    group = namedGroup[agregatedName];
-	    group.addLayer(marker);
-	} catch (e) {
+		} else if (bank.type == "way") {
+			var areaNodes = new Array();
+			var bankArea;
+			var marker = null;
+			var bounds;
+			var center;
 
-	}
-    };
+			$.each(bank.nodes, function(index, nodeId) {
+				areaNodes.push(L.latLng(wayNodeIds[nodeId].lat,
+						wayNodeIds[nodeId].lon));
+			});
 
-    var buildLayers = function() {
-	var group;
-	
-	operatorLayers = L.control.layers(null, null, {
-	    collapsed : false
-	}).addTo(map);
+			bankArea = L.polygon(areaNodes, {
+				clickable : false
+			});
+			bounds = bankArea.getBounds();
+			center = bounds.getCenter();
 
-	for (var i = 0; i < operatorCategories.length; i++) {
-	    group = L.layerGroup();
-	    group.addTo(map);
-	    namedGroup[operatorCategories[i]] = group;
-	    operatorLayers.addOverlay(group, operatorCategories[i]);
-	}
-    };
+			marker = L.marker([ center.lat, center.lng ], {
+				icon : atmIcon
+			});
 
-    var agregateName = function(name) {
-	if (name.search(/Volksbank/i) > -1) {
-	    return operatorCategories[0];
-	} else if (name.search(/Sparkasse/i) > -1) {
-	    return operatorCategories[1];
-	} else {
-	    for (var i = 0; i < cashGroup.length; i++) {
-		if (name.search(cashGroup[i]) > -1) {
-		    return operatorCategories[2];
+			marker.bindPopup(name);
+
+			return L.layerGroup([ bankArea, marker ]);
 		}
-	    }
-	}
-	return operatorCategories[3];
-    };
+	};
 
-    var moveEnd = function() {
-	loadPois();
-    };
+	var addSingleAtmToMap = function(atm) {
+		var name, marker;
 
-    // public interface
-    ATMMAP.initMap = function() {
-	var attr_osm, attr_overpass, attr_icons, osm;
+		name = utils.createNameFromeTags(atm);
+		marker = L.marker([ atm.lat, atm.lon ], {
+			icon : utils.atm
+		}).bindPopup(name);
 
-	attr_osm = 'Map data &copy; <a href="http://openstreetmap.org/">OpenStreetMap</a> contributors';
-	attr_overpass = '<br>POIs via <a href="http://www.overpass-api.de/">Overpass API</a>';
-	attr_icons = 'Icons by <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a> <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY SA 3.0</a>';
+		addToNamedGroup(name, marker);
+	};
 
-	osm = new L.TileLayer(
-		'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		    attribution : [ attr_osm, attr_overpass, attr_icons ]
-			    .join(' | ')
+	var addToNamedGroup = function(name, marker) {
+		var group, agregatedName;
+
+		agregatedName = agregateName(name);
+
+		try {
+			group = namedGroup[agregatedName];
+			group.addLayer(marker);
+		} catch (e) {
+
+		}
+	};
+
+	var buildLayers = function() {
+		var group;
+
+		operatorLayers = L.control.layers(null, null, {
+			collapsed : false
+		}).addTo(map);
+
+		for (var i = 0; i < operatorCategories.length; i++) {
+			group = L.layerGroup();
+			group.addTo(map);
+			namedGroup[operatorCategories[i]] = group;
+			operatorLayers.addOverlay(group, operatorCategories[i]);
+		}
+	};
+
+	var agregateName = function(name) {
+		if (name.search(/Volksbank/i) > -1) {
+			return operatorCategories[0];
+		} else if (name.search(/Sparkasse/i) > -1) {
+			return operatorCategories[1];
+		} else {
+			for (var i = 0; i < cashGroup.length; i++) {
+				if (name.search(cashGroup[i]) > -1) {
+					return operatorCategories[2];
+				}
+			}
+		}
+		return operatorCategories[3];
+	};
+
+	var moveEnd = function() {
+		loadPois();
+	};
+
+	// public interface
+	ATMMAP.initMap = function() {
+		var attr_osm, attr_overpass, attr_icons, osm;
+
+		attr_osm = 'Map data &copy; <a href="http://openstreetmap.org/">OpenStreetMap</a> contributors';
+		attr_overpass = '<br>POIs via <a href="http://www.overpass-api.de/">Overpass API</a>';
+		attr_icons = 'Icons by <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a> <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY SA 3.0</a>';
+
+		osm = new L.TileLayer(
+				'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+					attribution : [ attr_osm, attr_overpass, attr_icons ]
+							.join(' | ')
+				});
+
+		map = L.map('map', {
+			center : new L.LatLng(52.516, 13.379),
+			zoom : 15,
+			layers : osm
 		});
 
-	map = L.map('map', {
-	    center : new L.LatLng(52.468, 13.346),
-	    zoom : 16,
-	    layers : osm
-	});
+		L.control.locate().addTo(map);
 
-	L.control.locate().addTo(map);
-	
-	buildLayers();
-	
-	utils.addLegendTo(map);
+		buildLayers();
 
-	loadPois();
+		utils.addLegendTo(map);
 
-	map.on('moveend', moveEnd);
+		loadPois();
 
-	map.locate();
-    };
+		map.on('moveend', moveEnd);
+	};
 
 })();
