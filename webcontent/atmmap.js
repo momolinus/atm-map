@@ -264,6 +264,8 @@ var ATMMAP = {};
 			layers : osm
 		});
 
+		map.addControl(new L.Control.Permalink({text: 'Permalink'}));
+		
 		L.control.locate().addTo(map);
 
 		buildLayers();
