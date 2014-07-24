@@ -78,6 +78,8 @@ var ATMMAP = {};
 			// first store all node from any ways
 			$.each(data.elements, function(index, node) {
 
+				//TODO das schließt nodes aus, die zu einem way gehören
+				// aber zusätzliche tags haben
 				if ("tags" in node) {
 					return;
 				}
@@ -111,6 +113,10 @@ var ATMMAP = {};
 					else if (node.tags.atm == "no") {
 						addBankWithNoAtmToMap(node);
 					}
+					
+					//TODO das erwischt auch die Nodes eines ways, die zusätzlich 
+					// tags haben, wie z.B. entrance
+					
 					// bank with unknown atm state
 					else {
 						addBankWithUnknownAtmToMap(node);
