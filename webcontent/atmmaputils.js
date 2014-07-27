@@ -37,12 +37,16 @@ var UTILS = {};
 		return result;
 	};
 
-	//TODO mehr Details beim Namen
-	
+	// TODO mehr Details beim Namen
+
 	UTILS.createNameFromeTags = function(node) {
 
+		var description = "???";
+
 		if (node.tags["atm:operator"]) {
-			return node.tags["atm:operator"];
+			description = "<p>";
+			description += node.tags["atm:operator"] + "<br>";
+			description += "(" + node.tags.name + ")</p>";
 		} else if (node.tags.name) {
 			return node.tags.name;
 		} else if (node.tags.operator) {
@@ -50,6 +54,8 @@ var UTILS = {};
 		} else {
 			return "???";
 		}
+
+		return description;
 	};
 
 	UTILS.addLegendTo = function(map) {
