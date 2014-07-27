@@ -27,36 +27,27 @@ var ATMMAP = {};
 	// setting the output format to json
 	ovpCall += 'data=[out:json];';
 
-	// nodes with "amenity"="atm", meaning a single atm
-	// nodes with "amenity"="bank", meaning point mapped as a bank
-	ovpCall += '(node["amenity"="atm"]BOUNDINGBOX;';
-	ovpCall += 'node["amenity"="bank"]BOUNDINGBOX;';
-
-	// for ways (most buildings) which mapped with "amenity"="bank"
-	// these ways will be send to the set bank (by '->.bank')
-	ovpCall += '(way["amenity"="bank"]BOUNDINGBOX->.bank;';
-	// then all nodes contained by found ways will be fetched (by
-	// 'node(w.bank)')
-	ovpCall += 'node(w.bank););';
-
-	// sometimes "atm"="true" could be found with other attributes than
-	// "amenity"="bank", following statement looks for such atms
-	ovpCall += '(';
-	// all things mapped with "atm"="yes"
-	ovpCall += '(node["atm"="yes"]BOUNDINGBOX; way["atm"="yes"]BOUNDINGBOX; relation["atm"="yes"]BOUNDINGBOX;);';
-	// but not with "amenity"="bank"
-	ovpCall += '- (node["amenity"="bank"]BOUNDINGBOX; way["amenity"="bank"]BOUNDINGBOX; relation["amenity"="bank"]BOUNDINGBOX;);';
+	// nodes and ways with "amenity"="bank"
+	ovpCall += '(node["amenity"="bank"]({{bbox}});';
+	ovpCall += 'way["amenity"="bank"]({{bbox}});';
+	// other objects with "atm"="yes"
+	ovpCall += '((node["atm"="yes"]({{bbox}});';
+	ovpCall += 'way["atm"="yes"]({{bbox}}););';
+	ovpCall += '-';
+	ovpCall += '(node["amenity"="bank"]({{bbox}});';
+	ovpCall += 'way["amenity"="bank"]({{bbox}}););';
 	ovpCall += ');';
-
 	// closes the atm set statement
-	ovpCall += ')';
-
+	ovpCall += ');';
 	// output statement
-	ovpCall += ';out body;';
+	ovpCall += 'out body;';
+	// all nodes needed for ways only with lat/lng sorted by place
+	ovpCall += '>;';
+	ovpCall += 'out skel qt;';
 
-	/**
-	 * private methods
-	 */
+	/** **************** */
+	/** private methods */
+	/** **************** */
 
 	var loadPois = function() {
 		var overpassCall;
@@ -65,10 +56,10 @@ var ATMMAP = {};
 			return;
 		}
 
-		// note: g in /BOUNDINGBOX/g means replace all occurrences of
+		// note: g in /{{bbox}}/g means replace all occurrences of
 		// BOUNDINGBOX not just first occurrence
-		overpassCall = ovpCall.replace(/BOUNDINGBOX/g, utils
-				.latLongToString(map.getBounds()));
+		overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map
+				.getBounds()));
 
 		console.log("calling overpass-api: " + overpassCall);
 
@@ -78,14 +69,10 @@ var ATMMAP = {};
 			// first store all node from any ways
 			$.each(data.elements, function(index, node) {
 
-				//TODO das schließt nodes aus, die zu einem way gehören
-				// aber zusätzliche tags haben
-				if ("tags" in node) {
-					return;
-				}
-
-				// all way-nodes without any tags
-				else {
+				// all nodes of type "node", some tagged nodes are necessary for
+				// building ways, not all nodes here are stored are necessary
+				// for storing
+				if (node.type == "node") {
 					wayNodeIds[node.id] = node;
 				}
 			});
@@ -113,12 +100,16 @@ var ATMMAP = {};
 					else if (node.tags.atm == "no") {
 						addBankWithNoAtmToMap(node);
 					}
-					
-					//TODO das erwischt auch die Nodes eines ways, die zusätzlich 
-					// tags haben, wie z.B. entrance
-					
+
 					// bank with unknown atm state
-					else {
+					// note: it is important to check for node.tags.amenity ==
+					// bank
+					// because the if-constructs above omits nodes which has
+					// tags but are not banks
+					// this nodes will be store in next else case, because they
+					// arre needed to build
+					// ways
+					else if (node.tags.amenity == "bank") {
 						addBankWithUnknownAtmToMap(node);
 					}
 				}
@@ -172,6 +163,11 @@ var ATMMAP = {};
 			var center;
 
 			$.each(bank.nodes, function(index, nodeId) {
+
+				if (wayNodeIds[nodeId] == undefined) {
+					console.log("wayNodeIds for " + nodeId);
+				}
+
 				areaNodes.push(L.latLng(wayNodeIds[nodeId].lat,
 						wayNodeIds[nodeId].lon));
 			});
@@ -264,14 +260,19 @@ var ATMMAP = {};
 							.join(' | ')
 				});
 
+		// Sparkasse, Rheinhausen: 49.2787364, 8.4731802
+		// Berlin: 52.516, 13.379
+
 		map = L.map('map', {
 			center : new L.LatLng(52.516, 13.379),
 			zoom : 15,
 			layers : osm
 		});
 
-		map.addControl(new L.Control.Permalink({text: 'Permalink'}));
-		
+		map.addControl(new L.Control.Permalink({
+			text : 'Permalink'
+		}));
+
 		L.control.locate().addTo(map);
 
 		buildLayers();
