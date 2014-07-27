@@ -29,14 +29,19 @@ var ATMMAP = {};
 
 	// nodes and ways with "amenity"="bank"
 	ovpCall += '(node["amenity"="bank"]({{bbox}});';
+	ovpCall += 'node["amenity"="atm"]({{bbox}});';
 	ovpCall += 'way["amenity"="bank"]({{bbox}});';
+	
 	// other objects with "atm"="yes"
 	ovpCall += '((node["atm"="yes"]({{bbox}});';
 	ovpCall += 'way["atm"="yes"]({{bbox}}););';
 	ovpCall += '-';
+	// but no banks
 	ovpCall += '(node["amenity"="bank"]({{bbox}});';
-	ovpCall += 'way["amenity"="bank"]({{bbox}}););';
-	ovpCall += ');';
+	ovpCall += 'way["amenity"="bank"]({{bbox}});';
+	ovpCall += 'node["amenity"="atm"]({{bbox}});';
+	ovpCall += '););';
+	
 	// closes the atm set statement
 	ovpCall += ');';
 	// output statement
@@ -264,7 +269,7 @@ var ATMMAP = {};
 		// Berlin: 52.516, 13.379
 
 		map = L.map('map', {
-			center : new L.LatLng(49.2787364, 8.4731802),
+			center : new L.LatLng(52.516, 13.379),
 			zoom : 15,
 			layers : osm
 		});
