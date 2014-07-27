@@ -264,7 +264,7 @@ var ATMMAP = {};
 		// Berlin: 52.516, 13.379
 
 		map = L.map('map', {
-			center : new L.LatLng(52.516, 13.379),
+			center : new L.LatLng(49.2787364, 8.4731802),
 			zoom : 15,
 			layers : osm
 		});

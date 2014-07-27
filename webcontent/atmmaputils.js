@@ -37,14 +37,13 @@ var UTILS = {};
 		return result;
 	};
 
+	//TODO mehr Details beim Namen
+	
 	UTILS.createNameFromeTags = function(node) {
 
-		// FIXME das geht nicht sollte aber
-		/*
-		 * if (node.tags.'atm:operator'){ return node.tags.'atm:operator'; }
-		 */
-
-		if (node.tags.name) {
+		if (node.tags["atm:operator"]) {
+			return node.tags["atm:operator"];
+		} else if (node.tags.name) {
 			return node.tags.name;
 		} else if (node.tags.operator) {
 			return node.tags.operator;
