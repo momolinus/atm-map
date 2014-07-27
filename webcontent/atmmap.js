@@ -9,12 +9,13 @@ var ATMMAP = {};
 	/* private attributes */
 
 	// contains the node id of the OSM objects
-	var nodeIds = {};
+	var nodeIds = {}; // JavaScript pattern: object literal
 	var wayNodeIds = {};
 	var namedGroup = {};
+
 	var operatorLayers;
 	var operatorCategories = [ "Volksbanken", "Sparkassen", "Cashgroup",
-			"andere Banken" ];
+			"andere Banken" ]; // JavaScript pattern: array literal
 	var cashGroup = [ /Commerzbank/i, /Deutsche Bank/i, /Postbank/i,
 			/Dresdner Bank/, /Comdirekt/i, /Norisbank/i, /Berliner Bank/i ];
 
@@ -22,31 +23,40 @@ var ATMMAP = {};
 
 	// building the api call for atms (automated teller machine)
 	// the overpass api URL
-	var ovpCall = 'http://overpass-api.de/api/interpreter?';
+	var ovpCall = 'http://overpass-api.de/api/interpreter?data=';
 
 	// setting the output format to json
-	ovpCall += 'data=[out:json];';
+	ovpCall += '[out:json];';
 
 	// nodes and ways with "amenity"="bank"
-	ovpCall += '(node["amenity"="bank"]({{bbox}});';
-	ovpCall += 'node["amenity"="atm"]({{bbox}});';
+	ovpCall += '(';
+	ovpCall += 'node["amenity"="bank"]({{bbox}});';
 	ovpCall += 'way["amenity"="bank"]({{bbox}});';
-	
+	ovpCall += 'node["amenity"="atm"]({{bbox}});';
+
 	// other objects with "atm"="yes"
-	ovpCall += '((node["atm"="yes"]({{bbox}});';
-	ovpCall += 'way["atm"="yes"]({{bbox}}););';
+	ovpCall += '(';
+	ovpCall += '(';
+	ovpCall += 'node["atm"="yes"]({{bbox}});';
+	ovpCall += 'way["atm"="yes"]({{bbox}});';
+	ovpCall += ');';
+	// - means difference
 	ovpCall += '-';
 	// but no banks
-	ovpCall += '(node["amenity"="bank"]({{bbox}});';
+	ovpCall += '(';
+	ovpCall += 'node["amenity"="bank"]({{bbox}});';
 	ovpCall += 'way["amenity"="bank"]({{bbox}});';
 	ovpCall += 'node["amenity"="atm"]({{bbox}});';
-	ovpCall += '););';
-	
+	ovpCall += ');';
+	ovpCall += ');';
+
 	// closes the atm set statement
 	ovpCall += ');';
+
 	// output statement
 	ovpCall += 'out body;';
-	// all nodes needed for ways only with lat/lng sorted by place
+
+	// all nodes needed for ways only with lat/lng (skel) sorted by place (qt)
 	ovpCall += '>;';
 	ovpCall += 'out skel qt;';
 
@@ -62,7 +72,7 @@ var ATMMAP = {};
 		}
 
 		// note: g in /{{bbox}}/g means replace all occurrences of
-		// BOUNDINGBOX not just first occurrence
+		// {{bbox}} not just first occurrence
 		overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map
 				.getBounds()));
 
@@ -80,6 +90,7 @@ var ATMMAP = {};
 				if (node.type == "node") {
 					wayNodeIds[node.id] = node;
 				}
+
 			});
 
 			// overpass returns a list with elements, which contains the nodes
@@ -87,35 +98,30 @@ var ATMMAP = {};
 
 				if ("tags" in node) {
 
-					if (node.id in nodeIds)
-						return;
+					if (!(node.id in nodeIds)) {
 
-					nodeIds[node.id] = true;
+						nodeIds[node.id] = true;
 
-					// bank (or anything else) with atm
-					if (node.tags.atm == "yes") {
-						addBankWithAtmToMap(node);
-					}
-					// an atm
-					else if (node.tags.amenity == "atm") {
-						addSingleAtmToMap(node);
-					}
-					// bank without atm (or anything else without atm, but this
-					// case should be very rare)
-					else if (node.tags.atm == "no") {
-						addBankWithNoAtmToMap(node);
-					}
+						// bank (or anything else) with atm
+						if (node.tags.atm == "yes") {
+							addNodeWithAtmToMap(node);
+						}
 
-					// bank with unknown atm state
-					// note: it is important to check for node.tags.amenity ==
-					// bank
-					// because the if-constructs above omits nodes which has
-					// tags but are not banks
-					// this nodes will be store in next else case, because they
-					// arre needed to build
-					// ways
-					else if (node.tags.amenity == "bank") {
-						addBankWithUnknownAtmToMap(node);
+						// an atm
+						else if (node.tags.amenity == "atm") {
+							addSingleAtmToMap(node);
+						}
+
+						// banks without atm or unknow state
+						else if (node.tags.amenity == "bank") {
+
+							if (node.tags.atm == "no") {
+								addBankWithNoAtmToMap(node);
+							} else {
+								addBankWithUnknownAtmToMap(node);
+							}
+
+						}
 					}
 				}
 			});
@@ -140,19 +146,24 @@ var ATMMAP = {};
 		addToNamedGroup(name, marker);
 	};
 
-	var addBankWithAtmToMap = function(bank) {
+	var addNodeWithAtmToMap = function(node) {
 		var name, marker;
 
-		name = utils.createNameFromeTags(bank);
-		marker = createMarker(bank, name, utils.yesAtm);
+		name = utils.createNameFromeTags(node);
+
+		if (node.tags.amenity == "bank") {
+			marker = createMarker(node, name, utils.yesAtm);
+		} else {
+			marker = createMarker(node, name, utils.atm);
+		}
 
 		addToNamedGroup(name, marker);
 	};
 
-	var createMarker = function(bank, name, atmIcon) {
+	var createMarker = function(node, name, atmIcon) {
 
-		if (bank.type == "node") {
-			var marker = L.marker([ bank.lat, bank.lon ], {
+		if (node.type == "node") {
+			var marker = L.marker([ node.lat, node.lon ], {
 				icon : atmIcon
 			});
 
@@ -160,14 +171,14 @@ var ATMMAP = {};
 
 			return marker;
 
-		} else if (bank.type == "way") {
+		} else if (node.type == "way") {
 			var areaNodes = new Array();
 			var bankArea;
 			var marker = null;
 			var bounds;
 			var center;
 
-			$.each(bank.nodes, function(index, nodeId) {
+			$.each(node.nodes, function(index, nodeId) {
 
 				if (wayNodeIds[nodeId] == undefined) {
 					console.log("wayNodeIds for " + nodeId);

@@ -1,7 +1,6 @@
 /**
  * @author Marcus
  */
-
 var UTILS = {};
 
 (function() {
@@ -37,22 +36,34 @@ var UTILS = {};
 		return result;
 	};
 
-	// TODO mehr Details beim Namen
-
 	UTILS.createNameFromeTags = function(node) {
 
-		var description = "???";
+		var description = '???';
 
+		// atm usually not in bank
 		if (node.tags["atm:operator"]) {
-			description = "<p>";
-			description += node.tags["atm:operator"] + "<br>";
-			description += "(" + node.tags.name + ")</p>";
-		} else if (node.tags.name) {
-			return node.tags.name;
-		} else if (node.tags.operator) {
-			return node.tags.operator;
-		} else {
-			return "???";
+
+			description = '<p style="text-align: center;">';
+			description += '<span style="font-weight: bold;">'
+					+ node.tags["atm:operator"] + '</span>';
+
+			if (node.tags.name) {
+				description += '<br>(' + node.tags.name + ')</p>';
+			} else {
+				description += '</p>';
+			}
+		}
+
+		// usually a bank or an single atm
+		else if (node.tags.name) {
+			description = '<p style="text-align: center;">';
+			description += node.tags.name + '</p>';
+		}
+
+		// "operator" often used instead of "name"
+		else if (node.tags.operator) {
+			description = '<p style="text-align: center;">';
+			description += node.tags.operator + '</p>';
 		}
 
 		return description;
@@ -109,7 +120,7 @@ var UTILS = {};
 			table += '</td>';
 			table += '</tr>';
 			table += '</table>';
-			table += '<p><a href="https://github.com/momolinus/atm-map">Sourcecode der Karte</a></p>';
+			table += '<p><a href="https://github.com/momolinus/atm-map">Sourcecode der Karte</a>, Version 1.0</p>';
 			table += '</div>';
 
 			div.innerHTML += table;

@@ -9,3 +9,7 @@ icons used by this project:
 locatecontrol: https://github.com/domoritz/leaflet-locatecontrol
 
 permalink: https://github.com/shramov/leaflet-plugins
+
+
+27.07.2014 Version 1.0
+- fixed error with "way-nodes" has individual tags
