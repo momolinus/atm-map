@@ -17,7 +17,8 @@
 
 
 <!-- <script type="text/javascript" src="lib/jquery-1.10.2.js"></script>  -->
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
 <link rel="stylesheet"
 	href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />
@@ -29,6 +30,11 @@
 		<![endif]-->
 <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
 <script type="text/javascript" src="L.Control.Locate.js"></script>
+
+<script src="permalink/Permalink.js"></script>
+<script src="permalink/Permalink.Marker.js"></script>
+<script src="permalink/Permalink.Layer.js"></script>
+
 <script type="text/javascript" src="atmmaputils.js"></script>
 <script type="text/javascript" src="atmmap.js"></script>
 
@@ -41,9 +47,9 @@ body {
 .legend {
 	font-size: small;
 	border-radius: 5px;
-    box-shadow: 0 1px 7px rgba(0, 0, 0, 0.4);
-    background-color: white;
-    padding: 6px 10px 6px 6px;
+	box-shadow: 0 1px 7px rgba(0, 0, 0, 0.4);
+	background-color: white;
+	padding: 6px 10px 6px 6px;
 }
 
 .legend img {
@@ -52,7 +58,7 @@ body {
 	
 }
 
-html,body,#map {
+html, body, #map {
 	height: 100%;
 }
 </style>
@@ -62,7 +68,7 @@ html,body,#map {
 	<div id="map">&nbsp;</div>
 
 	<script type="text/javascript">
-	$(document).ready(ATMMAP.initMap());
-    </script>
+		$(document).ready(ATMMAP.initMap());
+	</script>
 </body>
 </html>

@@ -19,3 +19,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+*** except for for ***
+
+L.Control.Locate.js
+L.Control.Locate.ie.css
+L.Control.Locate.css
+L.Control.Locate.0.5.css
+Permalink.js
+Permalink.Layer.js
+Permalink.Marker.js
+
+which have own license in file headers 
