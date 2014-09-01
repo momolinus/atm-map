@@ -290,7 +290,8 @@ var ATMMAP = {};
 		});
 
 		map.addControl(new L.Control.Permalink({
-			text : 'Permalink'
+			text : 'Permalink',
+			position : 'bottomright',
 		}));
 
 		L.control.locate().addTo(map);
