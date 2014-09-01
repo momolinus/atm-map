@@ -16,7 +16,7 @@ var ATMMAP = {};
 	var operatorLayers;
 	var operatorCategories = [ "Volksbanken", "Sparkassen", "Cashgroup",
 			"andere Banken" ]; // JavaScript pattern: array literal
-	var cashGroup = [ /Commerzbank/i, /Deutsche Bank/i, /Postbank/i,
+	var cashGroup = [ /Commerzbank/i, /Deutsche Bank/i, /Postbank/i, /Post/i,
 			/Dresdner Bank/, /Comdirekt/i, /Norisbank/i, /Berliner Bank/i ];
 
 	var map = null;
