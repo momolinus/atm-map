@@ -29,5 +29,7 @@ L.Control.Locate.0.5.css
 Permalink.js
 Permalink.Layer.js
 Permalink.Marker.js
+leaflet.photon.css
+leaflet.photon.js
 
-which have own license in file headers 
+which have own license in file headers or in folders
