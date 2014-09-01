@@ -262,6 +262,10 @@ var ATMMAP = {};
 		loadPois();
 	};
 
+	var photonSearchAction = function photonSearchAction(geojson) {
+		console.debug(geojson);
+	};
+
 	// public interface
 	ATMMAP.initMap = function() {
 		var attr_osm, attr_overpass, attr_icons, osm;
@@ -290,6 +294,14 @@ var ATMMAP = {};
 		}));
 
 		L.control.locate().addTo(map);
+
+		map.addControl(new L.Control.Photon({
+			resultsHandler : photonSearchAction,
+			placeholder : 'Suche ...',
+			position : 'topleft',
+			emptyMessage: "Nichts gefunden",
+			noResultLabel: "kein Ergebnis"
+		}));
 
 		buildLayers();
 
