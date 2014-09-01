@@ -1,5 +1,4 @@
-atm-map
-=======
+# atm-map
 
 check out the <a href="http://www.marcusbleil.de/m/">demo</a>
 
@@ -10,6 +9,16 @@ locatecontrol: https://github.com/domoritz/leaflet-locatecontrol
 
 permalink: https://github.com/shramov/leaflet-plugins
 
+Photon search plugin: https://github.com/komoot/leaflet.photon
 
-27.07.2014 Version 1.0
-- fixed error with "way-nodes" has individual tags
+## Version 1.1
+
+published 01.09.2014
+
+-some enhancement
+
+## Version 1.0
+
+published 27.07.2014
+
+-fixed error with "way-nodes" has individual tags
