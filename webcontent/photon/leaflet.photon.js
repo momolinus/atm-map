@@ -1,18 +1,66 @@
+L.PhotonBase = L.Class.extend({
 
-L.Control.Photon = L.Control.extend({
+    forEach: function (els, callback) {
+        Array.prototype.forEach.call(els, callback);
+    },
+
+    ajax: function (callback, thisobj) {
+        if (typeof this.xhr === 'object') {
+            this.xhr.abort();
+        }
+        this.xhr = new XMLHttpRequest();
+        var self = this;
+        this.xhr.open('GET', this.options.url + this.buildQueryString(this.getParams()), true);
+
+        this.xhr.onload = function(e) {
+            self.fire('ajax:return');
+            if (this.status == 200) {
+                if (callback) {
+                    var raw = this.response;
+                    raw = JSON.parse(raw);
+                    callback.call(thisobj || this, raw);
+                }
+            }
+            delete this.xhr;
+        };
+
+        this.fire('ajax:send');
+        this.xhr.send();
+    },
+
+    buildQueryString: function (params) {
+        var query_string = [];
+        for (var key in params) {
+            if (params[key]) {
+                query_string.push(encodeURIComponent(key) + '=' + encodeURIComponent(params[key]));
+            }
+        }
+        return query_string.join('&');
+    },
+
+    featureToPopupContent: function (feature) {
+        var container = L.DomUtil.create('div', 'leaflet-photon-popup'),
+            title = L.DomUtil.create('h3', '', container);
+        title.innerHTML = feature.properties.label;
+        return container;
+    }
+
+});
+
+
+L.PhotonSearch = L.PhotonBase.extend({
 
     includes: L.Mixin.Events,
 
     options: {
         url: 'http://photon.komoot.de/api/?',
-        placeholder: "Start typing...",
-        emptyMessage: "No result",
+        placeholder: 'Start typing...',
         minChar: 3,
         limit: 5,
         submitDelay: 300,
         includePosition: true,
-        noResultLabel: "No result",
-        feedbackEmail: "photon@komoot.de" // Set to null to remove feedback box
+        noResultLabel: 'No result',
+        feedbackEmail: 'photon@komoot.de'  // Set to null to remove feedback box
     },
 
     CACHE: '',
@@ -31,20 +79,19 @@ L.Control.Photon = L.Control.extend({
         CTRL: 18
     },
 
-    onAdd: function (map, options) {
+    initialize: function (map, input, options) {
         this.map = map;
-        this.container = L.DomUtil.create('div', 'leaflet-photon');
-
-        this.options = L.Util.extend(this.options, options);
+        this.input = input;
+        L.setOptions(this, options);
         var CURRENT = null;
 
         try {
-            Object.defineProperty(this, "CURRENT", {
+            Object.defineProperty(this, 'CURRENT', {
                 get: function () {
                     return CURRENT;
                 },
                 set: function (index) {
-                    if (typeof index === "object") {
+                    if (typeof index === 'object') {
                         index = this.resultToIndex(index);
                     }
                     CURRENT = index;
@@ -53,14 +100,6 @@ L.Control.Photon = L.Control.extend({
         } catch (e) {
             // Hello IE8
         }
-
-        this.createInput();
-        this.createResultsContainer();
-        return this.container;
-    },
-
-    createInput: function () {
-        this.input = L.DomUtil.create('input', 'photon-input', this.container);
         this.input.type = 'text';
         this.input.placeholder = this.options.placeholder;
         this.input.autocomplete = 'off';
@@ -70,6 +109,7 @@ L.Control.Photon = L.Control.extend({
         L.DomEvent.on(this.input, 'keyup', this.onKeyUp, this);
         L.DomEvent.on(this.input, 'blur', this.onBlur, this);
         L.DomEvent.on(this.input, 'focus', this.onFocus, this);
+        this.createResultsContainer();
     },
 
     createResultsContainer: function () {
@@ -83,7 +123,7 @@ L.Control.Photon = L.Control.extend({
         this.resultsContainer.style.left = l + 'px';
         this.resultsContainer.style.top = t + 'px';
         var width = this.options.width ? this.options.width : this.input.offsetWidth - 2;
-        this.resultsContainer.style.width = width + "px";
+        this.resultsContainer.style.width = width + 'px';
     },
 
     onKeyDown: function (e) {
@@ -149,7 +189,7 @@ L.Control.Photon = L.Control.extend({
         ];
         if (special.indexOf(e.keyCode) === -1)
         {
-            if (typeof this.submitDelay === "number") {
+            if (typeof this.submitDelay === 'number') {
                 window.clearTimeout(this.submitDelay);
                 delete this.submitDelay;
             }
@@ -187,7 +227,8 @@ L.Control.Photon = L.Control.extend({
         choice = choice || this.RESULTS[this.CURRENT];
         if (choice) {
             this.hide();
-            this.input.value = "";
+            this.input.value = '';
+            this.fire('selected', {choice: choice.feature});
             this.onSelected(choice.feature);
         }
     },
@@ -208,11 +249,11 @@ L.Control.Photon = L.Control.extend({
         else {
             this.CACHE = val;
         }
-        this._do_search(val);
+        this._do_search();
     },
 
-    _do_search: function (val) {
-        this.ajax(val, this.handleResults, this);
+    _do_search: function () {
+        this.ajax(this.handleResults, this);
     },
 
     _onSelected: function (feature) {
@@ -226,13 +267,14 @@ L.Control.Photon = L.Control.extend({
     _formatResult: function (feature, el) {
         var title = L.DomUtil.create('strong', '', el),
             detailsContainer = L.DomUtil.create('small', '', el),
-            details = [];
+            details = [],
+            type = this.formatType(feature);
         title.innerHTML = feature.properties.name;
-        details.push(this.formatType(feature));
+        if (type) details.push(type);
         if (feature.properties.city && feature.properties.city !== feature.properties.name) {
             details.push(feature.properties.city);
         }
-        details.push(feature.properties.country);
+        if (feature.properties.country) details.push(feature.properties.country);
         detailsContainer.innerHTML = details.join(', ');
     },
 
@@ -280,7 +322,7 @@ L.Control.Photon = L.Control.extend({
     handleResults: function(geojson) {
         var self = this;
         this.clear();
-        this.resultsContainer.style.display = "block";
+        this.resultsContainer.style.display = 'block';
         this.resizeContainer();
         this.forEach(geojson.features, function (feature, index) {
             self.RESULTS.push(self.createResult(feature));
@@ -291,8 +333,8 @@ L.Control.Photon = L.Control.extend({
         }
         if (this.options.feedbackEmail) {
             var feedback = L.DomUtil.create('a', 'photon-feedback', this.resultsContainer);
-            feedback.href = "mailto:" + this.options.feedbackEmail;
-            feedback.innerHTML = "Feedback";
+            feedback.href = 'mailto:' + this.options.feedbackEmail;
+            feedback.innerHTML = 'Feedback';
         }
         this.CURRENT = 0;
         this.highlight();
@@ -333,50 +375,46 @@ L.Control.Photon = L.Control.extend({
         return tmp;
     },
 
-    forEach: function (els, callback) {
-        Array.prototype.forEach.call(els, callback);
-    },
-
-    ajax: function (val, callback, thisobj) {
-        if (typeof this.xhr === "object") {
-            this.xhr.abort();
-        }
-        this.xhr = new XMLHttpRequest(),
-            params = {
-                q: val,
-                lang: this.options.lang,
-                limit: this.options.limit,
-                lat: this.options.includePosition ? this.map.getCenter().lat : null,
-                lon: this.options.includePosition ? this.map.getCenter().lng : null
-            }, self = this;
-        this.xhr.open('GET', this.options.url + this.buildQueryString(params), true);
-        this.xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-
-        this.xhr.onload = function(e) {
-            self.fire('ajax:return');
-            if (this.status == 200) {
-                if (callback) {
-                    var raw = this.response;
-                    raw = JSON.parse(raw);
-                    callback.call(thisobj || this, raw);
-                }
-            }
-            delete this.xhr;
+    getParams: function () {
+        return {
+            q: this.CACHE,
+            lang: this.options.lang,
+            limit: this.options.limit,
+            lat: this.options.includePosition ? this.map.getCenter().lat : null,
+            lon: this.options.includePosition ? this.map.getCenter().lng : null
         };
+    }
 
-        this.fire('ajax:send');
-        this.xhr.send();
+});
+
+
+L.Control.Photon = L.Control.extend({
+
+    includes: L.Mixin.Events,
+
+    onAdd: function (map, options) {
+        this.map = map;
+        this.container = L.DomUtil.create('div', 'leaflet-photon');
+
+        this.options = L.Util.extend(this.options, options);
+
+        this.input = L.DomUtil.create('input', 'photon-input', this.container);
+        this.search = new L.PhotonSearch(map, this.input, this.options);
+        this.search.on('blur', this.forwardEvent, this);
+        this.search.on('focus', this.forwardEvent, this);
+        this.search.on('hide', this.forwardEvent, this);
+        this.search.on('selected', this.forwardEvent, this);
+        this.search.on('ajax:send', this.forwardEvent, this);
+        this.search.on('ajax:return', this.forwardEvent, this);
+        return this.container;
     },
 
-    buildQueryString: function (params) {
-        var query_string = [];
-        for (var key in params) {
-            if (params[key]) {
-                query_string.push(encodeURIComponent(key) + "=" + encodeURIComponent(params[key]));
-            }
-        }
-        return query_string.join('&');
+    // TODO onRemove
+
+    forwardEvent: function (e) {
+        this.fire(e.type, e);
     }
+
 
 });
 
@@ -385,4 +423,44 @@ L.Map.addInitHook(function () {
         this.photonControl = new L.Control.Photon(this.options.photonControlOptions || {});
         this.addControl(this.photonControl);
     }
+});
+
+L.PhotonReverse = L.PhotonBase.extend({
+
+    includes: L.Mixin.Events,
+
+    options: {
+        url: 'http://photon.komoot.de/reverse/?',
+        limit: 1,
+        handleResults: null
+    },
+
+    initialize: function (options) {
+        L.setOptions(this, options);
+    },
+
+    doReverse: function (latlng) {
+        latlng = L.latLng(latlng);
+        this.fire('reverse', {latlng: latlng});
+        this.latlng = latlng;
+        this.ajax(this.handleResults, this);
+    },
+
+    _handleResults: function (data) {
+        console.log(data);
+    },
+
+    handleResults: function (data) {
+        return (this.options.handleResults || this._handleResults).call(this, data);
+    },
+
+    getParams: function () {
+        return {
+            lang: this.options.lang,
+            limit: this.options.limit,
+            lat: this.latlng.lat,
+            lon: this.latlng.lng
+        };
+    }
+
 });
