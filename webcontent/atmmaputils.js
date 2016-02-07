@@ -82,7 +82,7 @@ var UTILS = {};
 			var table = '';
 
 			table += '<p id="legend_but" style="cursor: pointer">Legende (+/-):</p>';
-			table += '<div id="legend_table">'
+			table += '<div id="legend_table">';
 			table += '<table>';
 			table += '<tr>';
 			table += '<td>';
