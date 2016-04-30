@@ -23,7 +23,9 @@ icons used by this project:
 published 30.4,2016
 
 - updated to leaflet v0.7.7
-- updated to jquery
+- updated to jquery 1.12.2
+- added opening hours
+
 ## Version 1.2
 
 published 8.2.2015
