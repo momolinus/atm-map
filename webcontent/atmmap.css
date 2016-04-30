@@ -1,0 +1,22 @@
+.bank_name {
+	text-align: center;
+	font-weight: bold;
+	font-size: large;
+}
+
+.bank_subname {
+	font-weight: bold;
+	font-size: small;
+}
+
+.leaflet-popup-content p {
+	/*origin value:*/
+	/*margin: 18px 0;*/
+	margin: 5px 0;
+}
+
+.opening_hour {
+	text-align: center;
+	font-style: italic;
+	font-size: small;
+}
