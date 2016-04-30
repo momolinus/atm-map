@@ -38,17 +38,17 @@ var UTILS = {};
 
 	UTILS.createNameFromeTags = function(node) {
 
-		var description = '???';
+		var description = '<p class="bank_name">???</p>';
 
 		// atm usually not in bank
 		if (node.tags["atm:operator"]) {
 
-			description = '<p style="text-align: center;">';
-			description += '<span style="font-weight: bold;">'
-					+ node.tags["atm:operator"] + '</span>';
+			description = '<p class="bank_name">';
+			description += node.tags["atm:operator"];
 
 			if (node.tags.name) {
-				description += '<br>(' + node.tags.name + ')</p>';
+				description += '<br><span class="bank_subname">(';
+				description += node.tags.name + ')</span></p>';
 			} else {
 				description += '</p>';
 			}
@@ -56,16 +56,23 @@ var UTILS = {};
 
 		// usually a bank or an single atm
 		else if (node.tags.name) {
-			description = '<p style="text-align: center;">';
+			description = '<p class="bank_name">';
 			description += node.tags.name + '</p>';
 		}
 
 		// "operator" often used instead of "name"
 		else if (node.tags.operator) {
-			description = '<p style="text-align: center;">';
+			description = '<p class="bank_name">';
 			description += node.tags.operator + '</p>';
 		}
 
+		if (node.tags.opening_hours) {
+			description += '<p class="opening_hour">';
+			description += node.tags.opening_hours + '</p>';
+		} else {
+			description += '<p class="opening_hour">';
+			description += 'keine Öffnungszeiten angegeben</p>';
+		}
 		return description;
 	};
 
@@ -82,7 +89,7 @@ var UTILS = {};
 			var table = '';
 
 			table += '<p id="legend_but" style="cursor: pointer">Legende (+/-):</p>';
-			table += '<div id="legend_table">'
+			table += '<div id="legend_table">';
 			table += '<table>';
 			table += '<tr>';
 			table += '<td>';
@@ -120,7 +127,7 @@ var UTILS = {};
 			table += '</td>';
 			table += '</tr>';
 			table += '</table>';
-			table += '<p><a href="https://github.com/momolinus/atm-map">Sourcecode der Karte</a>, Version 1.2</p>';
+			table += '<p><a href="https://github.com/momolinus/atm-map">Sourcecode der Karte</a>, Version 1.3</p>';
 			table += '</div>';
 
 			div.innerHTML += table;
