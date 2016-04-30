@@ -5,19 +5,13 @@ var ATMMAP = {};
 
 	// dependencies
 	utils = UTILS;
+	layerBuilder = LAYER_BUILDER;
 
 	/* private attributes */
 
 	// contains the node id of the OSM objects
 	var nodeIds = {}; // JavaScript pattern: object literal
 	var wayNodeIds = {};
-	var namedGroup = {};
-
-	var operatorLayers;
-	var operatorCategories = [ "Volksbanken", "Sparkassen", "Cashgroup",
-			"andere Banken" ]; // JavaScript pattern: array literal
-	var cashGroup = [ /Commerzbank/i, /Deutsche Bank/i, /Postbank/i, /Post/i,
-			/Dresdner Bank/, /Comdirekt/i, /Norisbank/i, /Berliner Bank/i ];
 
 	var map = null;
 
@@ -59,6 +53,53 @@ var ATMMAP = {};
 	// all nodes needed for ways only with lat/lng (skel) sorted by place (qt)
 	ovpCall += '>;';
 	ovpCall += 'out skel qt;';
+
+	// public interface
+	ATMMAP.initMap = function() {
+		var attr_osm, attr_overpass, attr_icons, osm;
+
+		attr_osm = 'Map data &copy; <a href="http://openstreetmap.org/">OpenStreetMap</a> contributors';
+		attr_overpass = '<br>POIs via <a href="http://www.overpass-api.de/">Overpass API</a>';
+		attr_icons = 'Icons by <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a> <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY SA 3.0</a>';
+
+		osm = new L.TileLayer(
+				'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+					attribution : [ attr_osm, attr_overpass, attr_icons ]
+							.join(' | ')
+				});
+
+		// Sparkasse, Rheinhausen: 49.2787364, 8.4731802
+		// Berlin: 52.516, 13.379
+
+		map = L.map('map', {
+			center : new L.LatLng(52.516, 13.379),
+			zoom : 15,
+			layers : osm
+		});
+
+		map.addControl(new L.Control.Permalink({
+			text : 'Permalink',
+			position : 'bottomright',
+		}));
+
+		L.control.locate().addTo(map);
+
+		map.addControl(new L.Control.Photon({
+			resultsHandler : photonSearchAction,
+			placeholder : 'Suche ...',
+			position : 'topleft',
+			emptyMessage : "Nichts gefunden",
+			noResultLabel : "kein Ergebnis"
+		}));
+
+		layerBuilder.buildLayers(map);
+
+		utils.addLegendTo(map);
+
+		loadPois();
+
+		map.on('moveend', moveEnd);
+	};
 
 	/** **************** */
 	/** private methods */
@@ -218,45 +259,17 @@ var ATMMAP = {};
 	var addToNamedGroup = function(name, marker) {
 		var group, agregatedName;
 
-		agregatedName = agregateName(name);
+		agregatedName = layerBuilder.agregateName(name);
 
 		try {
-			group = namedGroup[agregatedName];
+			group = layerBuilder.namedGroup(agregatedName);
 			group.addLayer(marker);
 		} catch (e) {
 
 		}
 	};
 
-	var buildLayers = function() {
-		var group;
 
-		operatorLayers = L.control.layers(null, null, {
-			collapsed : false
-		}).addTo(map);
-
-		for (var i = 0; i < operatorCategories.length; i++) {
-			group = L.layerGroup();
-			group.addTo(map);
-			namedGroup[operatorCategories[i]] = group;
-			operatorLayers.addOverlay(group, operatorCategories[i]);
-		}
-	};
-
-	var agregateName = function(name) {
-		if (name.search(/Volksbank/i) > -1) {
-			return operatorCategories[0];
-		} else if (name.search(/Sparkasse/i) > -1) {
-			return operatorCategories[1];
-		} else {
-			for (var i = 0; i < cashGroup.length; i++) {
-				if (name.search(cashGroup[i]) > -1) {
-					return operatorCategories[2];
-				}
-			}
-		}
-		return operatorCategories[3];
-	};
 
 	var moveEnd = function() {
 		loadPois();
@@ -264,53 +277,6 @@ var ATMMAP = {};
 
 	var photonSearchAction = function photonSearchAction(geojson) {
 		console.debug(geojson);
-	};
-
-	// public interface
-	ATMMAP.initMap = function() {
-		var attr_osm, attr_overpass, attr_icons, osm;
-
-		attr_osm = 'Map data &copy; <a href="http://openstreetmap.org/">OpenStreetMap</a> contributors';
-		attr_overpass = '<br>POIs via <a href="http://www.overpass-api.de/">Overpass API</a>';
-		attr_icons = 'Icons by <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a> <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY SA 3.0</a>';
-
-		osm = new L.TileLayer(
-				'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-					attribution : [ attr_osm, attr_overpass, attr_icons ]
-							.join(' | ')
-				});
-
-		// Sparkasse, Rheinhausen: 49.2787364, 8.4731802
-		// Berlin: 52.516, 13.379
-
-		map = L.map('map', {
-			center : new L.LatLng(52.516, 13.379),
-			zoom : 15,
-			layers : osm
-		});
-
-		map.addControl(new L.Control.Permalink({
-			text : 'Permalink',
-			position : 'bottomright',
-		}));
-
-		L.control.locate().addTo(map);
-
-		map.addControl(new L.Control.Photon({
-			resultsHandler : photonSearchAction,
-			placeholder : 'Suche ...',
-			position : 'topleft',
-			emptyMessage: "Nichts gefunden",
-			noResultLabel: "kein Ergebnis"
-		}));
-
-		buildLayers();
-
-		utils.addLegendTo(map);
-
-		loadPois();
-
-		map.on('moveend', moveEnd);
 	};
 
 })();
