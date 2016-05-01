@@ -6,7 +6,7 @@ icons used by this project:
 <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a> <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY SA 3.0</a>
 
 - map framework: http://leafletjs.com/
-- JavaScript framework:
+- JavaScript framework: https://jquery.com/
 
 ## Plugins
 
