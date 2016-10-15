@@ -13,9 +13,24 @@ check out the <a href="http://www.marcusbleil.de/m/">demo</a>
 
 - permalink: https://github.com/shramov/leaflet-plugins
 
-- Photon search plugin: https://github.com/komoot/leaflet.photon
+- ~~Photon search plugin: https://github.com/komoot/leaflet.photon~~
+
+- ~~Geodocder: https://github.com/k4r573n/leaflet-control-osm-geocoder~~
+
+- Geodocder: https://github.com/smeijer/L.GeoSearch
 
 # Releases
+
+## Version 1.4 RC
+
+published 15.10.2016
+
+check out the <a href="http://www.marcusbleil.de/m/rc">release canditate</a>
+
+- update to leaflet 1.0.1
+- update to jquery 3.1.1
+- libraries used from local now
+- new geocoder: L.GeoSearch
 
 ## Version 1.3
 

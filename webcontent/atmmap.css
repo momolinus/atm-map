@@ -20,3 +20,9 @@
 	font-style: italic;
 	font-size: small;
 }
+
+.details {
+	font-style: italic;
+	font-size: smaller;
+	color: DarkGrey;
+}

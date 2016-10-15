@@ -84,13 +84,20 @@ var ATMMAP = {};
 
 		L.control.locate().addTo(map);
 
-		map.addControl(new L.Control.Photon({
-			resultsHandler : photonSearchAction,
-			placeholder : 'Suche ...',
-			position : 'topleft',
-			emptyMessage : "Nichts gefunden",
-			noResultLabel : "kein Ergebnis"
-		}));
+		
+		/*
+		 * map.addControl(new L.Control.Photon({ resultsHandler :
+		 * photonSearchAction, placeholder : 'Suche ...', position : 'topleft',
+		 * emptyMessage : "Nichts gefunden", noResultLabel : "kein Ergebnis"
+		 * }));
+		 */
+		
+		new L.Control.GeoSearch({
+		    provider: new L.GeoSearch.Provider.OpenStreetMap(),
+		    position: 'topleft',
+		    showMarker: true,
+		    retainZoomLevel: false,
+		}).addTo(map);
 
 		layerBuilder.buildLayers(map);
 
@@ -172,25 +179,25 @@ var ATMMAP = {};
 	var addBankWithNoAtmToMap = function(bank) {
 		var name, marker;
 
-		name = utils.createNameFromeTags(bank);
+		name = utils.createDescriptionFromeTags(bank);
 		marker = createMarker(bank, name, utils.noAtm);
 
-		addToNamedGroup(name, marker);
+		addToNamedGroups(bank, marker);
 	};
 
 	var addBankWithUnknownAtmToMap = function(bank) {
 		var name, marker;
 
-		name = utils.createNameFromeTags(bank);
+		name = utils.createDescriptionFromeTags(bank);
 		marker = createMarker(bank, name, utils.unknownAtm);
 
-		addToNamedGroup(name, marker);
+		addToNamedGroups(bank, marker);
 	};
 
 	var addNodeWithAtmToMap = function(node) {
 		var name, marker;
 
-		name = utils.createNameFromeTags(node);
+		name = utils.createDescriptionFromeTags(node);
 
 		if (node.tags.amenity == "bank") {
 			marker = createMarker(node, name, utils.yesAtm);
@@ -198,7 +205,7 @@ var ATMMAP = {};
 			marker = createMarker(node, name, utils.atm);
 		}
 
-		addToNamedGroup(name, marker);
+		addToNamedGroups(node, marker);
 	};
 
 	var createMarker = function(node, name, atmIcon) {
@@ -248,28 +255,21 @@ var ATMMAP = {};
 	var addSingleAtmToMap = function(atm) {
 		var name, marker;
 
-		name = utils.createNameFromeTags(atm);
+		name = utils.createDescriptionFromeTags(atm);
 		marker = L.marker([ atm.lat, atm.lon ], {
 			icon : utils.atm
 		}).bindPopup(name);
 
-		addToNamedGroup(name, marker);
+		addToNamedGroups(atm, marker);
 	};
 
-	var addToNamedGroup = function(name, marker) {
-		var group, agregatedName;
-
-		agregatedName = layerBuilder.agregateName(name);
-
+	var addToNamedGroups = function(node, marker) {
 		try {
-			group = layerBuilder.namedGroup(agregatedName);
-			group.addLayer(marker);
+			layerBuilder.addToNamedGroups(node, marker);
 		} catch (e) {
-
+			console.debug(e);
 		}
 	};
-
-
 
 	var moveEnd = function() {
 		loadPois();

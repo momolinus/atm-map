@@ -24,7 +24,8 @@ var map = L.map('map', {
 - `url` URL of the Photon API to use. *Default: 'http://photon.komoot.de/api/?'*
 - `placeholder` Placeholder of the search input. *Default: "Start typing..."*
 - `noResultLabel` Message to display when no result has been found. *Default: "No result"*
-- `minChar` Min char to be typed before actually searching. *Default: 3*
+- `minChar` Min char to be typed before actually searching (can be a function that
+   takes the val as parameter and must return a boolean). *Default: 3*
 - `limit` Number of results max to return from API. *Default: 5*
 - `submitDelay` Min time buffer between to sent request, to avoid too much
   requests when typing fast (in milliseconds). *Default: 300*
@@ -32,6 +33,7 @@ var map = L.map('map', {
   for the search. *Default: true*
 - `feedbackEmail` Email to use as feedback link. Set to null to disable the
   feedback box. *Default: "photon@komoot.de"*
+- `feedbackLabel` Message for feedback link. *Default: "Feedback"*
 - `lang` land code (en, it, fr…) to send to Photon API. *Default: null*
 - `onSelected` Action to run when user select a search result. *Default: center
   map on selected result's latlng*
