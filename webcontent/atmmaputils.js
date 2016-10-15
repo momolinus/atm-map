@@ -36,7 +36,7 @@ var UTILS = {};
 		return result;
 	};
 
-	UTILS.createNameFromeTags = function(node) {
+	UTILS.createDescriptionFromeTags = function(node) {
 
 		var description = '<p class="bank_name">???</p>';
 
@@ -73,9 +73,11 @@ var UTILS = {};
 			description += '<p class="opening_hour">';
 			description += 'keine Öffnungszeiten angegeben</p>';
 		}
+		
 		return description;
 	};
-
+	
+	
 	UTILS.addLegendTo = function(map) {
 
 		var legend = L.control({
