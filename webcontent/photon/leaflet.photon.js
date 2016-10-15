@@ -14,7 +14,7 @@ L.PhotonBase = L.Class.extend({
 
         this.xhr.onload = function(e) {
             self.fire('ajax:return');
-            if (this.status == 200) {
+            if (this.status === 200) {
                 if (callback) {
                     var raw = this.response;
                     raw = JSON.parse(raw);
@@ -29,13 +29,13 @@ L.PhotonBase = L.Class.extend({
     },
 
     buildQueryString: function (params) {
-        var query_string = [];
+        var queryString = [];
         for (var key in params) {
             if (params[key]) {
-                query_string.push(encodeURIComponent(key) + '=' + encodeURIComponent(params[key]));
+                queryString.push(encodeURIComponent(key) + '=' + encodeURIComponent(params[key]));
             }
         }
-        return query_string.join('&');
+        return queryString.join('&');
     },
 
     featureToPopupContent: function (feature) {
@@ -60,7 +60,8 @@ L.PhotonSearch = L.PhotonBase.extend({
         submitDelay: 300,
         includePosition: true,
         noResultLabel: 'No result',
-        feedbackEmail: 'photon@komoot.de'  // Set to null to remove feedback box
+        feedbackEmail: 'photon@komoot.de',  // Set to null to remove feedback box
+        feedbackLabel: 'Feedback'
     },
 
     CACHE: '',
@@ -100,13 +101,14 @@ L.PhotonSearch = L.PhotonBase.extend({
         } catch (e) {
             // Hello IE8
         }
-        this.input.type = 'text';
+        this.input.type = 'search';
         this.input.placeholder = this.options.placeholder;
         this.input.autocomplete = 'off';
+        this.input.autocorrect = 'off';
         L.DomEvent.disableClickPropagation(this.input);
 
         L.DomEvent.on(this.input, 'keydown', this.onKeyDown, this);
-        L.DomEvent.on(this.input, 'keyup', this.onKeyUp, this);
+        L.DomEvent.on(this.input, 'input', this.onInput, this);
         L.DomEvent.on(this.input, 'blur', this.onBlur, this);
         L.DomEvent.on(this.input, 'focus', this.onFocus, this);
         this.createResultsContainer();
@@ -174,27 +176,12 @@ L.PhotonSearch = L.PhotonBase.extend({
         }
     },
 
-    onKeyUp: function (e) {
-        var special = [
-            this.KEYS.TAB,
-            this.KEYS.RETURN,
-            this.KEYS.LEFT,
-            this.KEYS.RIGHT,
-            this.KEYS.DOWN,
-            this.KEYS.UP,
-            this.KEYS.APPLE,
-            this.KEYS.SHIFT,
-            this.KEYS.ALT,
-            this.KEYS.CTRL
-        ];
-        if (special.indexOf(e.keyCode) === -1)
-        {
-            if (typeof this.submitDelay === 'number') {
-                window.clearTimeout(this.submitDelay);
-                delete this.submitDelay;
-            }
-            this.submitDelay = window.setTimeout(L.Util.bind(this.search, this), this.options.submitDelay);
+    onInput: function (e) {
+        if (typeof this.submitDelay === 'number') {
+            window.clearTimeout(this.submitDelay);
+            delete this.submitDelay;
         }
+        this.submitDelay = window.setTimeout(L.Util.bind(this.search, this), this.options.submitDelay);
     },
 
     onBlur: function (e) {
@@ -208,6 +195,7 @@ L.PhotonSearch = L.PhotonBase.extend({
     onFocus: function (e) {
         this.fire('focus');
         this.input.select();
+        this.search();  // In case we have a value from a previous search.
     },
 
     clear: function () {
@@ -224,35 +212,25 @@ L.PhotonSearch = L.PhotonBase.extend({
     },
 
     setChoice: function (choice) {
-        choice = choice || this.RESULTS[this.CURRENT];
+        choice = choice || this.RESULTS[this.CURRENT];
         if (choice) {
             this.hide();
-            this.input.value = '';
             this.fire('selected', {choice: choice.feature});
             this.onSelected(choice.feature);
+            this.input.value = '';
         }
     },
 
     search: function() {
         var val = this.input.value;
-        if (val.length < this.options.minChar) {
-            this.clear();
-            return;
-        }
-        if(!val) {
-            this.clear();
-            return;
-        }
-        if( val + '' === this.CACHE + '') {
-            return;
-        }
-        else {
-            this.CACHE = val;
-        }
-        this._do_search();
+        var minChar = typeof this.options.minChar === 'function' ? this.options.minChar(val) : val.length >= this.options.minChar;
+        if (!val || !minChar) return this.clear();
+        if(val + '' === this.CACHE + '') return;
+        else this.CACHE = val;
+        this._doSearch();
     },
 
-    _do_search: function () {
+    _doSearch: function () {
         this.ajax(this.handleResults, this);
     },
 
@@ -261,7 +239,7 @@ L.PhotonSearch = L.PhotonBase.extend({
     },
 
     onSelected: function (choice) {
-        return (this.options.onSelected || this._onSelected).call(this, choice);
+        return (this.options.onSelected || this._onSelected).call(this, choice);
     },
 
     _formatResult: function (feature, el) {
@@ -279,11 +257,11 @@ L.PhotonSearch = L.PhotonBase.extend({
     },
 
     formatResult: function (feature, el) {
-        return (this.options.formatResult || this._formatResult).call(this, feature, el);
+        return (this.options.formatResult || this._formatResult).call(this, feature, el);
     },
 
     formatType: function (feature) {
-        return (this.options.formatType || this._formatType).call(this, feature);
+        return (this.options.formatType || this._formatType).call(this, feature);
     },
 
     _formatType: function (feature) {
@@ -324,7 +302,7 @@ L.PhotonSearch = L.PhotonBase.extend({
         this.clear();
         this.resultsContainer.style.display = 'block';
         this.resizeContainer();
-        this.forEach(geojson.features, function (feature, index) {
+        this.forEach(geojson.features, function (feature) {
             self.RESULTS.push(self.createResult(feature));
         });
         if (geojson.features.length === 0) {
@@ -334,7 +312,7 @@ L.PhotonSearch = L.PhotonBase.extend({
         if (this.options.feedbackEmail) {
             var feedback = L.DomUtil.create('a', 'photon-feedback', this.resultsContainer);
             feedback.href = 'mailto:' + this.options.feedbackEmail;
-            feedback.innerHTML = 'Feedback';
+            feedback.innerHTML = this.options.feedbackLabel;
         }
         this.CURRENT = 0;
         this.highlight();
@@ -447,11 +425,13 @@ L.PhotonReverse = L.PhotonBase.extend({
     },
 
     _handleResults: function (data) {
+        /*eslint-disable no-console */
         console.log(data);
+        /*eslint-enable no-alert */
     },
 
     handleResults: function (data) {
-        return (this.options.handleResults || this._handleResults).call(this, data);
+        return (this.options.handleResults || this._handleResults).call(this, data);
     },
 
     getParams: function () {
