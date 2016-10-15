@@ -1,2 +1,0 @@
-#http://stackoverflow.com/questions/27009425/how-can-i-fix-the-missing-cross-origin-resource-sharing-cors-response-header
-# Header set Access-Control-Allow-Origin "http://photon.komoot.de"

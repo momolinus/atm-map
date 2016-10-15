@@ -73,11 +73,10 @@ var UTILS = {};
 			description += '<p class="opening_hour">';
 			description += 'keine Öffnungszeiten angegeben</p>';
 		}
-		
+
 		return description;
 	};
-	
-	
+
 	UTILS.addLegendTo = function(map) {
 
 		var legend = L.control({
@@ -129,7 +128,7 @@ var UTILS = {};
 			table += '</td>';
 			table += '</tr>';
 			table += '</table>';
-			table += '<p><a href="https://github.com/momolinus/atm-map">Sourcecode der Karte</a>, Version 1.3.1</p>';
+			table += '<p><a href="https://github.com/momolinus/atm-map">Sourcecode der Karte</a>, Version 1.4 RC</p>';
 			table += '</div>';
 
 			div.innerHTML += table;
