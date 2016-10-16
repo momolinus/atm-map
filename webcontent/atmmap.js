@@ -130,7 +130,8 @@ var ATMMAP = {};
 			color : '#0026FF',
 			radius : 20,
 			width : 7,
-			length : 20
+			length : 20,
+			top: 10
 		});
 
 		// using JQuery executing overpass api
