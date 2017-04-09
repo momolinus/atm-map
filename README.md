@@ -19,18 +19,19 @@ check out the <a href="http://www.marcusbleil.de/m/">demo</a>
 
 - Geodocder: https://github.com/smeijer/L.GeoSearch
 
+- Spin: https://github.com/makinacorpus/Leaflet.Spin
+
 # Releases
 
-## Version 1.4 RC
+## Version 1.4
 
 published 15.10.2016
-
-check out the <a href="http://www.marcusbleil.de/m/rc">release canditate</a>
 
 - update to leaflet 1.0.1
 - update to jquery 3.1.1
 - libraries used from local now
 - new geocoder: L.GeoSearch
+- spin: Leaflet.Spin
 
 ## Version 1.3
 

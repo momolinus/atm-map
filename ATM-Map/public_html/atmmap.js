@@ -10,7 +10,8 @@ var ATMMAP = {};
 	/* private attributes */
 
 	// contains the node id of the OSM objects
-	var nodeIds = {}; // JavaScript pattern: object literal
+	// JavaScript pattern: object literal
+	var nodeIds = {};
 	var wayNodeIds = {};
 
 	var map = null;
@@ -81,24 +82,15 @@ var ATMMAP = {};
 			text : 'Permalink',
 			position : 'bottomright',
 		}));
-
-		L.control.locate().addTo(map);
-
 		
 		/*
-		 * map.addControl(new L.Control.Photon({ resultsHandler :
-		 * photonSearchAction, placeholder : 'Suche ...', position : 'topleft',
-		 * emptyMessage : "Nichts gefunden", noResultLabel : "kein Ergebnis"
-		 * }));
-		 */
+		var provider = new OpenStreetMapProvider();
+		var searchControl = new GeoSearchControl({
+			provider: provider,
+		});
+		map.addControl(searchControl);
+		*/
 		
-		new L.Control.GeoSearch({
-		    provider: new L.GeoSearch.Provider.OpenStreetMap(),
-		    position: 'topleft',
-		    showMarker: true,
-		    retainZoomLevel: false,
-		}).addTo(map);
-
 		layerBuilder.buildLayers(map);
 
 		utils.addLegendTo(map);
@@ -108,9 +100,9 @@ var ATMMAP = {};
 		map.on('moveend', moveEnd);
 	};
 
-	/** **************** */
+	/** *************** */
 	/** private methods */
-	/** **************** */
+	/** *************** */
 
 	var loadPois = function() {
 		var overpassCall;
@@ -125,6 +117,14 @@ var ATMMAP = {};
 				.getBounds()));
 
 		console.log("calling overpass-api: " + overpassCall);
+
+		map.spin(true, {
+			color : '#0026FF',
+			radius : 20,
+			width : 7,
+			length : 20,
+			top: 10
+		});
 
 		// using JQuery executing overpass api
 		$.getJSON(overpassCall, function(data) {
@@ -168,12 +168,15 @@ var ATMMAP = {};
 							} else {
 								addBankWithUnknownAtmToMap(node);
 							}
-
 						}
 					}
 				}
+
+				map.spin(false);
 			});
 		});
+
+		// map.spin(false);
 	};
 
 	var addBankWithNoAtmToMap = function(bank) {
