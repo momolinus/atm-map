@@ -3,42 +3,36 @@
 
 <meta charset="utf-8" />
 <title>Geldautomaten finden (ATM Map)</title>
-<meta name="description" content="" />
+<meta name="description" content="diese Karte stellt dar, ob Banken einen 
+Geldutomaten haben; zusätzlich werden Geldautomaten dargestellt,
+ die an anderen Orten als Banken stehen" />
 <meta name="author" content="Marcus Bleil" />
 
 <!-- for mobile devices -->
 <meta name="viewport"
 	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-
-<!-- <script type="text/javascript" src="lib/jquery-1.10.2.js"></script>  -->
-<script src="./bower_components/jquery/jquery-3.1.1.min.js"></script>
-
 <!-- Referenzen: http://webkompetenz.wikidot.com/html-handbuch:referenzierung -->
-<link rel="stylesheet" href="./bower_components/leaflet/leaflet.css" />
-<script src="./bower_components/leaflet/leaflet.js"></script>
+	
+<script src="./bower_components/jquery/dist/jquery.min.js"></script>
 
- <script src="./spin/dist/spin.min.js" charset="utf-8"></script>
-  <script src="./spin/leaflet.spin.min.js" charset="utf-8"></script>
+<link rel="stylesheet" href="./bower_components/leaflet/dist/leaflet.css" />
+<script src="./bower_components/leaflet/dist/leaflet.js"></script>
 
-<link rel="stylesheet" href="./L.Control.Locate.css" />
-<script type="text/javascript" src="./L.Control.Locate.js"></script>
+<script src="./bower_components/spin.js/spin.min.js"></script>
+<script src="./bower_components/leaflet-spin/leaflet.spin.min.js"></script>
 
-<link rel="stylesheet" href="./photon/leaflet.photon.css" />
-<script src="./photon/leaflet.photon.js"></script>
+<link rel="stylesheet" href="./bower_components/leaflet.locatecontrol/dist/L.Control.Locate.css" />
+<script src="./bower_components/leaflet.locatecontrol/dist/L.Control.Locate.js"></script>
 
-<script src="./geocoder/js/l.control.geosearch.js"></script>
-<script src="./geocoder/js/l.geosearch.provider.openstreetmap.js"></script>
-<link rel="stylesheet" href="./geocoder/css/l.geosearch.css" />
-
-<script src="./permalink/Permalink.js"></script>
-<script src="./permalink/Permalink.Marker.js"></script>
-<script src="./permalink/Permalink.Layer.js"></script>
+<script src="./bower_components/leaflet-plugins/control/Permalink.js"></script>
+<script src="./bower_components/leaflet-plugins/control/Permalink.Marker.js"></script>
+<script src="./bower_components/leaflet-plugins/control/Permalink.Layer.js"></script>
 
 <link rel="stylesheet" href="atmmap.css" />
-<script type="text/javascript" src="./atmmap_layerbuilder.js"></script>
-<script type="text/javascript" src="./atmmaputils.js"></script>
-<script type="text/javascript" src="./atmmap.js"></script>
+<script src="./atmmap_layerbuilder.js"></script>
+<script src="./atmmaputils.js"></script>
+<script src="./atmmap.js"></script>
 
 <style type="text/css">
 body {

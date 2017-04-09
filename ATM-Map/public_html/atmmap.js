@@ -82,23 +82,15 @@ var ATMMAP = {};
 			text : 'Permalink',
 			position : 'bottomright',
 		}));
-
-		L.control.locate().addTo(map);
-
+		
 		/*
-		 * map.addControl(new L.Control.Photon({ resultsHandler :
-		 * photonSearchAction, placeholder : 'Suche ...', position : 'topleft',
-		 * emptyMessage : "Nichts gefunden", noResultLabel : "kein Ergebnis"
-		 * }));
-		 */
-
-		new L.Control.GeoSearch({
-			provider : new L.GeoSearch.Provider.OpenStreetMap(),
-			position : 'topleft',
-			showMarker : true,
-			retainZoomLevel : false,
-		}).addTo(map);
-
+		var provider = new OpenStreetMapProvider();
+		var searchControl = new GeoSearchControl({
+			provider: provider,
+		});
+		map.addControl(searchControl);
+		*/
+		
 		layerBuilder.buildLayers(map);
 
 		utils.addLegendTo(map);

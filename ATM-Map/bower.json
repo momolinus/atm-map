@@ -1,14 +1,12 @@
 {
   "name": "geldautomatensuche",
   "version": "2.0.0",
-  "main": "path/to/main.css",
-  "ignore": [
-    ".jshintrc",
-    "**/*.txt"
-  ],
   "dependencies": {
     "jquery": "3.1.1",
-    "leaflet": "1.0.3"
+    "leaflet": "1.0.3",
+    "leaflet-spin": "^1.1.0",
+    "leaflet.locatecontrol": "^0.60.0",
+    "leaflet-plugins": "^3.0.0"
   },
   "devDependencies": {}
 }
