@@ -17,7 +17,7 @@ check out the <a href="http://www.marcusbleil.de/m/">demo</a>
 
 - ~~Geodocder: https://github.com/k4r573n/leaflet-control-osm-geocoder~~
 
-- Geodocder: https://github.com/smeijer/L.GeoSearch
+- ~~Geodocder: https://github.com/smeijer/L.GeoSearch~~
 
 - Spin: https://github.com/makinacorpus/Leaflet.Spin
 
