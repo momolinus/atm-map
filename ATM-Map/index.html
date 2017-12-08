@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<meta charset="utf-8" />
+<title>Geldautomaten finden (ATM Map)</title>
+<meta name="description" content="diese Karte stellt dar, ob Banken einen 
+Geldutomaten haben; zusätzlich werden Geldautomaten dargestellt,
+ die an anderen Orten als Banken stehen" />
+<meta name="author" content="Marcus Bleil" />
+
+<!-- for mobile devices -->
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+<!-- Referenzen: http://webkompetenz.wikidot.com/html-handbuch:referenzierung -->
+	
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+
+<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.min.js'></script>
+<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.mapbox.css' rel='stylesheet' />
+<!--[if lt IE 9]>
+  <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.ie.css' rel='stylesheet' />
+<![endif]-->
+<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/css/font-awesome.min.css' rel='stylesheet' />
+
+
+
+<script src="./permalink/Permalink.js"></script>
+<script src="./permalink/Permalink.Marker.js"></script>
+<script src="./permalink/Permalink.Layer.js"></script>
+<script src="./permalink/Permalink.Overlay.js"></script>
+
+<link rel="stylesheet" href="atmmap.css" />
+<script src="./atmmap_layerbuilder.js"></script>
+<script src="./atmmaputils.js"></script>
+<script src="./atmmap.js"></script>
+
+<style type="text/css">
+body {
+	padding: 0;
+	margin: 0;
+}
+
+.legend {
+	font-size: small;
+	border-radius: 5px;
+	box-shadow: 0 1px 7px rgba(0, 0, 0, 0.4);
+	background-color: white;
+	padding: 6px 10px 6px 6px;
+}
+
+.legend img {
+	/*width: 1.7em;*/
+	/*hight: 1.7em:*/
+	
+}
+
+html, body, #map {
+	height: 100%;
+}
+</style>
+
+
+<body>
+	<div id="map">&nbsp;</div>
+
+	<script type="text/javascript">
+		$(document).ready(ATMMAP.initMap());
+	</script>
+</body>
+</html>
