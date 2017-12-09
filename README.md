@@ -31,6 +31,7 @@ check out the <a href="http://www.marcusbleil.de/m/">demo</a>
 - updated to leaflet 1.2.0
 - updated to jquery 3.2.1
 - changed to locate control https://github.com/domoritz/leaflet-locatecontrol using https://www.mapbox.com/mapbox.js/plugins/#leaflet-locatecontrol
+- changed search https://github.com/k4r573n/leaflet-control-osm-geocoder
 
 ## Version 1.4
 

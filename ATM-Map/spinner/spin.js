@@ -111,7 +111,7 @@ var Spinner = /** @class */ (function () {
     };
     return Spinner;
 }());
-export { Spinner };
+/*export { Spinner };*/
 function getAdvancePercentage(msSinceLastFrame, roundsPerSecond) {
     return msSinceLastFrame / 1000 * roundsPerSecond;
 }
