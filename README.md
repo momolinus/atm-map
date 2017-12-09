@@ -17,11 +17,21 @@ check out the <a href="http://www.marcusbleil.de/m/">demo</a>
 
 - ~~Geodocder: https://github.com/k4r573n/leaflet-control-osm-geocoder~~
 
-- Geodocder: https://github.com/smeijer/L.GeoSearch
+- ~~Geodocder: https://github.com/smeijer/L.GeoSearch~~
 
 - Spin: https://github.com/makinacorpus/Leaflet.Spin
 
 # Releases
+
+## Version 2.0
+
+- updated spinner to https://github.com/makinacorpus/Leaflet.Spin/releases/tag/1.1.0
+	- depends on Spin.js https://github.com/fgnass/spin.js/releases/tag/3.1.0 download http://spin.js.org/spin.js
+- update permalink to https://github.com/shramov/leaflet-plugins/releases/tag/3.0.1
+- updated to leaflet 1.2.0
+- updated to jquery 3.2.1
+- changed to locate control https://github.com/domoritz/leaflet-locatecontrol using https://www.mapbox.com/mapbox.js/plugins/#leaflet-locatecontrol
+- changed search https://github.com/k4r573n/leaflet-control-osm-geocoder
 
 ## Version 1.4
 

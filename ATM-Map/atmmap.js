@@ -1,6 +1,9 @@
 // constructs the module ATMMAP
 var ATMMAP = {};
 
+var spinner = new Spinner().spin();
+//target.appendChild(spinner.el);
+
 (function() {
 
 	// dependencies
@@ -18,7 +21,7 @@ var ATMMAP = {};
 
 	// building the api call for atms (automated teller machine)
 	// the overpass api URL
-	var ovpCall = 'http://overpass-api.de/api/interpreter?data=';
+	var ovpCall = 'https://lz4.overpass-api.de/api/interpreter?data=';
 
 	// setting the output format to json
 	ovpCall += '[out:json];';
@@ -64,13 +67,10 @@ var ATMMAP = {};
 		attr_icons = 'Icons by <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a> <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY SA 3.0</a>';
 
 		osm = new L.TileLayer(
-				'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
 					attribution : [ attr_osm, attr_overpass, attr_icons ]
 							.join(' | ')
 				});
-
-		// Sparkasse, Rheinhausen: 49.2787364, 8.4731802
-		// Berlin: 52.516, 13.379
 
 		map = L.map('map', {
 			center : new L.LatLng(52.516, 13.379),
@@ -80,17 +80,21 @@ var ATMMAP = {};
 
 		map.addControl(new L.Control.Permalink({
 			text : 'Permalink',
-			position : 'bottomright',
+			position : 'bottomright'
 		}));
 		
-		/*
-		var provider = new OpenStreetMapProvider();
-		var searchControl = new GeoSearchControl({
-			provider: provider,
-		});
-		map.addControl(searchControl);
-		*/
+		var lc = L.control.locate({
+				strings: {
+					title: "Gehe zum meinem Standort!"
+        		}
+        }).addTo(map);
 		
+        var osmGeocoder = new L.Control.OSMGeocoder({
+        		position: 'topright',
+        		text: 'Suchen'
+        });
+        map.addControl(osmGeocoder);
+        
 		layerBuilder.buildLayers(map);
 
 		utils.addLegendTo(map);
@@ -122,10 +126,9 @@ var ATMMAP = {};
 			color : '#0026FF',
 			radius : 20,
 			width : 7,
-			length : 20,
-			top: 10
+			length : 20
 		});
-
+		
 		// using JQuery executing overpass api
 		$.getJSON(overpassCall, function(data) {
 
@@ -171,12 +174,9 @@ var ATMMAP = {};
 						}
 					}
 				}
-
 				map.spin(false);
 			});
 		});
-
-		// map.spin(false);
 	};
 
 	var addBankWithNoAtmToMap = function(bank) {
@@ -276,10 +276,6 @@ var ATMMAP = {};
 
 	var moveEnd = function() {
 		loadPois();
-	};
-
-	var photonSearchAction = function photonSearchAction(geojson) {
-		console.debug(geojson);
 	};
 
 })();
