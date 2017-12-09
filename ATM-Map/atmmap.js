@@ -18,7 +18,7 @@ var ATMMAP = {};
 
 	// building the api call for atms (automated teller machine)
 	// the overpass api URL
-	var ovpCall = 'http://overpass-api.de/api/interpreter?data=';
+	var ovpCall = 'https://lz4.overpass-api.de/api/interpreter?data=';
 
 	// setting the output format to json
 	ovpCall += '[out:json];';
@@ -64,7 +64,7 @@ var ATMMAP = {};
 		attr_icons = 'Icons by <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a> <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY SA 3.0</a>';
 
 		osm = new L.TileLayer(
-				'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 					attribution : [ attr_osm, attr_overpass, attr_icons ]
 							.join(' | ')
 				});
@@ -113,6 +113,14 @@ var ATMMAP = {};
 
 		console.log("calling overpass-api: " + overpassCall);
 
+		/*map.spin(true, {
+			color : '#0026FF',
+			radius : 20,
+			width : 7,
+			length : 20,
+			top: 10
+		});*/
+		
 		// using JQuery executing overpass api
 		$.getJSON(overpassCall, function(data) {
 
@@ -158,6 +166,7 @@ var ATMMAP = {};
 						}
 					}
 				}
+				/*map.spin(false);*/
 			});
 		});
 	};
