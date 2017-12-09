@@ -81,7 +81,6 @@ var ATMMAP = {};
 		}));
 		
 		var lc = L.control.locate({
-				position: 'topleft',  /* default value */
 				strings: {
 					title: "Gehe zum meinem Standort"
 				}

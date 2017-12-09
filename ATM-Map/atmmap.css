@@ -15,6 +15,10 @@
 	margin: 5px 0;
 }
 
+.leaflet-control-locate a {
+    padding: 0 0 0 0;
+}
+
 .opening_hour {
 	text-align: center;
 	font-style: italic;
