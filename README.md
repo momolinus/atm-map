@@ -1,36 +1,23 @@
 # atm-map
 
-check out the <a href="http://www.marcusbleil.de/m/">demo</a>
+check out the demo <a href="http://www.geldautomaten-suche.org">www.geldautomaten-suche.org</a>
 
 - icons used by this project:
 <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a> <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY SA 3.0</a>
 - map framework: http://leafletjs.com/
 - JavaScript framework: https://jquery.com/
-
-## Plugins
-
-- locatecontrol: https://github.com/domoritz/leaflet-locatecontrol
-
-- permalink: https://github.com/shramov/leaflet-plugins
-
-- ~~Photon search plugin: https://github.com/komoot/leaflet.photon~~
-
-- ~~Geodocder: https://github.com/k4r573n/leaflet-control-osm-geocoder~~
-
-- ~~Geodocder: https://github.com/smeijer/L.GeoSearch~~
-
-- Spin: https://github.com/makinacorpus/Leaflet.Spin
+- locator pin https://commons.wikimedia.org/wiki/File:Map_marker_font_awesome.svg
 
 # Releases
 
-## Version 2.0
+## Version 2.0 (Release Candidate)
 
 - updated spinner to https://github.com/makinacorpus/Leaflet.Spin/releases/tag/1.1.0
 	- depends on Spin.js https://github.com/fgnass/spin.js/releases/tag/3.1.0 download http://spin.js.org/spin.js
 - update permalink to https://github.com/shramov/leaflet-plugins/releases/tag/3.0.1
 - updated to leaflet 1.2.0
 - updated to jquery 3.2.1
-- changed to locate control https://github.com/domoritz/leaflet-locatecontrol using https://www.mapbox.com/mapbox.js/plugins/#leaflet-locatecontrol
+- changed to locate control https://github.com/domoritz/leaflet-locatecontrol
 - changed search https://github.com/k4r573n/leaflet-control-osm-geocoder
 
 ## Version 1.4

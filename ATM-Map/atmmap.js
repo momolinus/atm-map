@@ -23,8 +23,8 @@ var spinner = new Spinner().spin();
 	// the overpass api URL
 	var ovpCall = 'https://lz4.overpass-api.de/api/interpreter?data=';
 
-	// setting the output format to json
-	ovpCall += '[out:json];';
+	// setting the output format to json and timeout of 60 s
+	ovpCall += '[out:json][timeout:60];';
 
 	// nodes and ways with "amenity"="bank"
 	ovpCall += '(';
@@ -128,9 +128,10 @@ var spinner = new Spinner().spin();
 			width : 7,
 			length : 20
 		});
+		console.log("spinner started");
 		
 		// using JQuery executing overpass api
-		$.getJSON(overpassCall, function(data) {
+		var ovpCallForAtms = $.getJSON(overpassCall, function(data) {
 
 			// first store all node from any ways
 			$.each(data.elements, function(index, node) {
@@ -174,8 +175,10 @@ var spinner = new Spinner().spin();
 						}
 					}
 				}
-				map.spin(false);
 			});
+		}).always(function() {
+			map.spin(false);
+			console.log("spinner stopped");
 		});
 	};
 
