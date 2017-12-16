@@ -128,7 +128,7 @@ var UTILS = {};
 			table += '</td>';
 			table += '</tr>';
 			table += '</table>';
-			table += '<p><a href="https://github.com/momolinus/atm-map">Sourcecode der Karte</a>, Version 2.0.0 RC3 (10.12.17)</p>';
+			table += '<p><a href="https://github.com/momolinus/atm-map">Sourcecode der Karte</a>, Version 2.0.0 RC4 (16.12.17)</p>';
 			table += '</div>';
 
 			div.innerHTML += table;
