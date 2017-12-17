@@ -1,7 +1,7 @@
 /**
- * *** Geldautomaten-Verbünde ************************************************** **
- * Cashpool ****************************************************************
+ * *** Geldautomaten-Verbünde **********************************************
  *
+ * Genossenschaften: https://de.wikipedia.org/wiki/Bankcard-Servicenetz
  *
  * Webseite: www.cashpool.de Partner: (1)
  * http://www.cashpool.de/Presentation/CashPool/Home/Pressemitteilung im
