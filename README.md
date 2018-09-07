@@ -12,6 +12,7 @@ check out <a href="https://geldautomaten-suche.org/">geldautomaten-suche.org</a>
 
 ## Version 3.0
 
+- added side bar https://github.com/turbo87/sidebar-v2/
 
 ## Version 2.0 (Release Candidate)
 
