@@ -1,6 +1,6 @@
 # atm-map
 
-check out the demo <a href="http://www.geldautomaten-suche.org">www.geldautomaten-suche.org</a>
+check out <a href="https://geldautomaten-suche.org/">geldautomaten-suche.org</a>
 
 - icons used by this project:
 <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a> <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY SA 3.0</a>
@@ -9,6 +9,9 @@ check out the demo <a href="http://www.geldautomaten-suche.org">www.geldautomate
 - locator pin https://commons.wikimedia.org/wiki/File:Map_marker_font_awesome.svg
 
 # Releases
+
+## Version 3.0
+
 
 ## Version 2.0 (Release Candidate)
 
