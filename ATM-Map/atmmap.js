@@ -4,7 +4,7 @@ var ATMMAP = {};
 var spinner = new Spinner().spin();
 //target.appendChild(spinner.el);
 
-(function() {
+(function () {
 
 	// dependencies
 	utils = UTILS;
@@ -59,7 +59,7 @@ var spinner = new Spinner().spin();
 	ovpCall += 'out skel qt;';
 
 	// public interface
-	ATMMAP.initMap = function() {
+	ATMMAP.initMap = function () {
 		var attr_osm, attr_overpass, attr_icons, osm;
 
 		attr_osm = 'Map data &copy; <a href="http://openstreetmap.org/">OpenStreetMap</a> contributors';
@@ -67,39 +67,52 @@ var spinner = new Spinner().spin();
 		attr_icons = 'Icons by <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a> <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY SA 3.0</a>';
 
 		osm = new L.TileLayer(
-				'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
-					attribution : [ attr_osm, attr_overpass, attr_icons ]
-							.join(' | ')
-				});
+			'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
+				attribution: [attr_osm, attr_overpass, attr_icons]
+					.join(' | ')
+			});
 
 		map = L.map('map', {
-			center : new L.LatLng(52.516, 13.379),
-			zoom : 15,
-			layers : osm
+			center: new L.LatLng(52.516, 13.379),
+			zoom: 15,
+			layers: osm
+		});
+
+		var osmGeocoder = new L.Control.OSMGeocoder({
+			position: 'topright',
+			text: 'Suchen'
 		});
 
 		map.addControl(new L.Control.Permalink({
-			text : 'Permalink',
-			position : 'bottomright'
+			text: 'Permalink',
+			position: 'bottomright'
 		}));
-		
+
 		var lc = L.control.locate({
-				strings: {
-					title: "Gehe zum meinem Standort!"
-        		}
-        }).addTo(map);
-		
-        var osmGeocoder = new L.Control.OSMGeocoder({
-        		position: 'topright',
-        		text: 'Suchen'
-        });
-        map.addControl(osmGeocoder);
-        
+			strings: {
+				title: "Gehe zum meinem Standort!"
+			}
+		}).addTo(map);
+
+
+		map.addControl(osmGeocoder);
+
 		layerBuilder.buildLayers(map);
 
-		utils.addLegendTo(map);
+		//utils.addLegendTo(map);
 
-		var sidebar = L.control.sidebar('sidebar', {position: 'right'}).addTo(map);
+		var sidebar = L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
+
+		/**
+		 * see:
+		 * https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
+		 */
+		var htmlObject = osmGeocoder.getContainer();
+		var a = document.getElementById("search_control")
+		function setParent(el, newParent) {
+			newParent.appendChild(el);
+		}
+		setParent(htmlObject, a);
 
 		loadPois();
 
@@ -110,7 +123,7 @@ var spinner = new Spinner().spin();
 	/** private methods */
 	/** *************** */
 
-	var loadPois = function() {
+	var loadPois = function () {
 		var overpassCall;
 
 		if (map.getZoom() < 13) {
@@ -120,23 +133,23 @@ var spinner = new Spinner().spin();
 		// note: g in /{{bbox}}/g means replace all occurrences of
 		// {{bbox}} not just first occurrence
 		overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map
-				.getBounds()));
+			.getBounds()));
 
 		console.log("calling overpass-api: " + overpassCall);
 
 		map.spin(true, {
-			color : '#0026FF',
-			radius : 20,
-			width : 7,
-			length : 20
+			color: '#0026FF',
+			radius: 20,
+			width: 7,
+			length: 20
 		});
 		console.log("spinner started");
-		
+
 		// using JQuery executing overpass api
-		var ovpCallForAtms = $.getJSON(overpassCall, function(data) {
+		var ovpCallForAtms = $.getJSON(overpassCall, function (data) {
 
 			// first store all node from any ways
-			$.each(data.elements, function(index, node) {
+			$.each(data.elements, function (index, node) {
 
 				// all nodes of type "node", some tagged nodes are necessary for
 				// building ways, not all nodes here are stored are necessary
@@ -148,7 +161,7 @@ var spinner = new Spinner().spin();
 			});
 
 			// overpass returns a list with elements, which contains the nodes
-			$.each(data.elements, function(index, node) {
+			$.each(data.elements, function (index, node) {
 
 				if ("tags" in node) {
 
@@ -178,13 +191,13 @@ var spinner = new Spinner().spin();
 					}
 				}
 			});
-		}).always(function() {
+		}).always(function () {
 			map.spin(false);
 			console.log("spinner stopped");
 		});
 	};
 
-	var addBankWithNoAtmToMap = function(bank) {
+	var addBankWithNoAtmToMap = function (bank) {
 		var name, marker;
 
 		name = utils.createDescriptionFromeTags(bank);
@@ -193,7 +206,7 @@ var spinner = new Spinner().spin();
 		addToNamedGroups(bank, marker);
 	};
 
-	var addBankWithUnknownAtmToMap = function(bank) {
+	var addBankWithUnknownAtmToMap = function (bank) {
 		var name, marker;
 
 		name = utils.createDescriptionFromeTags(bank);
@@ -202,7 +215,7 @@ var spinner = new Spinner().spin();
 		addToNamedGroups(bank, marker);
 	};
 
-	var addNodeWithAtmToMap = function(node) {
+	var addNodeWithAtmToMap = function (node) {
 		var name, marker;
 
 		name = utils.createDescriptionFromeTags(node);
@@ -216,11 +229,11 @@ var spinner = new Spinner().spin();
 		addToNamedGroups(node, marker);
 	};
 
-	var createMarker = function(node, name, atmIcon) {
+	var createMarker = function (node, name, atmIcon) {
 
 		if (node.type == "node") {
-			var marker = L.marker([ node.lat, node.lon ], {
-				icon : atmIcon
+			var marker = L.marker([node.lat, node.lon], {
+				icon: atmIcon
 			});
 
 			marker.bindPopup(name);
@@ -234,44 +247,44 @@ var spinner = new Spinner().spin();
 			var bounds;
 			var center;
 
-			$.each(node.nodes, function(index, nodeId) {
+			$.each(node.nodes, function (index, nodeId) {
 
 				if (wayNodeIds[nodeId] == undefined) {
 					console.log("wayNodeIds for " + nodeId);
 				}
 
 				areaNodes.push(L.latLng(wayNodeIds[nodeId].lat,
-						wayNodeIds[nodeId].lon));
+					wayNodeIds[nodeId].lon));
 			});
 
 			bankArea = L.polygon(areaNodes, {
-				clickable : false
+				clickable: false
 			});
 			bounds = bankArea.getBounds();
 			center = bounds.getCenter();
 
-			marker = L.marker([ center.lat, center.lng ], {
-				icon : atmIcon
+			marker = L.marker([center.lat, center.lng], {
+				icon: atmIcon
 			});
 
 			marker.bindPopup(name);
 
-			return L.layerGroup([ bankArea, marker ]);
+			return L.layerGroup([bankArea, marker]);
 		}
 	};
 
-	var addSingleAtmToMap = function(atm) {
+	var addSingleAtmToMap = function (atm) {
 		var name, marker;
 
 		name = utils.createDescriptionFromeTags(atm);
-		marker = L.marker([ atm.lat, atm.lon ], {
-			icon : utils.atm
+		marker = L.marker([atm.lat, atm.lon], {
+			icon: utils.atm
 		}).bindPopup(name);
 
 		addToNamedGroups(atm, marker);
 	};
 
-	var addToNamedGroups = function(node, marker) {
+	var addToNamedGroups = function (node, marker) {
 		try {
 			layerBuilder.addToNamedGroups(node, marker);
 		} catch (e) {
@@ -279,7 +292,7 @@ var spinner = new Spinner().spin();
 		}
 	};
 
-	var moveEnd = function() {
+	var moveEnd = function () {
 		loadPois();
 	};
 

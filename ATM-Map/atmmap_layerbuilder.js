@@ -22,25 +22,25 @@
 
 var LAYER_BUILDER = {};
 
-(function() {
+(function () {
 
 	var operatorLayers;
 
 	// JavaScript pattern: array literal
 	var operatorCategories = [
-			"Genossenschaftsbanken<br /><span class=\"details\">Bankcard-Servicenetz, Volksbanken, usw.</span>",
-			"Sparkassen",
-			"CashPool<br /><span class=\"details\">Santander, Sparda, usw.</span>",
-			"Cash Group<br /><span class=\"details\">Deutsche Bank, Postbank, usw.</span>",
-			"weitere Banken<br /><span class=\"details\">Banken, die sich nicht zuordnen lassen</span>" ];
+		"Genossenschaftsbanken<br /><span class=\"details\">Bankcard-Servicenetz, Volksbanken, usw.</span>",
+		"Sparkassen",
+		"CashPool<br /><span class=\"details\">Santander, Sparda, usw.</span>",
+		"Cash Group<br /><span class=\"details\">Deutsche Bank, Postbank, usw.</span>",
+		"weitere Banken<br /><span class=\"details\">Banken, die sich nicht zuordnen lassen</span>"];
 
 	var namedGroup = {};
 
-	LAYER_BUILDER.buildLayers = function(map) {
+	LAYER_BUILDER.buildLayers = function (map) {
 		var group;
 
 		operatorLayers = L.control.layers(null, null, {
-			collapsed : false
+			collapsed: false
 		}).addTo(map);
 
 		for (var i = 0; i < operatorCategories.length; i++) {
@@ -50,9 +50,20 @@ var LAYER_BUILDER = {};
 
 			namedGroup[i] = group;
 		}
+
+		/**
+		 * see:
+		 * https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
+		 */
+		var htmlObject = operatorLayers.getContainer();
+		var a = document.getElementById("bank_layer_control")
+		function setParent(el, newParent) {
+			newParent.appendChild(el);
+		}
+		setParent(htmlObject, a);
 	};
 
-	LAYER_BUILDER.addToNamedGroups = function(node, marker) {
+	LAYER_BUILDER.addToNamedGroups = function (node, marker) {
 		var group, name, matched;
 
 		matched = false;
@@ -83,7 +94,7 @@ var LAYER_BUILDER = {};
 		}
 	};
 
-	LAYER_BUILDER.matchingCooperativeBank = function(name) {
+	LAYER_BUILDER.matchingCooperativeBank = function (name) {
 
 		if (name.search(/Volksbank/i) > -1) {
 			return true;
@@ -108,7 +119,7 @@ var LAYER_BUILDER = {};
 		return false;
 	};
 
-	LAYER_BUILDER.matchingSavingsBank = function(name) {
+	LAYER_BUILDER.matchingSavingsBank = function (name) {
 
 		if (name.search(/Sparkasse/i) > -1) {
 			return true;
@@ -117,7 +128,7 @@ var LAYER_BUILDER = {};
 		return false;
 	};
 
-	LAYER_BUILDER.matchingCashPool = function(name) {
+	LAYER_BUILDER.matchingCashPool = function (name) {
 
 		if (name.search(/Sparda-Bank/i) > -1) {
 			return true;
@@ -134,7 +145,7 @@ var LAYER_BUILDER = {};
 		return false;
 	};
 
-	LAYER_BUILDER.matchingCashGroup = function(name) {
+	LAYER_BUILDER.matchingCashGroup = function (name) {
 
 		if (name.search(/Commerzbank/i) > -1) {
 			return true;
@@ -171,7 +182,7 @@ var LAYER_BUILDER = {};
 		return false;
 	};
 
-	var createNameFromeTags = function(node) {
+	var createNameFromeTags = function (node) {
 
 		var name = 'xxxxxxxxxxxxxxxxxxxx';
 

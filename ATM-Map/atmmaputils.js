@@ -1,5 +1,6 @@
 /**
- * @author Marcus
+ * @author Marcus Bleil, www.marcusbleil.de
+ * 
  */
 var UTILS = {};
 
