@@ -9,11 +9,10 @@ Geldutomaten haben; zusätzlich werden Geldautomaten dargestellt,
 <meta name="author" content="Marcus Bleil" />
 
 <!-- for mobile devices -->
-<meta name="viewport"
-	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
 <!-- Referenzen: http://webkompetenz.wikidot.com/html-handbuch:referenzierung -->
-	
+
 <script src="./jquery/jquery-3.2.1.min.js"></script>
 
 <link rel="stylesheet" href="./leaflet/leaflet.css" />
@@ -32,42 +31,111 @@ Geldutomaten haben; zusätzlich werden Geldautomaten dargestellt,
 <script src="./permalink/Permalink.Layer.js"></script>
 <script src="./permalink/Permalink.Overlay.js"></script>
 
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<link rel="stylesheet" href="./sidebar-v2/leaflet-sidebar.css" />
+<script src="./sidebar-v2/leaflet-sidebar.js"></script>
+
 <link rel="stylesheet" href="atmmap.css" />
 <script src="./atmmap_layerbuilder.js"></script>
 <script src="./atmmaputils.js"></script>
 <script src="./atmmap.js"></script>
 
 <style type="text/css">
-body {
-	padding: 0;
-	margin: 0;
-}
+	body {
+		padding: 0;
+		margin: 0;
+	}
 
-.legend {
-	font-size: small;
-	border-radius: 5px;
-	box-shadow: 0 1px 7px rgba(0, 0, 0, 0.4);
-	background-color: white;
-	padding: 6px 10px 6px 6px;
-}
+	.legend {
+		font-size: small;
+		border-radius: 5px;
+		box-shadow: 0 1px 7px rgba(0, 0, 0, 0.4);
+		background-color: white;
+		padding: 6px 10px 6px 6px;
+	}
 
-.legend img {
-	/*width: 1.7em;*/
-	/*hight: 1.7em:*/
-	
-}
-
-html, body, #map {
-	height: 100%;
-}
+	html,
+	body,
+	#map {
+		height: 100%;
+	}
 </style>
 
 
 <body>
+	<div id="sidebar" class="sidebar collapsed">
+		<!-- Nav tabs -->
+		<div class="sidebar-tabs">
+			<ul role="tablist">
+				<li><a href="#home" role="tab"><i class="fa fa-bars">I-1</i></a></li>
+				<li><a href="#profile" role="tab"><i class="fa fa-user">I-2</i></a></li>
+				<li class="disabled"><a href="#messages" role="tab"><i class="fa fa-envelope">I-3</i></a></li>
+				<li><a href="https://github.com/Turbo87/sidebar-v2" role="tab" target="_blank">I-4<i class="fa fa-github"></i></a></li>
+			</ul>
+
+			<ul role="tablist">
+				<li><a href="#settings" role="tab"><i class="fa fa-gear">I-5</i></a></li>
+			</ul>
+		</div>
+
+		<!-- Tab panes -->
+		<div class="sidebar-content">
+			<div class="sidebar-pane" id="home">
+				<h1 class="sidebar-header">
+					sidebar-v2
+					<span class="sidebar-close"><i class="fa fa-caret-right"></i></span>
+				</h1>
+
+				<p>A responsive sidebar for mapping libraries like <a href="http://leafletjs.com/">Leaflet</a> or <a href="http://openlayers.org/">OpenLayers</a>.</p>
+
+				<p class="lorem">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut
+					labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+					Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet,
+					consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed
+					diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata
+					sanctus est Lorem ipsum dolor sit amet.</p>
+
+				<p class="lorem">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut
+					labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+					Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet,
+					consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed
+					diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata
+					sanctus est Lorem ipsum dolor sit amet.</p>
+
+				<p class="lorem">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut
+					labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+					Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet,
+					consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed
+					diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata
+					sanctus est Lorem ipsum dolor sit amet.</p>
+
+				<p class="lorem">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut
+					labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+					Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet,
+					consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed
+					diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata
+					sanctus est Lorem ipsum dolor sit amet.</p>
+			</div>
+
+			<div class="sidebar-pane" id="profile">
+				<h1 class="sidebar-header">Profile<span class="sidebar-close"><i class="fa fa-caret-right"></i></span></h1>
+			</div>
+
+			<div class="sidebar-pane" id="messages">
+				<h1 class="sidebar-header">Messages<span class="sidebar-close"><i class="fa fa-caret-right"></i></span></h1>
+			</div>
+
+			<div class="sidebar-pane" id="settings">
+				<h1 class="sidebar-header">Settings<span class="sidebar-close"><i class="fa fa-caret-right"></i></span></h1>
+			</div>
+		</div>
+	</div>
+
 	<div id="map">&nbsp;</div>
 
 	<script type="text/javascript">
 		$(document).ready(ATMMAP.initMap());
 	</script>
 </body>
+
 </html>

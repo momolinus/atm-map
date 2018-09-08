@@ -99,6 +99,8 @@ var spinner = new Spinner().spin();
 
 		utils.addLegendTo(map);
 
+		var sidebar = L.control.sidebar('sidebar', {position: 'right'}).addTo(map);
+
 		loadPois();
 
 		map.on('moveend', moveEnd);
