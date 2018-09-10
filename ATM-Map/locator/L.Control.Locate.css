@@ -3,7 +3,6 @@
   font-size: 1.4em;
   color: #444;
   cursor: pointer;
-  background-image: url("mappin.png");
 }
 .leaflet-control-locate.active a {
   color: #2074B6;
