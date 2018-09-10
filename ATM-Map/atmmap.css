@@ -26,3 +26,14 @@
 	font-size: smaller;
 	color: DarkGrey;
 }
+
+#bank_layer_control .leaflet-control {
+	float: none;
+}
+#bank_layer_control .leaflet-control-layers {
+	border: none;
+}
+#search_control .leaflet-control {
+	margin-top: 0.5em;
+	float: none;
+} 

@@ -97,11 +97,13 @@ var spinner = new Spinner().spin();
 
 		map.addControl(osmGeocoder);
 
-		layerBuilder.buildLayers(map);
+		
 
 		//utils.addLegendTo(map);
 
 		var sidebar = L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
+		
+		layerBuilder.buildLayers(map);
 
 		/**
 		 * see:
