@@ -63,18 +63,13 @@ Geldutomaten haben; zusätzlich werden Geldautomaten dargestellt,
 
 
 <body>
-	<div id="sidebar" class="sidebar collapsed">
+	<div id="sidebar" class="sidebar collapsed" style="height: 80%;">
 		<!-- Nav tabs -->
 		<div class="sidebar-tabs">
 			<ul role="tablist">
 				<li><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li>
-				<li><a href="#profile" role="tab"><i class="fa fa-user"></i></a></li>
-				<li class="disabled"><a href="#messages" role="tab"><i class="fa fa-envelope"></i></a></li>
-				<li><a href="https://github.com/Turbo87/sidebar-v2" role="tab" target="_blank"><i class="fa fa-github"></i></a></li>
-			</ul>
-
-			<ul role="tablist">
-				<li><a href="#settings" role="tab"><i class="fa fa-gear"></i></a></li>
+				<li><a href="#search" role="tab"><i class="fa fa-search"></i></a></li>
+				<li><a href="#info" role="tab"><i class="fa fa-info"></i></a></li>
 			</ul>
 		</div>
 
@@ -85,7 +80,7 @@ Geldutomaten haben; zusätzlich werden Geldautomaten dargestellt,
 					Auswahl der Banken
 					<span class="sidebar-close"><i class="fa fa-caret-right"></i></span>
 				</h1>
-
+				<div id="bank_layer_control"></div>
 				<table>
 					<tr>
 						<td>Geldautomat:</td>
@@ -113,26 +108,27 @@ Geldutomaten haben; zusätzlich werden Geldautomaten dargestellt,
 						</td>
 					</tr>
 				</table>
+
+			</div>
+
+			<div class="sidebar-pane" id="search">
+				<h1 class="sidebar-header">Suche<span class="sidebar-close"><i class="fa fa-caret-right"></i></span></h1>
+				<div id="search_control"></div>
+			</div>
+
+			<div class="sidebar-pane" id="info">
+				<h1 class="sidebar-header">Impressum und Datenschutz<span class="sidebar-close"><i class="fa fa-caret-right"></i></span></h1>
 				<p>
 					<a href="https://github.com/momolinus/atm-map">Sourcecode der Karte</a>, Version 2.0.0 RC4 (16.12.17)</p>
 				<p style="text-align: center;">
 					<a href="impressum.html">Impressum</a>
 				</p>
+				<p>Map data &copy; <a href="http://openstreetmap.org/">OpenStreetMap</a> contributors</p>
+				<p>POIs via <a href="http://www.overpass-api.de/">Overpass API</a></p>
+				<p>Icons by <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a>,	<a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY SA 3.0</a></p>
+			</p>
 			</div>
 
-			<div class="sidebar-pane" id="profile">
-				<h1 class="sidebar-header">Profile<span class="sidebar-close"><i class="fa fa-caret-right"></i></span></h1>
-				<div id="bank_layer_control"></div>
-				<div id="search_control"></div>
-			</div>
-
-			<div class="sidebar-pane" id="messages">
-				<h1 class="sidebar-header">Messages<span class="sidebar-close"><i class="fa fa-caret-right"></i></span></h1>
-			</div>
-
-			<div class="sidebar-pane" id="settings">
-				<h1 class="sidebar-header">Settings<span class="sidebar-close"><i class="fa fa-caret-right"></i></span></h1>
-			</div>
 		</div>
 	</div>
 

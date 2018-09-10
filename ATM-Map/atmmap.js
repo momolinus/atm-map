@@ -67,10 +67,8 @@ var spinner = new Spinner().spin();
 		attr_icons = 'Icons by <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a> <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY SA 3.0</a>';
 
 		osm = new L.TileLayer(
-			'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png', {
-				attribution: [attr_osm, attr_overpass, attr_icons]
-					.join(' | ')
-			});
+			'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png'
+		);
 
 		map = L.map('map', {
 			center: new L.LatLng(52.516, 13.379),
@@ -83,10 +81,12 @@ var spinner = new Spinner().spin();
 			text: 'Suchen'
 		});
 
+		/*
 		map.addControl(new L.Control.Permalink({
 			text: 'Permalink',
 			position: 'bottomright'
 		}));
+        */
 
 		var lc = L.control.locate({
 			strings: {
