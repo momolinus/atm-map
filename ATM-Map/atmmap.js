@@ -79,27 +79,13 @@ var spinner = new Spinner().spin();
 		var osmGeocoder = new L.Control.OSMGeocoder({
 			position: 'topright',
 			text: 'Suchen'
-		});
-
-		/*
-		map.addControl(new L.Control.Permalink({
-			text: 'Permalink',
-			position: 'bottomright'
-		}));
-        */
+		}).addTo(map);
 
 		var lc = L.control.locate({
 			strings: {
 				title: "Gehe zum meinem Standort!"
 			}
 		}).addTo(map);
-
-
-		map.addControl(osmGeocoder);
-
-		
-
-		//utils.addLegendTo(map);
 
 		var sidebar = L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
 		
@@ -110,11 +96,11 @@ var spinner = new Spinner().spin();
 		 * https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
 		 */
 		var htmlObject = osmGeocoder.getContainer();
-		var a = document.getElementById("search_control")
+		var searchdiv = document.getElementById("search_control")
 		function setParent(el, newParent) {
 			newParent.appendChild(el);
 		}
-		setParent(htmlObject, a);
+		setParent(htmlObject, searchdiv);
 
 		loadPois();
 
