@@ -31,7 +31,7 @@ Geldutomaten haben; zusätzlich werden Geldautomaten dargestellt,
 <script src="./permalink/Permalink.Layer.js"></script>
 <script src="./permalink/Permalink.Overlay.js"></script>
 
-<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel="stylesheet" href="./sidebar-v2/leaflet-sidebar.css" />
 <script src="./sidebar-v2/leaflet-sidebar.js"></script>
 
@@ -64,13 +64,17 @@ Geldutomaten haben; zusätzlich werden Geldautomaten dargestellt,
 
 
 <body>
-	<div id="sidebar" class="sidebar collapsed" style="height: 80%;">
+	<div id="sidebar" class="sidebar collapsed" style="margin-bottom: 1em;">
 		<!-- Nav tabs -->
 		<div class="sidebar-tabs">
 			<ul role="tablist">
-				<li><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li>
-				<li><a href="#search" role="tab"><i class="fa fa-search"></i></a></li>
+				<li><a href="#home" role="tab"><i class="fa fa-filter"></i></a></li>
 				<li><a href="#info" role="tab"><i class="fa fa-info"></i></a></li>
+				<li><a href="#search" role="tab"><i class="fa fa-search"></i></a></li>
+			</ul>
+
+			<ul role="tablist">
+				<li><a href="#copyright" role="tab"><i class="fa fa-copyright"></i></a></li>
 			</ul>
 		</div>
 
@@ -82,7 +86,9 @@ Geldutomaten haben; zusätzlich werden Geldautomaten dargestellt,
 					<span class="sidebar-close"><i class="fa fa-caret-right"></i></span>
 				</h1>
 				<p id="bank_layer_control"></p>
-				<h2 class="sidebar-header">Legende</h2>
+			</div>
+			<div class="sidebar-pane" id="info">
+				<h1 class="sidebar-header">Legende</h1>
 				<table>
 					<tr>
 						<td>Geldautomat:</td>
@@ -118,8 +124,8 @@ Geldutomaten haben; zusätzlich werden Geldautomaten dargestellt,
 				<div id="search_control"></div>
 			</div>
 
-			<div class="sidebar-pane" id="info">
-				<h1 class="sidebar-header">Impressum, Datenschutz und Copyrigth<span class="sidebar-close"><i class="fa fa-caret-right"></i></span></h1>
+			<div class="sidebar-pane" id="copyright">
+				<h1 class="sidebar-header">Impressum, Datenschutz ...<span class="sidebar-close"><i class="fa fa-caret-right"></i></span></h1>
 				<p>
 					<a href="https://github.com/momolinus/atm-map">Sourcecode der Karte</a>, Version 3.0.0 RC1 (10.09.2018)</p>
 				<p>
