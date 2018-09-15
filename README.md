@@ -7,21 +7,14 @@ check out <a href="https://geldautomaten-suche.org/">geldautomaten-suche.org</a>
 - map framework: http://leafletjs.com/
 - JavaScript framework: https://jquery.com/
 
-## Plugins
-
-- locatecontrol: https://github.com/domoritz/leaflet-locatecontrol
-
-- permalink: https://github.com/shramov/leaflet-plugins
-
-- ~~Photon search plugin: https://github.com/komoot/leaflet.photon~~
-
-- ~~Geodocder: https://github.com/k4r573n/leaflet-control-osm-geocoder~~
-
-- ~~Geodocder: https://github.com/smeijer/L.GeoSearch~~
-
-- Spin: https://github.com/makinacorpus/Leaflet.Spin
-
 # Releases
+
+## Version 3.0
+
+published 15.10.2018
+
+- added side bar https://github.com/turbo87/sidebar-v2/
+- removed permalink feature
 
 ## Version 2.0
 
@@ -30,7 +23,7 @@ check out <a href="https://geldautomaten-suche.org/">geldautomaten-suche.org</a>
 - update permalink to https://github.com/shramov/leaflet-plugins/releases/tag/3.0.1
 - updated to leaflet 1.2.0
 - updated to jquery 3.2.1
-- changed to locate control https://github.com/domoritz/leaflet-locatecontrol using https://www.mapbox.com/mapbox.js/plugins/#leaflet-locatecontrol
+- changed to locate control https://github.com/domoritz/leaflet-locatecontrol
 - changed search https://github.com/k4r573n/leaflet-control-osm-geocoder
 
 ## Version 1.4

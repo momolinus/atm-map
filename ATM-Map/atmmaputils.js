@@ -1,5 +1,6 @@
 /**
- * @author Marcus
+ * @author Marcus Bleil, www.marcusbleil.de
+ * 
  */
 var UTILS = {};
 
@@ -128,7 +129,9 @@ var UTILS = {};
 			table += '</td>';
 			table += '</tr>';
 			table += '</table>';
-			table += '<p><a href="https://github.com/momolinus/atm-map">Sourcecode der Karte</a>, Version 2.0.0 RC1</p>';
+			table += '<p><a href="https://github.com/momolinus/atm-map">';
+			table += 'Sourcecode der Karte</a>, Version 2.0.0 RC4 (16.12.17)</p>';
+			table += '<p style="text-align: center;"><a href="impressum.html">Impressum</a></p>';
 			table += '</div>';
 
 			div.innerHTML += table;
