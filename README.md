@@ -6,15 +6,17 @@ check out <a href="https://geldautomaten-suche.org/">geldautomaten-suche.org</a>
 <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a> <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY SA 3.0</a>
 - map framework: http://leafletjs.com/
 - JavaScript framework: https://jquery.com/
-- locator pin https://commons.wikimedia.org/wiki/File:Map_marker_font_awesome.svg
 
 # Releases
 
 ## Version 3.0
 
-- added side bar https://github.com/turbo87/sidebar-v2/
+published 15.10.2018
 
-## Version 2.0 (Release Candidate)
+- added side bar https://github.com/turbo87/sidebar-v2/
+- removed permalink feature
+
+## Version 2.0
 
 - updated spinner to https://github.com/makinacorpus/Leaflet.Spin/releases/tag/1.1.0
 	- depends on Spin.js https://github.com/fgnass/spin.js/releases/tag/3.1.0 download http://spin.js.org/spin.js
