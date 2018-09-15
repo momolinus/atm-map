@@ -76,10 +76,17 @@ var spinner = new Spinner().spin();
 			layers: osm
 		});
 
+		/*
 		var osmGeocoder = new L.Control.OSMGeocoder({
 			position: 'topright',
 			text: 'Suchen'
 		});
+		*/
+
+		var searchControl = L.control.photon({
+			position: 'topright',
+			placeholder: 'Suchen'
+		}).addTo(map);
 
 		/*
 		map.addControl(new L.Control.Permalink({
@@ -94,22 +101,17 @@ var spinner = new Spinner().spin();
 			}
 		}).addTo(map);
 
+		var sidebar = L.control.sidebar('sidebar', {
+			position: 'right'
+		}).addTo(map);
 
-		map.addControl(osmGeocoder);
-
-		
-
-		//utils.addLegendTo(map);
-
-		var sidebar = L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
-		
 		layerBuilder.buildLayers(map);
-
+		
 		/**
 		 * see:
 		 * https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
 		 */
-		var htmlObject = osmGeocoder.getContainer();
+		var htmlObject = searchControl.getContainer();
 		var a = document.getElementById("search_control")
 		function setParent(el, newParent) {
 			newParent.appendChild(el);
