@@ -9,6 +9,12 @@ check out <a href="https://geldautomaten-suche.org/">geldautomaten-suche.org</a>
 
 # Releases
 
+## Version 4.0.0
+
+published 02.02.2021
+
+minor change: now using ATM's network tag to find ATM's operator or name
+
 ## Version 3.0
 
 published 15.10.2018
