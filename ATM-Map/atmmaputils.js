@@ -67,6 +67,11 @@ var UTILS = {};
 			description += node.tags.operator + '</p>';
 		}
 
+		else if (node.tags.network) {
+			description = '<p class="bank_name">';
+			description += node.tags.network + '</p>';
+		}
+
 		if (node.tags.opening_hours) {
 			description += '<p class="opening_hour">';
 			description += node.tags.opening_hours + '</p>';
