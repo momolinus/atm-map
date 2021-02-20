@@ -1,8 +1,8 @@
 "use strict"
 // constructs the module ATMMAP
-var ATMMAP = {};
+let ATMMAP = {};
 
-var spinner = new Spinner().spin();
+let spinner = new Spinner().spin();
 //target.appendChild(spinner.el);
 
 (function () {
@@ -15,14 +15,14 @@ var spinner = new Spinner().spin();
 
 	// contains the node id of the OSM objects
 	// JavaScript pattern: object literal
-	var nodeIds = {};
-	var wayNodeIds = {};
+	let nodeIds = {};
+	let wayNodeIds = {};
 
-	var map = null;
+	let map = null;
 
 	// building the api call for atms (automated teller machine)
 	// the overpass api URL
-	var ovpCall = 'https://lz4.overpass-api.de/api/interpreter?data=';
+	let ovpCall = 'https://lz4.overpass-api.de/api/interpreter?data=';
 
 	// setting the output format to json and timeout of 60 s
 	ovpCall += '[out:json][timeout:60];';
@@ -61,7 +61,7 @@ var spinner = new Spinner().spin();
 
 	// public interface
 	ATMMAP.initMap = function () {
-		var attr_osm, attr_overpass, attr_icons, osm;
+		let attr_osm, attr_overpass, attr_icons, osm;
 
 		attr_osm = 'Map data &copy; <a href="http://openstreetmap.org/">OpenStreetMap</a> contributors';
 		attr_overpass = '<br>POIs via <a href="http://www.overpass-api.de/">Overpass API</a>';
@@ -77,18 +77,18 @@ var spinner = new Spinner().spin();
 			layers: osm
 		});
 
-		var osmGeocoder = new L.Control.OSMGeocoder({
+		let osmGeocoder = new L.Control.OSMGeocoder({
 			position: 'topright',
 			text: 'Suchen'
 		}).addTo(map);
 
-		var lc = L.control.locate({
+		let lc = L.control.locate({
 			strings: {
 				title: "Gehe zum meinem Standort!"
 			}
 		}).addTo(map);
 
-		var sidebar = L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
+		let sidebar = L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
 		
 		layerBuilder.buildLayers(map);
 
@@ -96,8 +96,8 @@ var spinner = new Spinner().spin();
 		 * see:
 		 * https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
 		 */
-		var htmlObject = osmGeocoder.getContainer();
-		var searchdiv = document.getElementById("search_control")
+		let htmlObject = osmGeocoder.getContainer();
+		let searchdiv = document.getElementById("search_control")
 		function setParent(el, newParent) {
 			newParent.appendChild(el);
 		}
@@ -112,8 +112,8 @@ var spinner = new Spinner().spin();
 	/** private methods */
 	/** *************** */
 
-	var loadPois = function () {
-		var overpassCall;
+	let loadPois = function () {
+		let overpassCall;
 
 		if (map.getZoom() < 13) {
 			return;
@@ -132,7 +132,7 @@ var spinner = new Spinner().spin();
 		});
 
 		// using JQuery executing overpass api
-		var ovpCallForAtms = $.getJSON(overpassCall, function (data) {
+		let ovpCallForAtms = $.getJSON(overpassCall, function (data) {
 
 			// first store all node from any ways
 			$.each(data.elements, function (index, node) {
@@ -182,8 +182,8 @@ var spinner = new Spinner().spin();
 		});
 	};
 
-	var addBankWithNoAtmToMap = function (bank) {
-		var name, marker;
+	let addBankWithNoAtmToMap = function (bank) {
+		let name, marker;
 
 		name = utils.createDescriptionFromeTags(bank);
 		marker = createMarker(bank, name, utils.noAtm);
@@ -191,8 +191,8 @@ var spinner = new Spinner().spin();
 		addToNamedGroups(bank, marker);
 	};
 
-	var addBankWithUnknownAtmToMap = function (bank) {
-		var name, marker;
+	let addBankWithUnknownAtmToMap = function (bank) {
+		let name, marker;
 
 		name = utils.createDescriptionFromeTags(bank);
 		marker = createMarker(bank, name, utils.unknownAtm);
@@ -200,8 +200,8 @@ var spinner = new Spinner().spin();
 		addToNamedGroups(bank, marker);
 	};
 
-	var addNodeWithAtmToMap = function (node) {
-		var name, marker;
+	let addNodeWithAtmToMap = function (node) {
+		let name, marker;
 
 		name = utils.createDescriptionFromeTags(node);
 
@@ -214,10 +214,10 @@ var spinner = new Spinner().spin();
 		addToNamedGroups(node, marker);
 	};
 
-	var createMarker = function (node, name, atmIcon) {
+	let createMarker = function (node, name, atmIcon) {
 
 		if (node.type == "node") {
-			var marker = L.marker([node.lat, node.lon], {
+			let marker = L.marker([node.lat, node.lon], {
 				icon: atmIcon
 			});
 
@@ -226,11 +226,11 @@ var spinner = new Spinner().spin();
 			return marker;
 
 		} else if (node.type == "way") {
-			var areaNodes = new Array();
-			var bankArea;
-			var marker = null;
-			var bounds;
-			var center;
+			let areaNodes = new Array();
+			let bankArea;
+			let marker = null;
+			let bounds;
+			let center;
 
 			$.each(node.nodes, function (index, nodeId) {
 
@@ -258,8 +258,8 @@ var spinner = new Spinner().spin();
 		}
 	};
 
-	var addSingleAtmToMap = function (atm) {
-		var name, marker;
+	let addSingleAtmToMap = function (atm) {
+		let name, marker;
 
 		name = utils.createDescriptionFromeTags(atm);
 		marker = L.marker([atm.lat, atm.lon], {
@@ -269,7 +269,7 @@ var spinner = new Spinner().spin();
 		addToNamedGroups(atm, marker);
 	};
 
-	var addToNamedGroups = function (node, marker) {
+	let addToNamedGroups = function (node, marker) {
 		try {
 			layerBuilder.addToNamedGroups(node, marker);
 		} catch (e) {
@@ -277,7 +277,7 @@ var spinner = new Spinner().spin();
 		}
 	};
 
-	var moveEnd = function () {
+	let moveEnd = function () {
 		loadPois();
 	};
 

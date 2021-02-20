@@ -3,11 +3,11 @@
  * @author Marcus Bleil, www.marcusbleil.de
  * 
  */
-var UTILS = {};
+let UTILS = {};
 
 (function() {
 
-	var buildAtmIcon = function(iconPic) {
+	let buildAtmIcon = function(iconPic) {
 		return L.icon({
 			iconUrl : iconPic,
 			iconSize : [ 32, 37 ],
@@ -25,8 +25,8 @@ var UTILS = {};
 	UTILS.latLongToString = function(bounds) {
 
 		/* The coordinate order is (lower lat, lower lon, upper lat, upper lon) */
-		var result;
-		var lowerLat, lowerLng, upperLat, upperLng;
+		let result;
+		let lowerLat, lowerLng, upperLat, upperLng;
 
 		lowerLat = bounds.getSouthWest().lat;
 		lowerLng = bounds.getSouthWest().lng;
@@ -40,7 +40,7 @@ var UTILS = {};
 
 	UTILS.createDescriptionFromeTags = function(node) {
 
-		var description = '<p class="bank_name">???</p>';
+		let description = '<p class="bank_name">???</p>';
 
 		// atm usually not in bank
 		if (node.tags["atm:operator"]) {
@@ -86,15 +86,15 @@ var UTILS = {};
 
 	UTILS.addLegendTo = function(map) {
 
-		var legend = L.control({
+		let legend = L.control({
 			position : 'topright',
 			collapsed : true
 		});
 
 		legend.onAdd = function(map) {
 
-			var div = L.DomUtil.create('div', 'legend');
-			var table = '';
+			let div = L.DomUtil.create('div', 'legend');
+			let table = '';
 
 			table += '<p id="legend_but" style="cursor: pointer">Legende (+/-):</p>';
 			table += '<div id="legend_table">';
