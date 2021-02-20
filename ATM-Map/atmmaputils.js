@@ -5,15 +5,15 @@
  */
 let UTILS = {};
 
-(function() {
+(function () {
 
-	let buildAtmIcon = function(iconPic) {
+	let buildAtmIcon = function (iconPic) {
 		return L.icon({
-			iconUrl : iconPic,
-			iconSize : [ 32, 37 ],
-			iconAnchor : [ 15, 37 ],
-			popupAnchor : [ -3, -37 ],
-			labelAnchor : [ 10, -18 ],
+			iconUrl: iconPic,
+			iconSize: [32, 37],
+			iconAnchor: [15, 37],
+			popupAnchor: [-3, -37],
+			labelAnchor: [10, -18],
 		});
 	};
 
@@ -22,7 +22,7 @@ let UTILS = {};
 	UTILS.unknownAtm = buildAtmIcon('bank_euro_atm_unknow.png');
 	UTILS.noAtm = buildAtmIcon('bank_icon_atm_no.png');
 
-	UTILS.latLongToString = function(bounds) {
+	UTILS.latLongToString = function (bounds) {
 
 		/* The coordinate order is (lower lat, lower lon, upper lat, upper lon) */
 		let result;
@@ -38,10 +38,11 @@ let UTILS = {};
 		return result;
 	};
 
-	UTILS.createDescriptionFromeTags = function(node) {
+	UTILS.createDescriptionFromeTags = function (node) {
 
 		let description = '<p class="bank_name">???</p>';
 
+		//TODO Folgendes mit einer verbesserten LAYER_BUILDER.createNameFromeTags ersetzen
 		// atm usually not in bank
 		if (node.tags["atm:operator"]) {
 
@@ -55,19 +56,16 @@ let UTILS = {};
 				description += '</p>';
 			}
 		}
-
 		// usually a bank or an single atm
 		else if (node.tags.name) {
 			description = '<p class="bank_name">';
 			description += node.tags.name + '</p>';
 		}
-
 		// "operator" often used instead of "name"
 		else if (node.tags.operator) {
 			description = '<p class="bank_name">';
 			description += node.tags.operator + '</p>';
 		}
-
 		else if (node.tags.network) {
 			description = '<p class="bank_name">';
 			description += node.tags.network + '</p>';
@@ -84,14 +82,14 @@ let UTILS = {};
 		return description;
 	};
 
-	UTILS.addLegendTo = function(map) {
+	UTILS.addLegendTo = function (map) {
 
 		let legend = L.control({
-			position : 'topright',
-			collapsed : true
+			position: 'topright',
+			collapsed: true
 		});
 
-		legend.onAdd = function(map) {
+		legend.onAdd = function (map) {
 
 			let div = L.DomUtil.create('div', 'legend');
 			let table = '';
@@ -147,7 +145,7 @@ let UTILS = {};
 
 		legend.addTo(map);
 
-		$('#legend_but').on('click', function() {
+		$('#legend_but').on('click', function () {
 			$('#legend_table').toggle();
 		});
 

@@ -89,7 +89,7 @@ let spinner = new Spinner().spin();
 		}).addTo(map);
 
 		let sidebar = L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
-		
+
 		layerBuilder.buildLayers(map);
 
 		/**
