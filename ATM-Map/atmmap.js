@@ -1,3 +1,4 @@
+"use strict"
 // constructs the module ATMMAP
 var ATMMAP = {};
 
@@ -7,8 +8,8 @@ var spinner = new Spinner().spin();
 (function () {
 
 	// dependencies
-	utils = UTILS;
-	layerBuilder = LAYER_BUILDER;
+	let utils = UTILS;
+	let layerBuilder = LAYER_BUILDER;
 
 	/* private attributes */
 
@@ -123,15 +124,12 @@ var spinner = new Spinner().spin();
 		overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map
 			.getBounds()));
 
-		console.log("calling overpass-api: " + overpassCall);
-
 		map.spin(true, {
 			color: '#0026FF',
 			radius: 20,
 			width: 7,
 			length: 20
 		});
-		console.log("spinner started");
 
 		// using JQuery executing overpass api
 		var ovpCallForAtms = $.getJSON(overpassCall, function (data) {
@@ -181,7 +179,6 @@ var spinner = new Spinner().spin();
 			});
 		}).always(function () {
 			map.spin(false);
-			console.log("spinner stopped");
 		});
 	};
 
