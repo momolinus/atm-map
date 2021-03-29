@@ -1,3 +1,4 @@
+"use strict"
 /**
  * *** Geldautomaten-Verbünde **********************************************
  *
@@ -20,30 +21,30 @@
  *
  */
 
-var LAYER_BUILDER = {};
+let LAYER_BUILDER = {};
 
 (function () {
 
-	var operatorLayers;
+	let operatorLayers;
 
 	// JavaScript pattern: array literal
-	var operatorCategories = [
+	let operatorCategories = [
 		"Genossenschaftsbanken<br /><span class=\"details\">Bankcard-Servicenetz, Volksbanken, usw.</span>",
 		"Sparkassen",
 		"CashPool<br /><span class=\"details\">Santander, Sparda, usw.</span>",
 		"Cash Group<br /><span class=\"details\">Deutsche Bank, Postbank, usw.</span>",
 		"weitere Banken<br /><span class=\"details\">Banken, die sich nicht zuordnen lassen</span>"];
 
-	var namedGroup = {};
+	let namedGroup = {};
 
 	LAYER_BUILDER.buildLayers = function (map) {
-		var group;
+		let group;
 
 		operatorLayers = L.control.layers(null, null, {
 			collapsed: false
 		}).addTo(map);
 
-		for (var i = 0; i < operatorCategories.length; i++) {
+		for (let i = 0; i < operatorCategories.length; i++) {
 			group = L.layerGroup();
 			group.addTo(map);
 			operatorLayers.addOverlay(group, operatorCategories[i]);
@@ -55,8 +56,8 @@ var LAYER_BUILDER = {};
 		 * see:
 		 * https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
 		 */
-		var htmlObject = operatorLayers.getContainer();
-		var a = document.getElementById("bank_layer_control")
+		let htmlObject = operatorLayers.getContainer();
+		let a = document.getElementById("bank_layer_control")
 		function setParent(el, newParent) {
 			newParent.appendChild(el);
 		}
@@ -64,7 +65,7 @@ var LAYER_BUILDER = {};
 	};
 
 	LAYER_BUILDER.addToNamedGroups = function (node, marker) {
-		var group, name, matched;
+		let group, name, matched;
 
 		matched = false;
 		name = createNameFromeTags(node);
@@ -182,9 +183,9 @@ var LAYER_BUILDER = {};
 		return false;
 	};
 
-	var createNameFromeTags = function (node) {
+	let createNameFromeTags = function (node) {
 
-		var name = 'xxxxxxxxxxxxxxxxxxxx';
+		let name = 'xxxxxxxxxxxxxxxxxxxx';
 
 		// atm usually not in bank
 		if (node.tags["atm:operator"]) {

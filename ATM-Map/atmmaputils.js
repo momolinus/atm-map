@@ -1,18 +1,19 @@
+"use strict"
 /**
  * @author Marcus Bleil, www.marcusbleil.de
  * 
  */
-var UTILS = {};
+let UTILS = {};
 
-(function() {
+(function () {
 
-	var buildAtmIcon = function(iconPic) {
+	let buildAtmIcon = function (iconPic) {
 		return L.icon({
-			iconUrl : iconPic,
-			iconSize : [ 32, 37 ],
-			iconAnchor : [ 15, 37 ],
-			popupAnchor : [ -3, -37 ],
-			labelAnchor : [ 10, -18 ],
+			iconUrl: iconPic,
+			iconSize: [32, 37],
+			iconAnchor: [15, 37],
+			popupAnchor: [-3, -37],
+			labelAnchor: [10, -18],
 		});
 	};
 
@@ -21,11 +22,11 @@ var UTILS = {};
 	UTILS.unknownAtm = buildAtmIcon('bank_euro_atm_unknow.png');
 	UTILS.noAtm = buildAtmIcon('bank_icon_atm_no.png');
 
-	UTILS.latLongToString = function(bounds) {
+	UTILS.latLongToString = function (bounds) {
 
 		/* The coordinate order is (lower lat, lower lon, upper lat, upper lon) */
-		var result;
-		var lowerLat, lowerLng, upperLat, upperLng;
+		let result;
+		let lowerLat, lowerLng, upperLat, upperLng;
 
 		lowerLat = bounds.getSouthWest().lat;
 		lowerLng = bounds.getSouthWest().lng;
@@ -37,10 +38,11 @@ var UTILS = {};
 		return result;
 	};
 
-	UTILS.createDescriptionFromeTags = function(node) {
+	UTILS.createDescriptionFromeTags = function (node) {
 
-		var description = '<p class="bank_name">???</p>';
+		let description = '<p class="bank_name">???</p>';
 
+		//TODO Folgendes mit einer verbesserten LAYER_BUILDER.createNameFromeTags ersetzen
 		// atm usually not in bank
 		if (node.tags["atm:operator"]) {
 
@@ -54,17 +56,19 @@ var UTILS = {};
 				description += '</p>';
 			}
 		}
-
 		// usually a bank or an single atm
 		else if (node.tags.name) {
 			description = '<p class="bank_name">';
 			description += node.tags.name + '</p>';
 		}
-
 		// "operator" often used instead of "name"
 		else if (node.tags.operator) {
 			description = '<p class="bank_name">';
 			description += node.tags.operator + '</p>';
+		}
+		else if (node.tags.network) {
+			description = '<p class="bank_name">';
+			description += node.tags.network + '</p>';
 		}
 
 		if (node.tags.opening_hours) {
@@ -78,17 +82,17 @@ var UTILS = {};
 		return description;
 	};
 
-	UTILS.addLegendTo = function(map) {
+	UTILS.addLegendTo = function (map) {
 
-		var legend = L.control({
-			position : 'topright',
-			collapsed : true
+		let legend = L.control({
+			position: 'topright',
+			collapsed: true
 		});
 
-		legend.onAdd = function(map) {
+		legend.onAdd = function (map) {
 
-			var div = L.DomUtil.create('div', 'legend');
-			var table = '';
+			let div = L.DomUtil.create('div', 'legend');
+			let table = '';
 
 			table += '<p id="legend_but" style="cursor: pointer">Legende (+/-):</p>';
 			table += '<div id="legend_table">';
@@ -141,7 +145,7 @@ var UTILS = {};
 
 		legend.addTo(map);
 
-		$('#legend_but').on('click', function() {
+		$('#legend_but').on('click', function () {
 			$('#legend_table').toggle();
 		});
 
