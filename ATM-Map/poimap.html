@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="de">
+<meta charset="utf-8" />
+
+<link rel="stylesheet" href="leaflet_1.7.1/leaflet.css" />
+<script src="leaflet_1.7.1/leaflet.js"></script>
+
+<script src="jquery_3.6.0/jquery-3.6.0.min.js"></script>
+
+<script src="PoiMap.js"></script>
+
+<style type="text/css">
+    /*
+    body {
+        padding: 0;
+        margin: 0;
+        font-family: sans-serif;
+    }
+    */
+
+
+    /*
+    html, body, #map {
+        height: 100%;
+    }
+    */
+
+    #map {
+        height: 100%;
+    }
+</style>
+
+<body>
+    <div id="map">&nbsp;</div>
+
+    <script type="text/javascript">
+        let poiMap = new PoiMap();
+        $(document).ready(poiMap.runMap());
+    </script>
+</body>
+
+</html>
