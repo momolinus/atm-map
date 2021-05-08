@@ -148,6 +148,7 @@ let ATMMAP = {};
 			// overpass returns a list with elements, which contains the nodes
 			$.each(data.elements, function (index, node) {
 
+				//TODO zweimal gibt es hier die Möglichkeit einer Wächterbedingung => zwei Ebenen weniger Verschachtelung
 				if ("tags" in node) {
 
 					if (!(node.id in nodeIds)) {
