@@ -2,62 +2,11 @@
 // constructs the module ATMMAP
 let ATMMAP = {};
 
-let spinner = new Spinner().spin();
-//target.appendChild(spinner.el);
-
 (function () {
 
 	// dependencies
 	let utils = UTILS;
 	let layerBuilder = LAYER_BUILDER;
-
-	/* private attributes */
-
-	// contains the node id of the OSM objects
-	// JavaScript pattern: object literal
-	let nodeIds = {};
-	let wayNodeIds = {};
-
-	let map = null;
-
-	// building the api call for atms (automated teller machine)
-	// the overpass api URL
-	let ovpCall = 'https://lz4.overpass-api.de/api/interpreter?data=';
-
-	// setting the output format to json and timeout of 60 s
-	ovpCall += '[out:json][timeout:60];';
-
-	// nodes and ways with "amenity"="bank"
-	ovpCall += '(';
-	ovpCall += 'node["amenity"="bank"]({{bbox}});';
-	ovpCall += 'way["amenity"="bank"]({{bbox}});';
-	ovpCall += 'node["amenity"="atm"]({{bbox}});';
-
-	// other objects with "atm"="yes"
-	ovpCall += '(';
-	ovpCall += '(';
-	ovpCall += 'node["atm"="yes"]({{bbox}});';
-	ovpCall += 'way["atm"="yes"]({{bbox}});';
-	ovpCall += ');';
-	// - means difference
-	ovpCall += '-';
-	// but no banks
-	ovpCall += '(';
-	ovpCall += 'node["amenity"="bank"]({{bbox}});';
-	ovpCall += 'way["amenity"="bank"]({{bbox}});';
-	ovpCall += 'node["amenity"="atm"]({{bbox}});';
-	ovpCall += ');';
-	ovpCall += ');';
-
-	// closes the atm set statement
-	ovpCall += ');';
-
-	// output statement
-	ovpCall += 'out body;';
-
-	// all nodes needed for ways only with lat/lng (skel) sorted by place (qt)
-	ovpCall += '>;';
-	ovpCall += 'out skel qt;';
 
 	// public interface
 	ATMMAP.initMap = function () {
@@ -107,6 +56,56 @@ let spinner = new Spinner().spin();
 
 		map.on('moveend', moveEnd);
 	};
+
+
+	/* private attributes */
+
+	// contains the node id of the OSM objects
+	// JavaScript pattern: object literal
+	let nodeIds = {};
+	let wayNodeIds = {};
+
+	let map = null;
+
+	// building the api call for atms (automated teller machine)
+	// the overpass api URL
+	let ovpCall = 'https://lz4.overpass-api.de/api/interpreter?data=';
+
+	// setting the output format to json and timeout of 60 s
+	ovpCall += '[out:json][timeout:60];';
+
+	// nodes and ways with "amenity"="bank"
+	ovpCall += '(';
+	ovpCall += 'node["amenity"="bank"]({{bbox}});';
+	ovpCall += 'way["amenity"="bank"]({{bbox}});';
+	ovpCall += 'node["amenity"="atm"]({{bbox}});';
+
+	// other objects with "atm"="yes"
+	ovpCall += '(';
+	ovpCall += '(';
+	ovpCall += 'node["atm"="yes"]({{bbox}});';
+	ovpCall += 'way["atm"="yes"]({{bbox}});';
+	ovpCall += ');';
+	// - means difference
+	ovpCall += '-';
+	// but no banks
+	ovpCall += '(';
+	ovpCall += 'node["amenity"="bank"]({{bbox}});';
+	ovpCall += 'way["amenity"="bank"]({{bbox}});';
+	ovpCall += 'node["amenity"="atm"]({{bbox}});';
+	ovpCall += ');';
+	ovpCall += ');';
+
+	// closes the atm set statement
+	ovpCall += ');';
+
+	// output statement
+	ovpCall += 'out body;';
+
+	// all nodes needed for ways only with lat/lng (skel) sorted by place (qt)
+	ovpCall += '>;';
+	ovpCall += 'out skel qt;';
+
 
 	/** *************** */
 	/** private methods */
