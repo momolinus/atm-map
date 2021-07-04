@@ -14,7 +14,7 @@ let ATMMAP = {};
 		attr_osm = 'Map data &copy; <a href="http://openstreetmap.org/">OpenStreetMap</a> contributors';
 		attr_overpass = '<br>POIs via <a href="http://www.overpass-api.de/">Overpass API</a>';
 		attr_icons = 'Icons by <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a> <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY SA 3.0</a>';
-		
+
 		let osm_layer;
 		osm_layer = new L.TileLayer(
 			'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png'
@@ -148,32 +148,31 @@ let ATMMAP = {};
 			// overpass returns a list with elements, which contains the nodes
 			$.each(data.elements, function (index, node) {
 
-				//TODO zweimal gibt es hier die Möglichkeit einer Wächterbedingung => zwei Ebenen weniger Verschachtelung
-				if ("tags" in node) {
+				// Guardian condition: if node has no "tags" property
+				// no further processing is necessary.
+				if (!("tags" in node)) return;
 
-					if (!(node.id in nodeIds)) {
+				// Guardian condition: If the node has already been processed before,
+				// a new processing is not necessary
+				if (node.is in nodeIds) return;
 
-						nodeIds[node.id] = true;
+				nodeIds[node.id] = true;
 
-						// bank (or anything else) with atm
-						if (node.tags.atm == "yes") {
-							addNodeWithAtmToMap(node);
-						}
+				// bank (or anything else) with atm
+				if (node.tags.atm == "yes") {
+					addNodeWithAtmToMap(node);
+				}
+				// a single atm
+				else if (node.tags.amenity == "atm") {
+					addSingleAtmToMap(node);
+				}
+				// banks without atm or unknow state
+				else if (node.tags.amenity == "bank") {
 
-						// an atm
-						else if (node.tags.amenity == "atm") {
-							addSingleAtmToMap(node);
-						}
-
-						// banks without atm or unknow state
-						else if (node.tags.amenity == "bank") {
-
-							if (node.tags.atm == "no") {
-								addBankWithNoAtmToMap(node);
-							} else {
-								addBankWithUnknownAtmToMap(node);
-							}
-						}
+					if (node.tags.atm == "no") {
+						addBankWithNoAtmToMap(node);
+					} else {
+						addBankWithUnknownAtmToMap(node);
 					}
 				}
 			});
