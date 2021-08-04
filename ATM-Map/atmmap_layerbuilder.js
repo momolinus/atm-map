@@ -20,7 +20,10 @@
  * unbekannt (5)
  *
  */
-
+/**
+ * @author Marcus Bleil, www.marcusbleil.de
+ * 
+ */
 let LAYER_BUILDER = {};
 
 (function () {

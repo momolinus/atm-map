@@ -1,4 +1,8 @@
 "use strict"
+/**
+ * @author Marcus Bleil, www.marcusbleil.de
+ * 
+ */
 // constructs the module ATMMAP
 let ATMMAP = {};
 
