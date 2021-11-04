@@ -122,6 +122,22 @@ let ATMMAP = {};
 			return;
 		}
 
+		/*
+		https://alexbol99.github.io/flatten-js/index.html
+		let new_area = map.getBounds()
+		new_area = new_area.pad(2) // Größe verdoppeln
+		if (polygon.contains(new_area)) return; //Loggen Abfrage gespart
+
+		Schleife über alle polygone
+		if (polygon.distanceTo(new_area) < max_distance) {
+			polygon.addFace(new_area);
+		}
+		else {
+			new_polygon.addFace(new_area);
+		}
+		overpassCall(new_area);
+		*/
+
 		// note: g in /{{bbox}}/g means replace all occurrences of
 		// {{bbox}} not just first occurrence
 		overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map
