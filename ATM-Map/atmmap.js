@@ -136,29 +136,47 @@ let ATMMAP = {};
 		// flatten-js-Methoden: addFace
 
 		let new_area = map.getBounds();
-		let new_polygon = turf.multiPolygon([[
+		let new_polygon = turf.polygon(
 			[
-				[new_area.getNorthWest().lat, new_area.getNorthWest().lng],
-				[new_area.getSouthEast().lat, new_area.getSouthEast().lng],
+				[
+					[new_area.getNorthWest().lat, new_area.getNorthWest().lng],
+					[new_area.getNorthEast().lat, new_area.getNorthEast().lng],
+					[new_area.getSouthEast().lat, new_area.getSouthEast().lng],
+					[new_area.getSouthWest().lat, new_area.getSouthWest().lng],
+					[new_area.getNorthWest().lat, new_area.getNorthWest().lng],
+				]
 			]
-		]]);
+		);
 		new_polygon = turf.transformScale(new_polygon, 2);
+
+		/**
+		polygon = turf.polygon([[[-5, 52], [-4, 56], [-2, 51], [-7, 54], [-5, 52]]], { name: 'poly1' });
+		polygon_child =  turf.polygon([[[-6, 52], [-4, 56], [-2, 51], [-7, 54], [-6, 52]]], { name: 'poly2' });
+		JSON.stringify(polygon)
+		JSON.stringify(polygon_child)
+		turf.booleanContains(polygon, polygon_child)
+		
+		*/
 
 		let query_necessary;
 		if (qurey_polygon === null) {
 			qurey_polygon = new_polygon;
 			query_necessary = true;
-		} else {
+		}
+		else {
+			console.log("#1: " + JSON.stringify(qurey_polygon));
+
 			if (turf.booleanContains(qurey_polygon, new_polygon)) {
 				query_necessary = false;
-			} else {
+			}
+			else {
 				qurey_polygon = turf.union(qurey_polygon, new_polygon);
 				query_necessary = true;
 			}
 		}
 
-		console.log(JSON.stringify(qurey_polygon));
-
+		console.log("#2: " + JSON.stringify(qurey_polygon));
+		console.log("query_necessary=" + query_necessary);
 
 		// note: g in /{{bbox}}/g means replace all occurrences of
 		// {{bbox}} not just first occurrence
