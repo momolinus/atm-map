@@ -3,6 +3,9 @@
  * @author Marcus Bleil, www.marcusbleil.de
  * 
  */
+
+//import { polygon as flatter_polygon } from "./node_modules/@flatten-js/core/index.js"
+
 // constructs the module ATMMAP
 let ATMMAP = {};
 
@@ -115,6 +118,9 @@ let ATMMAP = {};
 	/** private methods */
 	/** *************** */
 
+	// let qurey_polygon = window.polygon();
+	let qurey_polygon = null;
+
 	let loadPois = function () {
 		let overpassCall;
 
@@ -122,21 +128,37 @@ let ATMMAP = {};
 			return;
 		}
 
-		/*
-		https://alexbol99.github.io/flatten-js/index.html
-		let new_area = map.getBounds()
-		new_area = new_area.pad(2) // Größe verdoppeln
-		if (polygon.contains(new_area)) return; //Loggen Abfrage gespart
+		// https://alexbol99.github.io/flatten-js/index.html
 
-		Schleife über alle polygone
-		if (polygon.distanceTo(new_area) < max_distance) {
-			polygon.addFace(new_area);
+		// könnte acuh gehen: http://turfjs.org/getting-started
+
+		// leaflet-Methoden: pad, contains, distanceTo
+		// flatten-js-Methoden: addFace
+
+		let new_area = map.getBounds();
+		let new_polygon = turf.multiPolygon([[
+			[
+				[new_area.getNorthWest().lat, new_area.getNorthWest().lng],
+				[new_area.getSouthEast().lat, new_area.getSouthEast().lng],
+			]
+		]]);
+		new_polygon = turf.transformScale(new_polygon, 2);
+
+		let query_necessary;
+		if (qurey_polygon === null) {
+			qurey_polygon = new_polygon;
+			query_necessary = true;
+		} else {
+			if (turf.booleanContains(qurey_polygon, new_polygon)) {
+				query_necessary = false;
+			} else {
+				qurey_polygon = turf.union(qurey_polygon, new_polygon);
+				query_necessary = true;
+			}
 		}
-		else {
-			new_polygon.addFace(new_area);
-		}
-		overpassCall(new_area);
-		*/
+
+		console.log(JSON.stringify(qurey_polygon));
+
 
 		// note: g in /{{bbox}}/g means replace all occurrences of
 		// {{bbox}} not just first occurrence
