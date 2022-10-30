@@ -120,8 +120,32 @@ let ATMMAP = {};
 
 	let query_polygon = null;
 
-	ATMMAP.test_query_necessary = function () {
+	ATMMAP.test_query_necessary = function (query, next_query) {
+		let query_necessary;
+		// note: query_polygon is a class member, existing out of method call
+		if (query === null) {
+			query = next_query;
+			query = turf.transformScale(query, 2);
+			query_necessary = true;
+		}
+		else {
+			console.log("#1: " + JSON.stringify(query));
 
+			if (turf.booleanContains(query, next_polygon)) {
+				query_necessary = false;
+			}
+			else {
+				query = turf.union(query, next_polygon);
+				query_necessary = true;
+			}
+
+			//console.log("#2: query_necessary set to " + query_necessary);
+		}
+
+		//console.log("#2: " + JSON.stringify(query_polygon));
+		//console.log("query_necessary=" + query_necessary);
+
+		return query_necessary;
 	}
 
 	let loadPois = function () {
