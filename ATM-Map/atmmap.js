@@ -118,8 +118,11 @@ let ATMMAP = {};
 	/** private methods */
 	/** *************** */
 
-	// let qurey_polygon = window.polygon();
-	let qurey_polygon = null;
+	let query_polygon = null;
+
+	ATMMAP.test_query_necessary = function () {
+
+	}
 
 	let loadPois = function () {
 		let overpassCall;
@@ -130,7 +133,7 @@ let ATMMAP = {};
 
 		// https://alexbol99.github.io/flatten-js/index.html
 
-		// könnte acuh gehen: http://turfjs.org/getting-started
+		// könnte auch gehen: http://turfjs.org/getting-started
 
 		// leaflet-Methoden: pad, contains, distanceTo
 		// flatten-js-Methoden: addFace
@@ -147,7 +150,6 @@ let ATMMAP = {};
 				]
 			]
 		);
-		new_polygon = turf.transformScale(new_polygon, 2);
 
 		/**
 		polygon = turf.polygon([[[-5, 52], [-4, 56], [-2, 51], [-7, 54], [-5, 52]]], { name: 'poly1' });
@@ -159,86 +161,93 @@ let ATMMAP = {};
 		*/
 
 		let query_necessary;
-		if (qurey_polygon === null) {
-			qurey_polygon = new_polygon;
+		// note: query_polygon is a class member, existing out of method call
+		if (query_polygon === null) {
+			query_polygon = new_polygon;
+			query_polygon = turf.transformScale(query_polygon, 2);
 			query_necessary = true;
 		}
 		else {
-			console.log("#1: " + JSON.stringify(qurey_polygon));
+			console.log("#1: " + JSON.stringify(query_polygon));
 
-			if (turf.booleanContains(qurey_polygon, new_polygon)) {
+			if (turf.booleanContains(query_polygon, new_polygon)) {
 				query_necessary = false;
 			}
 			else {
-				qurey_polygon = turf.union(qurey_polygon, new_polygon);
+				query_polygon = turf.union(query_polygon, new_polygon);
 				query_necessary = true;
 			}
+
+			console.log("#2: query_necessary set to " + query_necessary);
 		}
 
-		console.log("#2: " + JSON.stringify(qurey_polygon));
+		console.log("#2: " + JSON.stringify(query_polygon));
 		console.log("query_necessary=" + query_necessary);
 
-		// note: g in /{{bbox}}/g means replace all occurrences of
-		// {{bbox}} not just first occurrence
-		overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map
-			.getBounds()));
+		if (query_necessary) {
 
-		map.spin(true, {
-			color: '#0026FF',
-			radius: 20,
-			width: 7,
-			length: 20
-		});
+			// note: g in /{{bbox}}/g means replace all occurrences of
+			// {{bbox}} not just first occurrence
+			overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map
+				.getBounds()));
 
-		// using JQuery executing overpass api
-		let ovpCallForAtms = $.getJSON(overpassCall, function (data) {
-
-			// first store all node from any ways
-			$.each(data.elements, function (index, node) {
-
-				// all nodes of type "node", some tagged nodes are necessary for
-				// building ways, not all nodes here are stored are necessary
-				// for storing
-				if (node.type == "node") {
-					wayNodeIds[node.id] = node;
-				}
-
+			map.spin(true, {
+				color: '#0026FF',
+				radius: 20,
+				width: 7,
+				length: 20
 			});
 
-			// overpass returns a list with elements, which contains the nodes
-			$.each(data.elements, function (index, node) {
+			// using JQuery executing overpass api
+			let ovpCallForAtms = $.getJSON(overpassCall, function (data) {
 
-				// Guardian condition: if node has no "tags" property
-				// no further processing is necessary.
-				if (!("tags" in node)) return;
+				// first store all node from any ways
+				$.each(data.elements, function (index, node) {
 
-				// Guardian condition: If the node has already been processed before,
-				// a new processing is not necessary
-				if (node.is in nodeIds) return;
-
-				nodeIds[node.id] = true;
-
-				// bank (or anything else) with atm
-				if (node.tags.atm == "yes") {
-					addNodeWithAtmToMap(node);
-				}
-				// a single atm
-				else if (node.tags.amenity == "atm") {
-					addSingleAtmToMap(node);
-				}
-				// banks without atm or unknow state
-				else if (node.tags.amenity == "bank") {
-
-					if (node.tags.atm == "no") {
-						addBankWithNoAtmToMap(node);
-					} else {
-						addBankWithUnknownAtmToMap(node);
+					// all nodes of type "node", some tagged nodes are necessary for
+					// building ways, not all nodes here are stored are necessary
+					// for storing
+					if (node.type == "node") {
+						wayNodeIds[node.id] = node;
 					}
-				}
+
+				});
+
+				// overpass returns a list with elements, which contains the nodes
+				$.each(data.elements, function (index, node) {
+
+					// Guardian condition: if node has no "tags" property
+					// no further processing is necessary.
+					if (!("tags" in node)) return;
+
+					// Guardian condition: If the node has already been processed before,
+					// a new processing is not necessary
+					if (node.is in nodeIds) return;
+
+					nodeIds[node.id] = true;
+
+					// bank (or anything else) with atm
+					if (node.tags.atm == "yes") {
+						addNodeWithAtmToMap(node);
+					}
+					// a single atm
+					else if (node.tags.amenity == "atm") {
+						addSingleAtmToMap(node);
+					}
+					// banks without atm or unknow state
+					else if (node.tags.amenity == "bank") {
+
+						if (node.tags.atm == "no") {
+							addBankWithNoAtmToMap(node);
+						} else {
+							addBankWithUnknownAtmToMap(node);
+						}
+					}
+				});
+			}).always(function () {
+				map.spin(false);
 			});
-		}).always(function () {
-			map.spin(false);
-		});
+		}
 	};
 
 	let addBankWithNoAtmToMap = function (bank) {

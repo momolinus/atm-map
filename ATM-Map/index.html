@@ -27,14 +27,6 @@ Geldautomaten haben; zusätzlich werden Geldautomaten dargestellt,
 
 <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
 
-<script type="module">
-	import { polygon } from './node_modules/@flatten-js/core/index.js';
-	if (polygon === undefined || polygon === null) {
-		throw new Error("can't build polygon function");
-	}
-	window.polygon = polygon;
-</script>
-
 <script src="./sidebar-v2/leaflet-sidebar.js"></script>
 
 <script src="./atmmap_layerbuilder.js"></script>
