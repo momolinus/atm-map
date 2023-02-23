@@ -48,6 +48,29 @@ let ATMMAP = {};
 
 		layerBuilder.buildLayers(map);
 
+		L.Control.Button = L.Control.extend({
+			options: {
+				position: 'topleft'
+			},
+			onAdd: function (map) {
+				var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+				var button = L.DomUtil.create('a', 'leaflet-control-button', container);
+				L.DomEvent.disableClickPropagation(button);
+				L.DomEvent.on(button, 'click', function(){
+					//console.log('click');
+					loadPois();
+				});
+		
+				container.title = "Title";
+		
+				return container;
+			},
+			onRemove: function(map) {},
+		});
+		
+		let control = new L.Control.Button();
+		control.addTo(map);
+
 		/**
 		 * see:
 		 * https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
@@ -59,7 +82,7 @@ let ATMMAP = {};
 		}
 		setParent(htmlObject, searchdiv);
 
-		loadPois();
+		// loadPois();
 
 		map.on('moveend', moveEnd);
 	};
@@ -370,7 +393,7 @@ let ATMMAP = {};
 	};
 
 	let moveEnd = function () {
-		loadPois();
+		//loadPois();
 	};
 
 })();
