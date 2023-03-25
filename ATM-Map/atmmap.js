@@ -1,10 +1,7 @@
 "use strict"
 /**
  * @author Marcus Bleil, www.marcusbleil.de
- * 
  */
-
-//import { polygon as flatter_polygon } from "./node_modules/@flatten-js/core/index.js"
 
 // constructs the module ATMMAP
 let ATMMAP = {};
@@ -15,7 +12,7 @@ let ATMMAP = {};
 	let utils = UTILS;
 	let layerBuilder = LAYER_BUILDER;
 
-	// public interface
+	// public interface, used in index.html
 	ATMMAP.initMap = function () {
 		let attr_osm, attr_overpass, attr_icons;
 		attr_osm = 'Map data &copy; <a href="http://openstreetmap.org/">OpenStreetMap</a> contributors';
@@ -57,11 +54,10 @@ let ATMMAP = {};
 				var button = L.DomUtil.create('a', 'leaflet-control-button', container);
 				L.DomEvent.disableClickPropagation(button);
 				L.DomEvent.on(button, 'click', function(){
-					//console.log('click');
 					loadPois();
 				});
 		
-				container.title = "Title";
+				container.title = "die Geldautomaten anzeigen";
 		
 				return container;
 			},
@@ -81,8 +77,6 @@ let ATMMAP = {};
 			newParent.appendChild(el);
 		}
 		setParent(htmlObject, searchdiv);
-
-		// loadPois();
 
 		map.on('moveend', moveEnd);
 	};
