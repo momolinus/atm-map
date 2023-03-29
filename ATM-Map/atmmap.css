@@ -9,6 +9,11 @@
 	font-size: small;
 }
 
+.atm-reload-button {
+	background-image: url("reload.png");
+	cursor: pointer;
+}
+
 .leaflet-popup-content p {
 	/*origin value:*/
 	/*margin: 18px 0;*/

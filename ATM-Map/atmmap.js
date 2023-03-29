@@ -51,7 +51,7 @@ let ATMMAP = {};
 			},
 			onAdd: function (map) {
 				var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-				var button = L.DomUtil.create('a', 'leaflet-control-button', container);
+				var button = L.DomUtil.create('a', 'leaflet-control-button atm-reload-button', container);
 				L.DomEvent.disableClickPropagation(button);
 				L.DomEvent.on(button, 'click', function(){
 					loadPois();
@@ -280,13 +280,16 @@ let ATMMAP = {};
 
 						if (node.tags.atm == "no") {
 							addBankWithNoAtmToMap(node);
-						} else {
 							addBankWithUnknownAtmToMap(node);
 						}
 					}
 				});
 			}).always(function () {
 				map.spin(false);
+			}).fail(function(jqXHR, textStatus, errorThrown) {
+				console.error(textStatus);
+				console.error(errorThrown);
+				console.error(jqXHR);
 			});
 		}
 	};
