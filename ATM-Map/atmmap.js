@@ -93,7 +93,7 @@ let ATMMAP = {};
 
 	// building the api call for atms (automated teller machine)
 	// the overpass api URL
-	let ovpCall = 'https://lz4.overpass-api.de/api/interpreter?data=';
+	let ovpCall = 'http://overpass-api.de/api/interpreter?data=';
 
 	// setting the output format to json and timeout of 60 s
 	ovpCall += '[out:json][timeout:60];';
