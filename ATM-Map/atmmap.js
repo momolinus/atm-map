@@ -1,15 +1,85 @@
 "use strict"
+/**
+ * @author Marcus Bleil, www.marcusbleil.de
+ */
+
+// eslint settings
+/*global L, $, UTILS, LAYER_BUILDER, turf*/
+
 // constructs the module ATMMAP
 let ATMMAP = {};
 
-let spinner = new Spinner().spin();
-//target.appendChild(spinner.el);
-
 (function () {
 
-	// dependencies
+	// dependencies, see atmmaputils.js
 	let utils = UTILS;
+	// see atmmap_layerbuilder.js
 	let layerBuilder = LAYER_BUILDER;
+
+	// public interface, used in index.html
+	ATMMAP.initMap = function () {
+		let osm_layer;
+		osm_layer = new L.TileLayer(
+			'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png'
+		);
+
+		map = L.map('map', {
+			center: new L.LatLng(52.516, 13.379),
+			zoom: 15,
+			layers: osm_layer
+		});
+
+		let osmGeocoder = new L.Control.OSMGeocoder({
+			position: 'topright',
+			text: 'Suchen'
+		}).addTo(map);
+
+		L.control.locate({
+			strings: {
+				title: "Gehe zum meinem Standort!"
+			}
+		}).addTo(map);
+
+		L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
+
+		layerBuilder.buildLayers(map);
+
+		L.Control.Button = L.Control.extend({
+			options: {
+				position: 'topleft'
+			},
+			onAdd: function (map) {
+				var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+				var button = L.DomUtil.create('a', 'leaflet-control-button atm-reload-button', container);
+				L.DomEvent.disableClickPropagation(button);
+				L.DomEvent.on(button, 'click', function(){
+					loadPois();
+				});
+		
+				container.title = "die Geldautomaten anzeigen";
+		
+				return container;
+			},
+			onRemove: function(map) {},
+		});
+		
+		let control = new L.Control.Button();
+		control.addTo(map);
+
+		/**
+		 * see:
+		 * https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
+		 */
+		let htmlObject = osmGeocoder.getContainer();
+		let searchdiv = document.getElementById("search_control")
+		function setParent(el, newParent) {
+			newParent.appendChild(el);
+		}
+		setParent(htmlObject, searchdiv);
+
+		map.on('moveend', moveEnd);
+	};
+
 
 	/* private attributes */
 
@@ -22,7 +92,7 @@ let spinner = new Spinner().spin();
 
 	// building the api call for atms (automated teller machine)
 	// the overpass api URL
-	let ovpCall = 'https://lz4.overpass-api.de/api/interpreter?data=';
+	let ovpCall = 'http://overpass-api.de/api/interpreter?data=';
 
 	// setting the output format to json and timeout of 60 s
 	ovpCall += '[out:json][timeout:60];';
@@ -59,58 +129,40 @@ let spinner = new Spinner().spin();
 	ovpCall += '>;';
 	ovpCall += 'out skel qt;';
 
-	// public interface
-	ATMMAP.initMap = function () {
-		let attr_osm, attr_overpass, attr_icons, osm;
-
-		attr_osm = 'Map data &copy; <a href="http://openstreetmap.org/">OpenStreetMap</a> contributors';
-		attr_overpass = '<br>POIs via <a href="http://www.overpass-api.de/">Overpass API</a>';
-		attr_icons = 'Icons by <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a> <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY SA 3.0</a>';
-
-		osm = new L.TileLayer(
-			'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png'
-		);
-
-		map = L.map('map', {
-			center: new L.LatLng(52.516, 13.379),
-			zoom: 15,
-			layers: osm
-		});
-
-		let osmGeocoder = new L.Control.OSMGeocoder({
-			position: 'topright',
-			text: 'Suchen'
-		}).addTo(map);
-
-		let lc = L.control.locate({
-			strings: {
-				title: "Gehe zum meinem Standort!"
-			}
-		}).addTo(map);
-
-		let sidebar = L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
-
-		layerBuilder.buildLayers(map);
-
-		/**
-		 * see:
-		 * https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
-		 */
-		let htmlObject = osmGeocoder.getContainer();
-		let searchdiv = document.getElementById("search_control")
-		function setParent(el, newParent) {
-			newParent.appendChild(el);
-		}
-		setParent(htmlObject, searchdiv);
-
-		loadPois();
-
-		map.on('moveend', moveEnd);
-	};
 
 	/** *************** */
 	/** private methods */
 	/** *************** */
+
+	let query_polygon = null;
+
+	ATMMAP.test_query_necessary = function (query, next_query) {
+		let query_necessary;
+		// note: query_polygon is a class member, existing out of method call
+		if (query === null) {
+			query = next_query;
+			query = turf.transformScale(query, 2);
+			query_necessary = true;
+		}
+		else {
+			console.log("#1: " + JSON.stringify(query));
+
+			if (turf.booleanContains(query, next_polygon)) {
+				query_necessary = false;
+			}
+			else {
+				query = turf.union(query, next_polygon);
+				query_necessary = true;
+			}
+
+			//console.log("#2: query_necessary set to " + query_necessary);
+		}
+
+		//console.log("#2: " + JSON.stringify(query_polygon));
+		//console.log("query_necessary=" + query_necessary);
+
+		return query_necessary;
+	}
 
 	let loadPois = function () {
 		let overpassCall;
@@ -119,67 +171,126 @@ let spinner = new Spinner().spin();
 			return;
 		}
 
-		// note: g in /{{bbox}}/g means replace all occurrences of
-		// {{bbox}} not just first occurrence
-		overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map
-			.getBounds()));
+		// https://alexbol99.github.io/flatten-js/index.html
 
-		map.spin(true, {
-			color: '#0026FF',
-			radius: 20,
-			width: 7,
-			length: 20
-		});
+		// könnte auch gehen: http://turfjs.org/getting-started
 
-		// using JQuery executing overpass api
-		let ovpCallForAtms = $.getJSON(overpassCall, function (data) {
+		// leaflet-Methoden: pad, contains, distanceTo
+		// flatten-js-Methoden: addFace
 
-			// first store all node from any ways
-			$.each(data.elements, function (index, node) {
+		let new_area = map.getBounds();
+		let new_polygon = turf.polygon(
+			[
+				[
+					[new_area.getNorthWest().lat, new_area.getNorthWest().lng],
+					[new_area.getNorthEast().lat, new_area.getNorthEast().lng],
+					[new_area.getSouthEast().lat, new_area.getSouthEast().lng],
+					[new_area.getSouthWest().lat, new_area.getSouthWest().lng],
+					[new_area.getNorthWest().lat, new_area.getNorthWest().lng],
+				]
+			]
+		);
 
-				// all nodes of type "node", some tagged nodes are necessary for
-				// building ways, not all nodes here are stored are necessary
-				// for storing
-				if (node.type == "node") {
-					wayNodeIds[node.id] = node;
-				}
+		/**
+		polygon = turf.polygon([[[-5, 52], [-4, 56], [-2, 51], [-7, 54], [-5, 52]]], { name: 'poly1' });
+		polygon_child =  turf.polygon([[[-6, 52], [-4, 56], [-2, 51], [-7, 54], [-6, 52]]], { name: 'poly2' });
+		JSON.stringify(polygon)
+		JSON.stringify(polygon_child)
+		turf.booleanContains(polygon, polygon_child)
+		
+		*/
 
+		let query_necessary;
+		// note: query_polygon is a class member, existing out of method call
+		if (query_polygon === null) {
+			query_polygon = new_polygon;
+			query_polygon = turf.transformScale(query_polygon, 2);
+			query_necessary = true;
+		}
+		else {
+			console.log("#1: " + JSON.stringify(query_polygon));
+
+			if (turf.booleanContains(query_polygon, new_polygon)) {
+				query_necessary = false;
+			}
+			else {
+				query_polygon = turf.union(query_polygon, new_polygon);
+				query_necessary = true;
+			}
+
+			console.log("#2: query_necessary set to " + query_necessary);
+		}
+
+		console.log("#2: " + JSON.stringify(query_polygon));
+		console.log("query_necessary=" + query_necessary);
+
+		if (query_necessary) {
+
+			// note: g in /{{bbox}}/g means replace all occurrences of
+			// {{bbox}} not just first occurrence
+			overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map
+				.getBounds()));
+
+			map.spin(true, {
+				color: '#0026FF',
+				radius: 20,
+				width: 7,
+				length: 20
 			});
 
-			// overpass returns a list with elements, which contains the nodes
-			$.each(data.elements, function (index, node) {
+			// using JQuery executing overpass api
+			$.getJSON(overpassCall, function (data) {
 
-				if ("tags" in node) {
+				// first store all node from any ways
+				$.each(data.elements, function (index, node) {
 
-					if (!(node.id in nodeIds)) {
+					// all nodes of type "node", some tagged nodes are necessary for
+					// building ways, not all nodes here are stored are necessary
+					// for storing
+					if (node.type == "node") {
+						wayNodeIds[node.id] = node;
+					}
 
-						nodeIds[node.id] = true;
+				});
 
-						// bank (or anything else) with atm
-						if (node.tags.atm == "yes") {
-							addNodeWithAtmToMap(node);
-						}
+				// overpass returns a list with elements, which contains the nodes
+				$.each(data.elements, function (index, node) {
 
-						// an atm
-						else if (node.tags.amenity == "atm") {
-							addSingleAtmToMap(node);
-						}
+					// Guardian condition: if node has no "tags" property
+					// no further processing is necessary.
+					if (!("tags" in node)) return;
 
-						// banks without atm or unknow state
-						else if (node.tags.amenity == "bank") {
+					// Guardian condition: If the node has already been processed before,
+					// a new processing is not necessary
+					if (node.is in nodeIds) return;
 
-							if (node.tags.atm == "no") {
-								addBankWithNoAtmToMap(node);
-							} else {
-								addBankWithUnknownAtmToMap(node);
-							}
+					nodeIds[node.id] = true;
+
+					// bank (or anything else) with atm
+					if (node.tags.atm == "yes") {
+						addNodeWithAtmToMap(node);
+					}
+					// a single atm
+					else if (node.tags.amenity == "atm") {
+						addSingleAtmToMap(node);
+					}
+					// banks without atm or unknow state
+					else if (node.tags.amenity == "bank") {
+
+						if (node.tags.atm == "no") {
+							addBankWithNoAtmToMap(node);
+							addBankWithUnknownAtmToMap(node);
 						}
 					}
-				}
+				});
+			}).always(function () {
+				map.spin(false);
+			}).fail(function(jqXHR, textStatus, errorThrown) {
+				console.error(textStatus);
+				console.error(errorThrown);
+				console.error(jqXHR);
 			});
-		}).always(function () {
-			map.spin(false);
-		});
+		}
 	};
 
 	let addBankWithNoAtmToMap = function (bank) {
@@ -278,7 +389,7 @@ let spinner = new Spinner().spin();
 	};
 
 	let moveEnd = function () {
-		loadPois();
+		//loadPois();
 	};
 
 })();
