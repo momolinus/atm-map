@@ -21,6 +21,9 @@
  *
  */
 
+// eslint settings
+/*global L*/
+
 /**
  * @author Marcus Bleil, www.marcusbleil.de
  */
@@ -68,7 +71,7 @@ let LAYER_BUILDER = {};
 	};
 
 	LAYER_BUILDER.addToNamedGroups = function (node, marker) {
-		let group, name, matched;
+		let name, matched;
 
 		matched = false;
 		name = createNameFromeTags(node);

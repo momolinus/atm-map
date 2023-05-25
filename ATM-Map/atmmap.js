@@ -3,6 +3,9 @@
  * @author Marcus Bleil, www.marcusbleil.de
  */
 
+// eslint settings
+/*global L, $*/
+
 // constructs the module ATMMAP
 let ATMMAP = {};
 
@@ -35,13 +38,13 @@ let ATMMAP = {};
 			text: 'Suchen'
 		}).addTo(map);
 
-		let lc = L.control.locate({
+		L.control.locate({
 			strings: {
 				title: "Gehe zum meinem Standort!"
 			}
 		}).addTo(map);
 
-		let sidebar = L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
+		L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
 
 		layerBuilder.buildLayers(map);
 
@@ -240,7 +243,7 @@ let ATMMAP = {};
 			});
 
 			// using JQuery executing overpass api
-			let ovpCallForAtms = $.getJSON(overpassCall, function (data) {
+			$.getJSON(overpassCall, function (data) {
 
 				// first store all node from any ways
 				$.each(data.elements, function (index, node) {

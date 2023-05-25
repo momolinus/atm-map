@@ -3,6 +3,10 @@
  * @author Marcus Bleil, www.marcusbleil.de
  * 
  */
+
+// eslint settings
+/*global L, $*/
+
 let UTILS = {};
 
 (function () {
