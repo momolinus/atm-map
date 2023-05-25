@@ -4,24 +4,20 @@
  */
 
 // eslint settings
-/*global L, $*/
+/*global L, $, UTILS, LAYER_BUILDER, turf*/
 
 // constructs the module ATMMAP
 let ATMMAP = {};
 
 (function () {
 
-	// dependencies
+	// dependencies, see atmmaputils.js
 	let utils = UTILS;
+	// see atmmap_layerbuilder.js
 	let layerBuilder = LAYER_BUILDER;
 
 	// public interface, used in index.html
 	ATMMAP.initMap = function () {
-		let attr_osm, attr_overpass, attr_icons;
-		attr_osm = 'Map data &copy; <a href="http://openstreetmap.org/">OpenStreetMap</a> contributors';
-		attr_overpass = '<br>POIs via <a href="http://www.overpass-api.de/">Overpass API</a>';
-		attr_icons = 'Icons by <a href="http://mapicons.nicolasmollet.com/">Nicolas Mollet</a> <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY SA 3.0</a>';
-
 		let osm_layer;
 		osm_layer = new L.TileLayer(
 			'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png'
