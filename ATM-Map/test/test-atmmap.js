@@ -1,3 +1,6 @@
+// eslint settings
+/*global QUnit, ATMMAP, turf*/
+
 QUnit.test("Test Query-Optimizer", function (assert) {
     let query_necessary;
 
