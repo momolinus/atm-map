@@ -136,30 +136,22 @@ let ATMMAP = {};
 
 	let query_polygon = null;
 
-	ATMMAP.test_query_necessary = function (query, next_query) {
+	ATMMAP.test_query_necessary = function (next_polygon) {
 		let query_necessary;
-		// note: query_polygon is a class member, existing out of method call
-		if (query === null) {
-			query = next_query;
-			query = turf.transformScale(query, 2);
+		if (query_polygon === null) {
+			query_polygon = next_polygon;
+			query_polygon = turf.transformScale(query_polygon, 2);
 			query_necessary = true;
 		}
 		else {
-			console.log("#1: " + JSON.stringify(query));
-
-			if (turf.booleanContains(query, next_polygon)) {
+			if (turf.booleanContains(query_polygon, next_polygon)) {
 				query_necessary = false;
 			}
 			else {
-				query = turf.union(query, next_polygon);
+				query_polygon = turf.union(query_polygon, next_polygon);
 				query_necessary = true;
 			}
-
-			//console.log("#2: query_necessary set to " + query_necessary);
 		}
-
-		//console.log("#2: " + JSON.stringify(query_polygon));
-		//console.log("query_necessary=" + query_necessary);
 
 		return query_necessary;
 	}
@@ -201,29 +193,8 @@ let ATMMAP = {};
 		*/
 
 		let query_necessary;
-		// note: query_polygon is a class member, existing out of method call
-		if (query_polygon === null) {
-			query_polygon = new_polygon;
-			query_polygon = turf.transformScale(query_polygon, 2);
-			query_necessary = true;
-		}
-		else {
-			console.log("#1: " + JSON.stringify(query_polygon));
-
-			if (turf.booleanContains(query_polygon, new_polygon)) {
-				query_necessary = false;
-			}
-			else {
-				query_polygon = turf.union(query_polygon, new_polygon);
-				query_necessary = true;
-			}
-
-			console.log("#2: query_necessary set to " + query_necessary);
-		}
-
-		console.log("#2: " + JSON.stringify(query_polygon));
-		console.log("query_necessary=" + query_necessary);
-
+		query_necessary = ATMMAP.test_query_necessary(query_polygon);
+		
 		if (query_necessary) {
 
 			// note: g in /{{bbox}}/g means replace all occurrences of
