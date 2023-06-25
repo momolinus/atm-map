@@ -176,61 +176,63 @@ let ATMMAP = {};
 		return query_necessary;
 	}
 
-	//TODO Methode verkürzen
+	function storeAllNodes(data) {
+		$.each(data.elements, function (index, node) {
+			// all nodes of type "node", some tagged nodes are necessary for
+			// building ways, not all nodes here are stored are necessary for storing
+			if (node.type == "node") {
+				wayNodeIds[node.id] = node;
+			}
+		});
+	}
+
+	function addAtmNodeToMap(node) {
+		// bank (or anything else) with atm
+		if (node.tags.atm == "yes") {
+			addNodeWithAtmToMap(node);
+		}
+		// a single atm
+		else if (node.tags.amenity == "atm") {
+			addSingleAtmToMap(node);
+		}
+		// banks without atm or unknow state
+		else if (node.tags.amenity == "bank") {
+			if (node.tags.atm == "no") {
+				addBankWithNoAtmToMap(node);
+				addBankWithUnknownAtmToMap(node);
+			}
+		}
+	}
+
+	function storeAtmNodesToMap(data) {
+
+		// overpass returns a list with elements, which contains the nodes
+		$.each(data.elements, function (index, node) {
+
+			// Guardian condition: if node has no "tags" property no further processing is necessary.
+			if (!("tags" in node)) return;
+			// Guardian condition: If the node has already been processed before, a new processing is not necessary
+			if (node.is in nodeIds) return;
+
+			nodeIds[node.id] = true;
+
+			addAtmNodeToMap(node);
+		});
+	}
+
 	let loadPois = function () {
-		
+
 		if (map.getZoom() < 13) return;
 
-		let overpassCall;
 		// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence
-		overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map.getBounds()));
+		let overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map.getBounds()));
 
 		map.spin(true, { color: '#0026FF', radius: 20, width: 7, length: 20 });
 
 		// using JQuery executing overpass api
 		$.getJSON(overpassCall, function (data) {
-
-			// first store all node from any ways
-			$.each(data.elements, function (index, node) {
-
-				// all nodes of type "node", some tagged nodes are necessary for
-				// building ways, not all nodes here are stored are necessary for storing
-				if (node.type == "node") {
-					wayNodeIds[node.id] = node;
-				}
-
-			});
-
-			// overpass returns a list with elements, which contains the nodes
-			$.each(data.elements, function (index, node) {
-
-				// Guardian condition: if node has no "tags" property
-				// no further processing is necessary.
-				if (!("tags" in node)) return;
-
-				// Guardian condition: If the node has already been processed before,
-				// a new processing is not necessary
-				if (node.is in nodeIds) return;
-
-				nodeIds[node.id] = true;
-
-				// bank (or anything else) with atm
-				if (node.tags.atm == "yes") {
-					addNodeWithAtmToMap(node);
-				}
-				// a single atm
-				else if (node.tags.amenity == "atm") {
-					addSingleAtmToMap(node);
-				}
-				// banks without atm or unknow state
-				else if (node.tags.amenity == "bank") {
-
-					if (node.tags.atm == "no") {
-						addBankWithNoAtmToMap(node);
-						addBankWithUnknownAtmToMap(node);
-					}
-				}
-			});
+			storeAllNodes(data);
+			storeAtmNodesToMap(data);
 		}).always(function () {
 			map.spin(false);
 		}).fail(function (jqXHR, textStatus, errorThrown) {
