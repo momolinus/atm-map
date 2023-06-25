@@ -10,11 +10,78 @@
 let ATMMAP = {};
 
 (function () {
-
 	// dependencies, see atmmaputils.js
 	let utils = UTILS;
 	// see atmmap_layerbuilder.js
 	let layerBuilder = LAYER_BUILDER;
+
+	// public interface, used in index.html
+	ATMMAP.initMap = function () {
+		//TODO map ist ein "Attribut" der Klasse und darf hier nicht mit let definiert werden
+		// lässt sich das noch deutlicher machen
+		map = buildMap();
+
+		let osmGeocoder = buildOsmGeocoderAndAddToMap(map);
+		addLocateControlToMap(map);
+		addSidebarToMap(map);
+
+		//TODO Projekt später als Variante der ATM-MAP weiter entwickeln
+		// addPropagationButtonToMap(map);
+
+		layerBuilder.buildLayers(map);
+
+		addSearchToSidebar(osmGeocoder);
+
+		loadPois();
+	};
+
+	/* ****************** */
+	/* private attributes */
+	/* ****************** */
+
+	// contains the node id of the OSM objects
+	// JavaScript pattern: object literal
+	let nodeIds = {};
+	let wayNodeIds = {};
+
+	let map = null;
+
+	// building the api call for atms (automated teller machine)
+	// the overpass api URL
+	let ovpCall = 'http://overpass-api.de/api/interpreter?data=';
+	// setting the output format to json and timeout of 60 s
+	ovpCall += '[out:json][timeout:60];';
+	// nodes and ways with "amenity"="bank"
+	ovpCall += '(';
+	ovpCall += 'node["amenity"="bank"]({{bbox}});';
+	ovpCall += 'way["amenity"="bank"]({{bbox}});';
+	ovpCall += 'node["amenity"="atm"]({{bbox}});';
+	// other objects with "atm"="yes"
+	ovpCall += '(';
+	ovpCall += '(';
+	ovpCall += 'node["atm"="yes"]({{bbox}});';
+	ovpCall += 'way["atm"="yes"]({{bbox}});';
+	ovpCall += ');';
+	// - means difference
+	ovpCall += '-';
+	// but no banks
+	ovpCall += '(';
+	ovpCall += 'node["amenity"="bank"]({{bbox}});';
+	ovpCall += 'way["amenity"="bank"]({{bbox}});';
+	ovpCall += 'node["amenity"="atm"]({{bbox}});';
+	ovpCall += ');';
+	ovpCall += ');';
+	// closes the atm set statement
+	ovpCall += ');';
+	// output statement
+	ovpCall += 'out body;';
+	// all nodes needed for ways only with lat/lng (skel) sorted by place (qt)
+	ovpCall += '>;';
+	ovpCall += 'out skel qt;';
+
+	/** *************** */
+	/** private methods */
+	/** *************** */
 
 	function buildMap() {
 		let osm_layer = new L.TileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png');
@@ -24,7 +91,6 @@ let ATMMAP = {};
 			zoom: 15,
 			layers: osm_layer
 		});
-
 		map.on('moveend', moveEnd);
 
 		return map;
@@ -86,82 +152,7 @@ let ATMMAP = {};
 		let htmlObject = osmGeocoder.getContainer();
 		let searchdiv = document.getElementById("search_control");
 		setParent(htmlObject, searchdiv);
-
 	}
-	// public interface, used in index.html
-	ATMMAP.initMap = function () {
-		//TODO map ist ein "Attribut" der Klasse und darf hier nicht mit let definiert werden
-		// lässt sich das noch deutlicher machen
-		map = buildMap();
-
-		let osmGeocoder = buildOsmGeocoderAndAddToMap(map);
-		addLocateControlToMap(map);
-		addSidebarToMap(map);
-
-		//TODO Projekt später als Variante der ATM-MAP weiter entwickeln
-		// addPropagationButtonToMap(map);
-
-		layerBuilder.buildLayers(map);
-
-		addSearchToSidebar(osmGeocoder);
-
-
-		loadPois();
-	};
-
-
-	/* private attributes */
-
-	// contains the node id of the OSM objects
-	// JavaScript pattern: object literal
-	let nodeIds = {};
-	let wayNodeIds = {};
-
-	let map = null;
-
-	// building the api call for atms (automated teller machine)
-	// the overpass api URL
-	let ovpCall = 'http://overpass-api.de/api/interpreter?data=';
-
-	// setting the output format to json and timeout of 60 s
-	ovpCall += '[out:json][timeout:60];';
-
-	// nodes and ways with "amenity"="bank"
-	ovpCall += '(';
-	ovpCall += 'node["amenity"="bank"]({{bbox}});';
-	ovpCall += 'way["amenity"="bank"]({{bbox}});';
-	ovpCall += 'node["amenity"="atm"]({{bbox}});';
-
-	// other objects with "atm"="yes"
-	ovpCall += '(';
-	ovpCall += '(';
-	ovpCall += 'node["atm"="yes"]({{bbox}});';
-	ovpCall += 'way["atm"="yes"]({{bbox}});';
-	ovpCall += ');';
-	// - means difference
-	ovpCall += '-';
-	// but no banks
-	ovpCall += '(';
-	ovpCall += 'node["amenity"="bank"]({{bbox}});';
-	ovpCall += 'way["amenity"="bank"]({{bbox}});';
-	ovpCall += 'node["amenity"="atm"]({{bbox}});';
-	ovpCall += ');';
-	ovpCall += ');';
-
-	// closes the atm set statement
-	ovpCall += ');';
-
-	// output statement
-	ovpCall += 'out body;';
-
-	// all nodes needed for ways only with lat/lng (skel) sorted by place (qt)
-	ovpCall += '>;';
-	ovpCall += 'out skel qt;';
-
-
-	/** *************** */
-	/** private methods */
-	/** *************** */
 
 	let query_polygon = null;
 
@@ -185,112 +176,68 @@ let ATMMAP = {};
 		return query_necessary;
 	}
 
+	//TODO Methode verkürzen
 	let loadPois = function () {
-		let overpassCall;
-
-		if (map.getZoom() < 13) {
-			return;
-		}
-
-		// https://alexbol99.github.io/flatten-js/index.html
-
-		// könnte auch gehen: http://turfjs.org/getting-started
-
-		// leaflet-Methoden: pad, contains, distanceTo
-		// flatten-js-Methoden: addFace
-
-		let new_area = map.getBounds();
-		let new_polygon = turf.polygon(
-			[
-				[
-					[new_area.getNorthWest().lat, new_area.getNorthWest().lng],
-					[new_area.getNorthEast().lat, new_area.getNorthEast().lng],
-					[new_area.getSouthEast().lat, new_area.getSouthEast().lng],
-					[new_area.getSouthWest().lat, new_area.getSouthWest().lng],
-					[new_area.getNorthWest().lat, new_area.getNorthWest().lng],
-				]
-			]
-		);
-
-		/**
-		polygon = turf.polygon([[[-5, 52], [-4, 56], [-2, 51], [-7, 54], [-5, 52]]], { name: 'poly1' });
-		polygon_child =  turf.polygon([[[-6, 52], [-4, 56], [-2, 51], [-7, 54], [-6, 52]]], { name: 'poly2' });
-		JSON.stringify(polygon)
-		JSON.stringify(polygon_child)
-		turf.booleanContains(polygon, polygon_child)
 		
-		*/
+		if (map.getZoom() < 13) return;
 
-		let query_necessary = true;
-		//query_necessary = ATMMAP.test_query_necessary(query_polygon);
+		let overpassCall;
+		// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence
+		overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map.getBounds()));
 
-		if (query_necessary) {
+		map.spin(true, { color: '#0026FF', radius: 20, width: 7, length: 20 });
 
-			// note: g in /{{bbox}}/g means replace all occurrences of
-			// {{bbox}} not just first occurrence
-			overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map
-				.getBounds()));
+		// using JQuery executing overpass api
+		$.getJSON(overpassCall, function (data) {
 
-			map.spin(true, {
-				color: '#0026FF',
-				radius: 20,
-				width: 7,
-				length: 20
+			// first store all node from any ways
+			$.each(data.elements, function (index, node) {
+
+				// all nodes of type "node", some tagged nodes are necessary for
+				// building ways, not all nodes here are stored are necessary for storing
+				if (node.type == "node") {
+					wayNodeIds[node.id] = node;
+				}
+
 			});
 
-			// using JQuery executing overpass api
-			$.getJSON(overpassCall, function (data) {
+			// overpass returns a list with elements, which contains the nodes
+			$.each(data.elements, function (index, node) {
 
-				// first store all node from any ways
-				$.each(data.elements, function (index, node) {
+				// Guardian condition: if node has no "tags" property
+				// no further processing is necessary.
+				if (!("tags" in node)) return;
 
-					// all nodes of type "node", some tagged nodes are necessary for
-					// building ways, not all nodes here are stored are necessary
-					// for storing
-					if (node.type == "node") {
-						wayNodeIds[node.id] = node;
+				// Guardian condition: If the node has already been processed before,
+				// a new processing is not necessary
+				if (node.is in nodeIds) return;
+
+				nodeIds[node.id] = true;
+
+				// bank (or anything else) with atm
+				if (node.tags.atm == "yes") {
+					addNodeWithAtmToMap(node);
+				}
+				// a single atm
+				else if (node.tags.amenity == "atm") {
+					addSingleAtmToMap(node);
+				}
+				// banks without atm or unknow state
+				else if (node.tags.amenity == "bank") {
+
+					if (node.tags.atm == "no") {
+						addBankWithNoAtmToMap(node);
+						addBankWithUnknownAtmToMap(node);
 					}
-
-				});
-
-				// overpass returns a list with elements, which contains the nodes
-				$.each(data.elements, function (index, node) {
-
-					// Guardian condition: if node has no "tags" property
-					// no further processing is necessary.
-					if (!("tags" in node)) return;
-
-					// Guardian condition: If the node has already been processed before,
-					// a new processing is not necessary
-					if (node.is in nodeIds) return;
-
-					nodeIds[node.id] = true;
-
-					// bank (or anything else) with atm
-					if (node.tags.atm == "yes") {
-						addNodeWithAtmToMap(node);
-					}
-					// a single atm
-					else if (node.tags.amenity == "atm") {
-						addSingleAtmToMap(node);
-					}
-					// banks without atm or unknow state
-					else if (node.tags.amenity == "bank") {
-
-						if (node.tags.atm == "no") {
-							addBankWithNoAtmToMap(node);
-							addBankWithUnknownAtmToMap(node);
-						}
-					}
-				});
-			}).always(function () {
-				map.spin(false);
-			}).fail(function (jqXHR, textStatus, errorThrown) {
-				console.error(textStatus);
-				console.error(errorThrown);
-				console.error(jqXHR);
+				}
 			});
-		}
+		}).always(function () {
+			map.spin(false);
+		}).fail(function (jqXHR, textStatus, errorThrown) {
+			console.error(textStatus);
+			console.error(errorThrown);
+			console.error(jqXHR);
+		});
 	};
 
 	let addBankWithNoAtmToMap = function (bank) {
