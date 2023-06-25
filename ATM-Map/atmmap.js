@@ -176,7 +176,7 @@ let ATMMAP = {};
 		return query_necessary;
 	}
 
-	function storeAllNodes(data) {
+	function saveAllNodes(data) {
 		$.each(data.elements, function (index, node) {
 			// all nodes of type "node", some tagged nodes are necessary for
 			// building ways, not all nodes here are stored are necessary for storing
@@ -231,7 +231,7 @@ let ATMMAP = {};
 
 		// using JQuery executing overpass api
 		$.getJSON(overpassCall, function (data) {
-			storeAllNodes(data);
+			saveAllNodes(data);
 			storeAtmNodesToMap(data);
 		}).always(function () {
 			map.spin(false);
