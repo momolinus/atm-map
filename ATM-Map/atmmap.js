@@ -16,33 +16,21 @@ let ATMMAP = {};
 	// see atmmap_layerbuilder.js
 	let layerBuilder = LAYER_BUILDER;
 
-	// public interface, used in index.html
-	ATMMAP.initMap = function () {
-		let osm_layer;
-		osm_layer = new L.TileLayer(
-			'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png'
-		);
+	function buildMap() {
+		let osm_layer = new L.TileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png');
 
-		map = L.map('map', {
+		let map = L.map('map', {
 			center: new L.LatLng(52.516, 13.379),
 			zoom: 15,
 			layers: osm_layer
 		});
 
-		let osmGeocoder = new L.Control.OSMGeocoder({
-			position: 'topright',
-			text: 'Suchen'
-		}).addTo(map);
+		map.on('moveend', moveEnd);
 
-		L.control.locate({
-			strings: {
-				title: "Gehe zum meinem Standort!"
-			}
-		}).addTo(map);
+		return map;
+	}
 
-		L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
-
-		layerBuilder.buildLayers(map);
+	function addPropagationButtonToMap(map) {
 
 		L.Control.Button = L.Control.extend({
 			options: {
@@ -52,32 +40,73 @@ let ATMMAP = {};
 				var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
 				var button = L.DomUtil.create('a', 'leaflet-control-button atm-reload-button', container);
 				L.DomEvent.disableClickPropagation(button);
-				L.DomEvent.on(button, 'click', function(){
+				L.DomEvent.on(button, 'click', function () {
 					loadPois();
 				});
-		
+
 				container.title = "die Geldautomaten anzeigen";
-		
+
 				return container;
 			},
-			onRemove: function(map) {},
+			onRemove: function (map) { },
 		});
-		
+
 		let control = new L.Control.Button();
 		control.addTo(map);
+	}
 
-		/**
-		 * see:
-		 * https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
-		 */
+	function setParent(el, newParent) {
+		newParent.appendChild(el);
+	}
+
+	function addSidebarToMap(map) {
+		L.control.sidebar('sidebar',
+			{ position: 'right' }
+		).addTo(map);
+	}
+
+	function addLocateControlToMap(map) {
+		L.control.locate({
+			strings:
+				{ title: "Gehe zum meinem Standort!" }
+		}).addTo(map);
+	}
+
+	function buildOsmGeocoderAndAddToMap(map) {
+		let geocoder = new L.Control.OSMGeocoder({
+			position: 'topright',
+			text: 'Suchen'
+		});
+		geocoder.addTo(map);
+		return geocoder;
+	}
+
+	function addSearchToSidebar(osmGeocoder) {
+		// see: https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
 		let htmlObject = osmGeocoder.getContainer();
-		let searchdiv = document.getElementById("search_control")
-		function setParent(el, newParent) {
-			newParent.appendChild(el);
-		}
+		let searchdiv = document.getElementById("search_control");
 		setParent(htmlObject, searchdiv);
 
-		map.on('moveend', moveEnd);
+	}
+	// public interface, used in index.html
+	ATMMAP.initMap = function () {
+		//TODO map ist ein "Attribut" der Klasse und darf hier nicht mit let definiert werden
+		// lässt sich das noch deutlicher machen
+		map = buildMap();
+
+		let osmGeocoder = buildOsmGeocoderAndAddToMap(map);
+		addLocateControlToMap(map);
+		addSidebarToMap(map);
+
+		//TODO Projekt später als Variante der ATM-MAP weiter entwickeln
+		// addPropagationButtonToMap(map);
+
+		layerBuilder.buildLayers(map);
+
+		addSearchToSidebar(osmGeocoder);
+
+
+		loadPois();
 	};
 
 
@@ -192,9 +221,9 @@ let ATMMAP = {};
 		
 		*/
 
-		let query_necessary;
-		query_necessary = ATMMAP.test_query_necessary(query_polygon);
-		
+		let query_necessary = true;
+		//query_necessary = ATMMAP.test_query_necessary(query_polygon);
+
 		if (query_necessary) {
 
 			// note: g in /{{bbox}}/g means replace all occurrences of
@@ -256,7 +285,7 @@ let ATMMAP = {};
 				});
 			}).always(function () {
 				map.spin(false);
-			}).fail(function(jqXHR, textStatus, errorThrown) {
+			}).fail(function (jqXHR, textStatus, errorThrown) {
 				console.error(textStatus);
 				console.error(errorThrown);
 				console.error(jqXHR);
@@ -360,7 +389,7 @@ let ATMMAP = {};
 	};
 
 	let moveEnd = function () {
-		//loadPois();
+		loadPois();
 	};
 
 })();
