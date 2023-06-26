@@ -23,7 +23,7 @@ let ATMMAP = {};
 
 		let osmGeocoder = buildOsmGeocoderAndAddToMap(map);
 		addLocateControlToMap(map);
-		addSidebarToMap(map);
+		L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
 
 		layerBuilder.buildLayers(map);
 
@@ -92,16 +92,6 @@ let ATMMAP = {};
 		return map;
 	}
 
-	let setParent = function (el, newParent) {
-		newParent.appendChild(el);
-	}
-
-	let addSidebarToMap = function (map) {
-		L.control.sidebar('sidebar',
-			{ position: 'right' }
-		).addTo(map);
-	}
-
 	let addLocateControlToMap = function (map) {
 		L.control.locate({
 			strings:
@@ -122,12 +112,12 @@ let ATMMAP = {};
 		// see: https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
 		let htmlObject = osmGeocoder.getContainer();
 		let searchdiv = document.getElementById("search_control");
-		setParent(htmlObject, searchdiv);
+		searchdiv.appendChild(htmlObject);
 	}
 
 	ATMMAP.test_query_necessary = function (next_polygon, previous_polygon = null) {
 		let query_necessary;
-		
+
 		if (previous_polygon === null) {
 			query_necessary = true;
 		}
@@ -234,54 +224,53 @@ let ATMMAP = {};
 
 		if (node.tags.amenity == "bank") {
 			marker = createMarker(node, name, utils.yesAtm);
-		} else {
+		}
+		else {
 			marker = createMarker(node, name, utils.atm);
 		}
 
 		addToNamedGroups(node, marker);
 	};
 
+	let createMarkerForNode = function (node, name, atmIcon) {
+		let marker = L.marker([node.lat, node.lon], {
+			icon: atmIcon
+		});
+
+		marker.bindPopup(name);
+
+		return marker;
+	}
+
+	let createMarkerForWay = function (node, wayNodeIds, atmIcon, name) {
+		let areaNodes = new Array();
+		let bankArea;
+		let marker = null;
+		let bounds;
+		let center;
+
+		$.each(node.nodes, function (index, nodeId) {
+			areaNodes.push(L.latLng(wayNodeIds[nodeId].lat, wayNodeIds[nodeId].lon));
+		});
+
+		bankArea = L.polygon(areaNodes, { clickable: false });
+		bounds = bankArea.getBounds();
+		center = bounds.getCenter();
+
+		marker = L.marker([center.lat, center.lng], { icon: atmIcon });
+
+		marker.bindPopup(name);
+
+		return L.layerGroup([bankArea, marker]);
+	}
+
 	let createMarker = function (node, name, atmIcon) {
 
 		if (node.type == "node") {
-			let marker = L.marker([node.lat, node.lon], {
-				icon: atmIcon
-			});
-
-			marker.bindPopup(name);
-
-			return marker;
-
-		} else if (node.type == "way") {
-			let areaNodes = new Array();
-			let bankArea;
-			let marker = null;
-			let bounds;
-			let center;
-
-			$.each(node.nodes, function (index, nodeId) {
-
-				if (wayNodeIds[nodeId] == undefined) {
-					console.log("wayNodeIds for " + nodeId);
-				}
-
-				areaNodes.push(L.latLng(wayNodeIds[nodeId].lat,
-					wayNodeIds[nodeId].lon));
-			});
-
-			bankArea = L.polygon(areaNodes, {
-				clickable: false
-			});
-			bounds = bankArea.getBounds();
-			center = bounds.getCenter();
-
-			marker = L.marker([center.lat, center.lng], {
-				icon: atmIcon
-			});
-
-			marker.bindPopup(name);
-
-			return L.layerGroup([bankArea, marker]);
+			return createMarkerForNode(node, name, atmIcon);
+		}
+		else if (node.type == "way") {
+			return createMarkerForWay(node, wayNodeIds, atmIcon, name);
 		}
 	};
 
@@ -289,9 +278,7 @@ let ATMMAP = {};
 		let name, marker;
 
 		name = utils.createDescriptionFromeTags(atm);
-		marker = L.marker([atm.lat, atm.lon], {
-			icon: utils.atm
-		}).bindPopup(name);
+		marker = L.marker([atm.lat, atm.lon], { icon: utils.atm }).bindPopup(name);
 
 		addToNamedGroups(atm, marker);
 	};
