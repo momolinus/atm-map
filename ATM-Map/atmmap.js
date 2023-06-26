@@ -25,9 +25,6 @@ let ATMMAP = {};
 		addLocateControlToMap(map);
 		addSidebarToMap(map);
 
-		//TODO Projekt später als Variante der ATM-MAP weiter entwickeln
-		// addPropagationButtonToMap(map);
-
 		layerBuilder.buildLayers(map);
 
 		addSearchToSidebar(osmGeocoder);
@@ -94,31 +91,6 @@ let ATMMAP = {};
 		map.on('moveend', moveEnd);
 
 		return map;
-	}
-
-	function addPropagationButtonToMap(map) {
-
-		L.Control.Button = L.Control.extend({
-			options: {
-				position: 'topleft'
-			},
-			onAdd: function (map) {
-				var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-				var button = L.DomUtil.create('a', 'leaflet-control-button atm-reload-button', container);
-				L.DomEvent.disableClickPropagation(button);
-				L.DomEvent.on(button, 'click', function () {
-					loadPois();
-				});
-
-				container.title = "die Geldautomaten anzeigen";
-
-				return container;
-			},
-			onRemove: function (map) { },
-		});
-
-		let control = new L.Control.Button();
-		control.addTo(map);
 	}
 
 	function setParent(el, newParent) {
