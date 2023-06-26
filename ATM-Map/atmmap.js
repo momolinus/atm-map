@@ -22,7 +22,7 @@ let ATMMAP = {};
 		map = buildMap();
 
 		let osmGeocoder = buildOsmGeocoderAndAddToMap(map);
-		addLocateControlToMap(map);
+		L.control.locate({strings: { title: "Gehe zum meinem Standort!" }}).addTo(map);
 		L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
 
 		layerBuilder.buildLayers(map);
@@ -90,13 +90,6 @@ let ATMMAP = {};
 		map.on('moveend', moveEnd);
 
 		return map;
-	}
-
-	let addLocateControlToMap = function (map) {
-		L.control.locate({
-			strings:
-				{ title: "Gehe zum meinem Standort!" }
-		}).addTo(map);
 	}
 
 	let buildOsmGeocoderAndAddToMap = function (map) {
