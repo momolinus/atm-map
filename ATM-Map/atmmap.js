@@ -80,7 +80,7 @@ let ATMMAP = {};
 	/** private methods */
 	/** *************** */
 
-	function buildMap() {
+	let buildMap = function () {
 		let osm_layer = new L.TileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png');
 
 		let map = L.map('map', {
@@ -93,24 +93,24 @@ let ATMMAP = {};
 		return map;
 	}
 
-	function setParent(el, newParent) {
+	let setParent = function (el, newParent) {
 		newParent.appendChild(el);
 	}
 
-	function addSidebarToMap(map) {
+	let addSidebarToMap = function (map) {
 		L.control.sidebar('sidebar',
 			{ position: 'right' }
 		).addTo(map);
 	}
 
-	function addLocateControlToMap(map) {
+	let addLocateControlToMap = function (map) {
 		L.control.locate({
 			strings:
 				{ title: "Gehe zum meinem Standort!" }
 		}).addTo(map);
 	}
 
-	function buildOsmGeocoderAndAddToMap(map) {
+	let buildOsmGeocoderAndAddToMap = function (map) {
 		let geocoder = new L.Control.OSMGeocoder({
 			position: 'topright',
 			text: 'Suchen'
@@ -119,7 +119,7 @@ let ATMMAP = {};
 		return geocoder;
 	}
 
-	function addSearchToSidebar(osmGeocoder) {
+	let addSearchToSidebar = function(osmGeocoder) {
 		// see: https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
 		let htmlObject = osmGeocoder.getContainer();
 		let searchdiv = document.getElementById("search_control");
@@ -148,7 +148,7 @@ let ATMMAP = {};
 		return query_necessary;
 	}
 
-	function saveAllNodes(data) {
+	let saveAllNodes = function (data) {
 		$.each(data.elements, function (index, node) {
 			// all nodes of type "node", some tagged nodes are necessary for
 			// building ways, not all nodes here are stored are necessary for storing
@@ -158,7 +158,7 @@ let ATMMAP = {};
 		});
 	}
 
-	function addAtmNodeToMap(node) {
+	let addAtmNodeToMap = function(node) {
 		// bank (or anything else) with atm
 		if (node.tags.atm == "yes") {
 			addNodeWithAtmToMap(node);
@@ -176,7 +176,7 @@ let ATMMAP = {};
 		}
 	}
 
-	function storeAtmNodesToMap(data) {
+	let storeAtmNodesToMap = function(data) {
 
 		// overpass returns a list with elements, which contains the nodes
 		$.each(data.elements, function (index, node) {
