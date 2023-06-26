@@ -40,7 +40,6 @@ let ATMMAP = {};
 	// JavaScript pattern: object literal
 	let nodeIds = {};
 	let wayNodeIds = {};
-
 	let map = null;
 
 	// building the api call for atms (automated teller machine)
@@ -119,28 +118,24 @@ let ATMMAP = {};
 		return geocoder;
 	}
 
-	let addSearchToSidebar = function(osmGeocoder) {
+	let addSearchToSidebar = function (osmGeocoder) {
 		// see: https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
 		let htmlObject = osmGeocoder.getContainer();
 		let searchdiv = document.getElementById("search_control");
 		setParent(htmlObject, searchdiv);
 	}
 
-	let query_polygon = null;
-
-	ATMMAP.test_query_necessary = function (next_polygon) {
+	ATMMAP.test_query_necessary = function (next_polygon, previous_polygon = null) {
 		let query_necessary;
-		if (query_polygon === null) {
-			query_polygon = next_polygon;
-			query_polygon = turf.transformScale(query_polygon, 2);
+		
+		if (previous_polygon === null) {
 			query_necessary = true;
 		}
 		else {
-			if (turf.booleanContains(query_polygon, next_polygon)) {
+			if (turf.booleanContains(previous_polygon, next_polygon)) {
 				query_necessary = false;
 			}
 			else {
-				query_polygon = turf.union(query_polygon, next_polygon);
 				query_necessary = true;
 			}
 		}
@@ -158,7 +153,7 @@ let ATMMAP = {};
 		});
 	}
 
-	let addAtmNodeToMap = function(node) {
+	let addAtmNodeToMap = function (node) {
 		// bank (or anything else) with atm
 		if (node.tags.atm == "yes") {
 			addNodeWithAtmToMap(node);
@@ -176,7 +171,7 @@ let ATMMAP = {};
 		}
 	}
 
-	let storeAtmNodesToMap = function(data) {
+	let storeAtmNodesToMap = function (data) {
 
 		// overpass returns a list with elements, which contains the nodes
 		$.each(data.elements, function (index, node) {

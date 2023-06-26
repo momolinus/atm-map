@@ -16,6 +16,6 @@ QUnit.test("Test Query-Optimizer", function (assert) {
 
     query_necessary = ATMMAP.test_query_necessary(first_query);
     assert.ok(query_necessary);
-    query_necessary = ATMMAP.test_query_necessary(smaller_query);
+    query_necessary = ATMMAP.test_query_necessary(smaller_query, first_query);
     assert.notOk(query_necessary)
 });
