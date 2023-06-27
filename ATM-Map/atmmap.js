@@ -22,7 +22,7 @@ let ATMMAP = {};
 		map = buildMap();
 
 		let osmGeocoder = buildOsmGeocoderAndAddToMap(map);
-		L.control.locate({strings: { title: "Gehe zum meinem Standort!" }}).addTo(map);
+		L.control.locate({ strings: { title: "Gehe zum meinem Standort!" } }).addTo(map);
 		L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
 
 		layerBuilder.buildLayers(map);
@@ -149,6 +149,8 @@ let ATMMAP = {};
 		else if (node.tags.amenity == "bank") {
 			if (node.tags.atm == "no") {
 				addBankWithNoAtmToMap(node);
+			}
+			else {
 				addBankWithUnknownAtmToMap(node);
 			}
 		}
