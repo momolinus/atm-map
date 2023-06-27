@@ -64,10 +64,7 @@ let LAYER_BUILDER = {};
 		 */
 		let htmlObject = operatorLayers.getContainer();
 		let a = document.getElementById("bank_layer_control")
-		function setParent(el, newParent) {
-			newParent.appendChild(el);
-		}
-		setParent(htmlObject, a);
+		a.appendChild(htmlObject);
 	};
 
 	LAYER_BUILDER.addToNamedGroups = function (node, marker) {

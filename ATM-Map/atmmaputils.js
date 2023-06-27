@@ -46,7 +46,6 @@ let UTILS = {};
 
 		let description = '<p class="bank_name">???</p>';
 
-		//TODO Folgendes mit einer verbesserten LAYER_BUILDER.createNameFromeTags ersetzen
 		// atm usually not in bank
 		if (node.tags["atm:operator"]) {
 
@@ -56,7 +55,8 @@ let UTILS = {};
 			if (node.tags.name) {
 				description += '<br><span class="bank_subname">(';
 				description += node.tags.name + ')</span></p>';
-			} else {
+			} 
+			else {
 				description += '</p>';
 			}
 		}
@@ -78,7 +78,8 @@ let UTILS = {};
 		if (node.tags.opening_hours) {
 			description += '<p class="opening_hour">';
 			description += node.tags.opening_hours + '</p>';
-		} else {
+		} 
+		else {
 			description += '<p class="opening_hour">';
 			description += 'keine Öffnungszeiten angegeben</p>';
 		}
