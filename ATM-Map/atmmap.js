@@ -4,7 +4,7 @@
  */
 
 // eslint settings
-/*global L, $, UTILS, LAYER_BUILDER, turf*/
+/*global L, $, UTILS, LAYER_BUILDER */
 
 // constructs the module ATMMAP
 let ATMMAP = {};
@@ -115,7 +115,7 @@ let ATMMAP = {};
 			query_necessary = true;
 		}
 		else {
-			if (turf.booleanContains(previous_polygon, next_polygon)) {
+			if (previous_polygon.contains(next_polygon)) {
 				query_necessary = false;
 			}
 			else {
