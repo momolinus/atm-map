@@ -117,6 +117,8 @@ let ATMMAP = {};
 		else {
 			if (previous_polygon.contains(next_polygon)) {
 				query_necessary = false;
+
+				console.log("query saved")
 			}
 			else {
 				query_necessary = true;
@@ -172,9 +174,21 @@ let ATMMAP = {};
 		});
 	}
 
+	let query_bound = null;
+
 	let loadPois = function () {
 
 		if (map.getZoom() < 13) return;
+		//FIXME map.getBounds gibt https://leafletjs.com/reference.html#latlngbounds zurück
+		if (!ATMMAP.test_query_necessary(map.getBounds(), query_bound)) return;
+			
+		if (query_bound === null) {
+			query_bound = L.bounds(	map.getBounds().getTopLeft(),
+									map.getBounds().getBottomRight());
+		}
+		else {
+			query_bound.expand(map.getBounds());
+		}
 
 		// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence
 		let overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map.getBounds()));
