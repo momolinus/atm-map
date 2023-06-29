@@ -187,21 +187,7 @@ let ATMMAP = {};
 		}
 	}
 
-	let query_bound = null;
-
-	let loadPois = function () {
-
-		if (map.getZoom() < 13) return;
-
-		let mapBounds = utils.latLngBoundsToBounds(map.getBounds());
-
-		if (!ATMMAP.test_query_necessary(mapBounds, query_bound)) return;
-			
-		updateQueryBound(mapBounds);
-
-		// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence
-		let overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map.getBounds()));
-
+	let callOverpassApi = function (overpassCall) {
 		map.spin(true, { color: '#0026FF', radius: 20, width: 7, length: 20 });
 
 		// using JQuery executing overpass api
@@ -215,7 +201,24 @@ let ATMMAP = {};
 			console.error(errorThrown);
 			console.error(jqXHR);
 		});
-	};
+	}
+	
+	let query_bound = null;
+
+	let loadPois = function () {
+
+		if (map.getZoom() < 13) return;
+
+		let mapBounds = utils.latLngBoundsToBounds(map.getBounds());
+		if (!ATMMAP.test_query_necessary(mapBounds, query_bound)) return;
+			
+		updateQueryBound(mapBounds);
+
+		// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence
+		let overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map.getBounds()));
+
+		callOverpassApi(overpassCall);
+	}
 
 	let addBankWithNoAtmToMap = function (bank) {
 		let name, marker;
