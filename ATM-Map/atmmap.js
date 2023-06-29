@@ -113,15 +113,19 @@ let ATMMAP = {};
 
 		if (previous_polygon === null) {
 			query_necessary = true;
+
+			console.log("query necessary, previous_polygon === null");
 		}
 		else {
 			if (previous_polygon.contains(next_polygon)) {
 				query_necessary = false;
 
-				console.log("query saved")
+				console.log("query saved");
 			}
 			else {
 				query_necessary = true;
+
+				console.log("query necessary");
 			}
 		}
 
@@ -179,15 +183,16 @@ let ATMMAP = {};
 	let loadPois = function () {
 
 		if (map.getZoom() < 13) return;
-		//FIXME map.getBounds gibt https://leafletjs.com/reference.html#latlngbounds zurück
-		if (!ATMMAP.test_query_necessary(map.getBounds(), query_bound)) return;
+
+		let mapBounds = utils.latLngBoundsToBounds(map.getBounds());
+
+		if (!ATMMAP.test_query_necessary(mapBounds, query_bound)) return;
 			
 		if (query_bound === null) {
-			query_bound = L.bounds(	map.getBounds().getTopLeft(),
-									map.getBounds().getBottomRight());
+			query_bound = L.bounds(	mapBounds.getTopLeft(),	mapBounds.getBottomRight());
 		}
 		else {
-			query_bound.expand(map.getBounds());
+			query_bound.extend(mapBounds.getTopLeft(),	mapBounds.getBottomRight());
 		}
 
 		// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence

@@ -26,6 +26,13 @@ let UTILS = {};
 	UTILS.unknownAtm = buildAtmIcon('bank_euro_atm_unknow.png');
 	UTILS.noAtm = buildAtmIcon('bank_icon_atm_no.png');
 
+	UTILS.latLngBoundsToBounds = function(latLngBounds) {
+		let point1 = L.point(latLngBounds.getNorthWest().lat, latLngBounds.getNorthWest().lng);
+		let point2 = L.point(latLngBounds.getSouthEast().lat, latLngBounds.getSouthWest().lng);
+
+		return L.bounds(point1, point2);
+	}
+
 	UTILS.latLongToString = function (bounds) {
 
 		/* The coordinate order is (lower lat, lower lon, upper lat, upper lon) */
