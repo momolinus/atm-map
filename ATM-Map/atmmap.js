@@ -16,16 +16,29 @@ let ATMMAP = {};
 	let layerBuilder = LAYER_BUILDER;
 
 	// public interface, used in index.html
+	let cooperativ = null;
+	let others = null;
 	ATMMAP.initMap = function () {
 		//TODO map ist ein "Attribut" der Klasse und darf hier nicht mit let definiert werden
 		// lässt sich das noch deutlicher machen
 		map = buildMap();
+
+		cooperativ = L.tileLayer('https://mymapnik.rudzick.it/MeinMapnikWMS/tiles/geldautomaten_genossenschaftsbanken_hq/webmercator_hq/{z}/{x}/{y}.png?origin=nw', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            });
+
+        others = L.tileLayer('https://mymapnik.rudzick.it/MeinMapnikWMS/tiles/geldautomaten_weiterebanken_hq/webmercator_hq/{z}/{x}/{y}.png?origin=nw', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            });
 
 		let osmGeocoder = buildOsmGeocoderAndAddToMap(map);
 		L.control.locate({ strings: { title: "Gehe zum meinem Standort!" } }).addTo(map);
 		L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
 
 		layerBuilder.buildLayers(map);
+		layerBuilder.operatorLayers.remove();
 
 		addSearchToSidebar(osmGeocoder);
 
@@ -207,7 +220,17 @@ let ATMMAP = {};
 
 	let loadPois = function () {
 
-		if (map.getZoom() < 13) return;
+		if (map.getZoom() < 15){
+			others.addTo(map);
+			cooperativ.addTo(map);
+			layerBuilder.operatorLayers.remove();
+
+			return;
+		} else {
+			others.remove();
+			cooperativ.remove();
+			layerBuilder.operatorLayers.addTo(map);
+		}
 
 		let mapBounds = utils.latLngBoundsToBounds(map.getBounds());
 		if (!ATMMAP.test_query_necessary(mapBounds, query_bound)) return;
