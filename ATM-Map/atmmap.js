@@ -15,26 +15,19 @@ let ATMMAP = {};
 	// see atmmap_layerbuilder.js
 	let layerBuilder = LAYER_BUILDER;
 
-	// public interface, used in index.html
-	let cooperativ = null;
-	let others = null;
+	let cooperativBanks = null;
+	let otherBanks = null;
+
 	ATMMAP.initMap = function () {
-		//TODO map ist ein "Attribut" der Klasse und darf hier nicht mit let definiert werden
-		// lässt sich das noch deutlicher machen
+
 		map = buildMap();
 
-		cooperativ = L.tileLayer('https://mymapnik.rudzick.it/MeinMapnikWMS/tiles/geldautomaten_genossenschaftsbanken_hq/webmercator_hq/{z}/{x}/{y}.png?origin=nw', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            });
-
-        others = L.tileLayer('https://mymapnik.rudzick.it/MeinMapnikWMS/tiles/geldautomaten_weiterebanken_hq/webmercator_hq/{z}/{x}/{y}.png?origin=nw', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            });
+		buildAtmWmsLayers();
 
 		let osmGeocoder = buildOsmGeocoderAndAddToMap(map);
+
 		L.control.locate({ strings: { title: "Gehe zum meinem Standort!" } }).addTo(map);
+
 		L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
 
 		layerBuilder.buildLayers(map);
@@ -91,6 +84,18 @@ let ATMMAP = {};
 	/** *************** */
 	/** private methods */
 	/** *************** */
+
+	let buildAtmWmsLayers = function () {
+		cooperativBanks = L.tileLayer('https://mymapnik.rudzick.it/MeinMapnikWMS/tiles/geldautomaten_genossenschaftsbanken_hq/webmercator_hq/{z}/{x}/{y}.png?origin=nw', {
+			maxZoom: 19,
+			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+		});
+
+		otherBanks = L.tileLayer('https://mymapnik.rudzick.it/MeinMapnikWMS/tiles/geldautomaten_weiterebanken_hq/webmercator_hq/{z}/{x}/{y}.png?origin=nw', {
+			maxZoom: 19,
+			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+		});
+	}
 
 	let buildMap = function () {
 		let osm_layer = new L.TileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png');
@@ -215,32 +220,38 @@ let ATMMAP = {};
 			console.error(jqXHR);
 		});
 	}
-	
+
 	let query_bound = null;
 
 	let loadPois = function () {
 
-		if (map.getZoom() < 15){
-			others.addTo(map);
-			cooperativ.addTo(map);
-			layerBuilder.operatorLayers.remove();
-
-			return;
+		if (map.getZoom() < 15) {
+			setupSmallZoom();
 		} else {
-			others.remove();
-			cooperativ.remove();
-			layerBuilder.operatorLayers.addTo(map);
+			setupLargeZoom();
+
+			let mapBounds = utils.latLngBoundsToBounds(map.getBounds());
+			if (!ATMMAP.test_query_necessary(mapBounds, query_bound)) return;
+
+			updateQueryBound(mapBounds);
+
+			// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence
+			let overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map.getBounds()));
+
+			callOverpassApi(overpassCall);
 		}
+	}
 
-		let mapBounds = utils.latLngBoundsToBounds(map.getBounds());
-		if (!ATMMAP.test_query_necessary(mapBounds, query_bound)) return;
-			
-		updateQueryBound(mapBounds);
+	let setupLargeZoom = function () {
+		otherBanks.remove();
+		cooperativBanks.remove();
+		layerBuilder.operatorLayers.addTo(map);
+	}
 
-		// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence
-		let overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map.getBounds()));
-
-		callOverpassApi(overpassCall);
+	let setupSmallZoom = function () {
+		otherBanks.addTo(map);
+		cooperativBanks.addTo(map);
+		layerBuilder.operatorLayers.remove();
 	}
 
 	let addBankWithNoAtmToMap = function (bank) {
