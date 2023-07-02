@@ -28,7 +28,7 @@
  * @author Marcus Bleil, www.marcusbleil.de
  */
 let LAYER_BUILDER = {};
-LAYER_BUILDER.namedGroup = {};
+LAYER_BUILDER.namedGroup = [];
 LAYER_BUILDER.operatorLayers = null;
 
 (function () {

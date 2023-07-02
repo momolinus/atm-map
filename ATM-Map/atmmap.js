@@ -31,7 +31,6 @@ let ATMMAP = {};
 		L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
 
 		layerBuilder.buildLayers(map);
-		layerBuilder.operatorLayers.remove();
 
 		addSearchToSidebar(osmGeocoder);
 
@@ -131,19 +130,13 @@ let ATMMAP = {};
 
 		if (previous_polygon === null) {
 			query_necessary = true;
-
-			console.log("query necessary, previous_polygon === null");
 		}
 		else {
 			if (previous_polygon.contains(next_polygon)) {
 				query_necessary = false;
-
-				console.log("query saved");
 			}
 			else {
 				query_necessary = true;
-
-				console.log("query necessary");
 			}
 		}
 
@@ -227,7 +220,8 @@ let ATMMAP = {};
 
 		if (map.getZoom() < 15) {
 			setupSmallZoom();
-		} else {
+		} 
+		else {
 			setupLargeZoom();
 
 			let mapBounds = utils.latLngBoundsToBounds(map.getBounds());
@@ -245,13 +239,17 @@ let ATMMAP = {};
 	let setupLargeZoom = function () {
 		otherBanks.remove();
 		cooperativBanks.remove();
-		layerBuilder.operatorLayers.addTo(map);
 	}
 
 	let setupSmallZoom = function () {
 		otherBanks.addTo(map);
 		cooperativBanks.addTo(map);
-		layerBuilder.operatorLayers.remove();
+
+		for (let l of layerBuilder.namedGroup) {
+			l.clearLayers();
+		}
+		query_bound = null;
+		nodeIds = {};
 	}
 
 	let addBankWithNoAtmToMap = function (bank) {
