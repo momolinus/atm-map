@@ -28,12 +28,11 @@
  * @author Marcus Bleil, www.marcusbleil.de
  */
 let LAYER_BUILDER = {};
+LAYER_BUILDER.namedGroup = [];
+LAYER_BUILDER.operatorLayers = null;
 
 (function () {
 
-	let operatorLayers;
-
-	// JavaScript pattern: array literal
 	let operatorCategories = [
 		"Genossenschaftsbanken<br /><span class=\"details\">Bankcard-Servicenetz, Volksbanken, usw.</span>",
 		"Sparkassen",
@@ -41,33 +40,28 @@ let LAYER_BUILDER = {};
 		"Cash Group<br /><span class=\"details\">Deutsche Bank, Postbank, usw.</span>",
 		"weitere Banken<br /><span class=\"details\">Banken, die sich nicht zuordnen lassen</span>"];
 
-	let namedGroup = {};
-
 	LAYER_BUILDER.buildLayers = function (map) {
 		let group;
 
-		operatorLayers = L.control.layers(null, null, {
+		LAYER_BUILDER.operatorLayers = L.control.layers(null, null, {
 			collapsed: false
 		}).addTo(map);
 
 		for (let i = 0; i < operatorCategories.length; i++) {
 			group = L.layerGroup();
 			group.addTo(map);
-			operatorLayers.addOverlay(group, operatorCategories[i]);
+			LAYER_BUILDER.operatorLayers.addOverlay(group, operatorCategories[i]);
 
-			namedGroup[i] = group;
+			LAYER_BUILDER.namedGroup[i] = group;
 		}
 
 		/**
 		 * see:
 		 * https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
 		 */
-		let htmlObject = operatorLayers.getContainer();
+		let htmlObject = LAYER_BUILDER.operatorLayers.getContainer();
 		let a = document.getElementById("bank_layer_control")
-		function setParent(el, newParent) {
-			newParent.appendChild(el);
-		}
-		setParent(htmlObject, a);
+		a.appendChild(htmlObject);
 	};
 
 	LAYER_BUILDER.addToNamedGroups = function (node, marker) {
@@ -77,27 +71,27 @@ let LAYER_BUILDER = {};
 		name = createNameFromeTags(node);
 
 		if (LAYER_BUILDER.matchingCooperativeBank(name)) {
-			namedGroup[0].addLayer(marker);
+			LAYER_BUILDER.namedGroup[0].addLayer(marker);
 			matched = true;
 		}
 
 		if (LAYER_BUILDER.matchingSavingsBank(name)) {
-			namedGroup[1].addLayer(marker);
+			LAYER_BUILDER.namedGroup[1].addLayer(marker);
 			matched = true;
 		}
 
 		if (LAYER_BUILDER.matchingCashPool(name)) {
-			namedGroup[2].addLayer(marker);
+			LAYER_BUILDER.namedGroup[2].addLayer(marker);
 			matched = true;
 		}
 
 		if (LAYER_BUILDER.matchingCashGroup(name)) {
-			namedGroup[3].addLayer(marker);
+			LAYER_BUILDER.namedGroup[3].addLayer(marker);
 			matched = true;
 		}
 
 		if (!matched) {
-			namedGroup[4].addLayer(marker);
+			LAYER_BUILDER.namedGroup[4].addLayer(marker);
 		}
 	};
 

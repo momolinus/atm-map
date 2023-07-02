@@ -1,6 +1,10 @@
 /**
  *
  */
+
+// eslint settings
+/*global LAYER_BUILDER, QUnit*/
+
 QUnit.test("Brandenburger Bank", function(assert) {
 	var bankName = "Brandenburger Bank";
 
@@ -10,10 +14,10 @@ QUnit.test("Brandenburger Bank", function(assert) {
 	var isSaving = LAYER_BUILDER.matchingSavingsBank(bankName);
 	assert.notOk(isSaving, bankName + " is not a Sparkasse");
 
-	var isSaving = LAYER_BUILDER.matchingCashPool(bankName);
-	assert.notOk(isSaving, bankName + " is not a CashPool-Bank");
+	var isCashPool = LAYER_BUILDER.matchingCashPool(bankName);
+	assert.notOk(isCashPool, bankName + " is not a CashPool-Bank");
 
-	var isSaving = LAYER_BUILDER.matchingCashGroup(bankName);
-	assert.notOk(isSaving, bankName + " is not a CashGroup-Bank");
+	var isCashCroup = LAYER_BUILDER.matchingCashGroup(bankName);
+	assert.notOk(isCashCroup, bankName + " is not a CashGroup-Bank");
 
 });

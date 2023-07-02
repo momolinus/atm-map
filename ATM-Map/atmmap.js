@@ -4,105 +4,59 @@
  */
 
 // eslint settings
-/*global L, $, UTILS, LAYER_BUILDER, turf*/
+/*global L, $, UTILS, LAYER_BUILDER */
 
 // constructs the module ATMMAP
 let ATMMAP = {};
 
 (function () {
-
 	// dependencies, see atmmaputils.js
 	let utils = UTILS;
 	// see atmmap_layerbuilder.js
 	let layerBuilder = LAYER_BUILDER;
 
-	// public interface, used in index.html
+	let cooperativBanks = null;
+	let otherBanks = null;
+
 	ATMMAP.initMap = function () {
-		let osm_layer;
-		osm_layer = new L.TileLayer(
-			'https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png'
-		);
 
-		map = L.map('map', {
-			center: new L.LatLng(52.516, 13.379),
-			zoom: 15,
-			layers: osm_layer
-		});
+		map = buildMap();
 
-		let osmGeocoder = new L.Control.OSMGeocoder({
-			position: 'topright',
-			text: 'Suchen'
-		}).addTo(map);
+		buildAtmWmsLayers();
 
-		L.control.locate({
-			strings: {
-				title: "Gehe zum meinem Standort!"
-			}
-		}).addTo(map);
+		let osmGeocoder = buildOsmGeocoderAndAddToMap(map);
+
+		L.control.locate({ strings: { title: "Gehe zum meinem Standort!" } }).addTo(map);
 
 		L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
 
 		layerBuilder.buildLayers(map);
 
-		L.Control.Button = L.Control.extend({
-			options: {
-				position: 'topleft'
-			},
-			onAdd: function (map) {
-				var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-				var button = L.DomUtil.create('a', 'leaflet-control-button atm-reload-button', container);
-				L.DomEvent.disableClickPropagation(button);
-				L.DomEvent.on(button, 'click', function(){
-					loadPois();
-				});
-		
-				container.title = "die Geldautomaten anzeigen";
-		
-				return container;
-			},
-			onRemove: function(map) {},
-		});
-		
-		let control = new L.Control.Button();
-		control.addTo(map);
+		addSearchToSidebar(osmGeocoder);
 
-		/**
-		 * see:
-		 * https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
-		 */
-		let htmlObject = osmGeocoder.getContainer();
-		let searchdiv = document.getElementById("search_control")
-		function setParent(el, newParent) {
-			newParent.appendChild(el);
-		}
-		setParent(htmlObject, searchdiv);
-
-		map.on('moveend', moveEnd);
+		loadPois();
 	};
 
-
+	/* ****************** */
 	/* private attributes */
+	/* ****************** */
 
 	// contains the node id of the OSM objects
 	// JavaScript pattern: object literal
 	let nodeIds = {};
 	let wayNodeIds = {};
-
 	let map = null;
 
 	// building the api call for atms (automated teller machine)
 	// the overpass api URL
 	let ovpCall = 'http://overpass-api.de/api/interpreter?data=';
-
 	// setting the output format to json and timeout of 60 s
 	ovpCall += '[out:json][timeout:60];';
-
 	// nodes and ways with "amenity"="bank"
 	ovpCall += '(';
 	ovpCall += 'node["amenity"="bank"]({{bbox}});';
 	ovpCall += 'way["amenity"="bank"]({{bbox}});';
 	ovpCall += 'node["amenity"="atm"]({{bbox}});';
-
 	// other objects with "atm"="yes"
 	ovpCall += '(';
 	ovpCall += '(';
@@ -118,180 +72,185 @@ let ATMMAP = {};
 	ovpCall += 'node["amenity"="atm"]({{bbox}});';
 	ovpCall += ');';
 	ovpCall += ');';
-
 	// closes the atm set statement
 	ovpCall += ');';
-
 	// output statement
 	ovpCall += 'out body;';
-
 	// all nodes needed for ways only with lat/lng (skel) sorted by place (qt)
 	ovpCall += '>;';
 	ovpCall += 'out skel qt;';
-
 
 	/** *************** */
 	/** private methods */
 	/** *************** */
 
-	let query_polygon = null;
+	let buildAtmWmsLayers = function () {
+		cooperativBanks = L.tileLayer('https://mymapnik.rudzick.it/MeinMapnikWMS/tiles/geldautomaten_genossenschaftsbanken_hq/webmercator_hq/{z}/{x}/{y}.png?origin=nw', {
+			maxZoom: 19,
+			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+		});
 
-	ATMMAP.test_query_necessary = function (query, next_query) {
+		otherBanks = L.tileLayer('https://mymapnik.rudzick.it/MeinMapnikWMS/tiles/geldautomaten_weiterebanken_hq/webmercator_hq/{z}/{x}/{y}.png?origin=nw', {
+			maxZoom: 19,
+			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+		});
+	}
+
+	let buildMap = function () {
+		let osm_layer = new L.TileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png');
+
+		let map = L.map('map', {
+			center: new L.LatLng(52.516, 13.379),
+			zoom: 15,
+			layers: osm_layer
+		});
+		map.on('moveend', moveEnd);
+
+		return map;
+	}
+
+	let buildOsmGeocoderAndAddToMap = function (map) {
+		let geocoder = new L.Control.OSMGeocoder({
+			position: 'topright',
+			text: 'Suchen'
+		});
+		geocoder.addTo(map);
+		return geocoder;
+	}
+
+	let addSearchToSidebar = function (osmGeocoder) {
+		// see: https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
+		let htmlObject = osmGeocoder.getContainer();
+		let searchdiv = document.getElementById("search_control");
+		searchdiv.appendChild(htmlObject);
+	}
+
+	ATMMAP.test_query_necessary = function (next_polygon, previous_polygon = null) {
 		let query_necessary;
-		// note: query_polygon is a class member, existing out of method call
-		if (query === null) {
-			query = next_query;
-			query = turf.transformScale(query, 2);
+
+		if (previous_polygon === null) {
 			query_necessary = true;
 		}
 		else {
-			console.log("#1: " + JSON.stringify(query));
-
-			if (turf.booleanContains(query, next_polygon)) {
+			if (previous_polygon.contains(next_polygon)) {
 				query_necessary = false;
 			}
 			else {
-				query = turf.union(query, next_polygon);
 				query_necessary = true;
 			}
-
-			//console.log("#2: query_necessary set to " + query_necessary);
 		}
-
-		//console.log("#2: " + JSON.stringify(query_polygon));
-		//console.log("query_necessary=" + query_necessary);
 
 		return query_necessary;
 	}
 
-	let loadPois = function () {
-		let overpassCall;
+	let saveAllNodes = function (data) {
+		$.each(data.elements, function (index, node) {
+			// all nodes of type "node", some tagged nodes are necessary for
+			// building ways, not all nodes here are stored are necessary for storing
+			if (node.type == "node") {
+				wayNodeIds[node.id] = node;
+			}
+		});
+	}
 
-		if (map.getZoom() < 13) {
-			return;
+	let addAtmNodeToMap = function (node) {
+		// bank (or anything else) with atm
+		if (node.tags.atm == "yes") {
+			addNodeWithAtmToMap(node);
 		}
-
-		// https://alexbol99.github.io/flatten-js/index.html
-
-		// könnte auch gehen: http://turfjs.org/getting-started
-
-		// leaflet-Methoden: pad, contains, distanceTo
-		// flatten-js-Methoden: addFace
-
-		let new_area = map.getBounds();
-		let new_polygon = turf.polygon(
-			[
-				[
-					[new_area.getNorthWest().lat, new_area.getNorthWest().lng],
-					[new_area.getNorthEast().lat, new_area.getNorthEast().lng],
-					[new_area.getSouthEast().lat, new_area.getSouthEast().lng],
-					[new_area.getSouthWest().lat, new_area.getSouthWest().lng],
-					[new_area.getNorthWest().lat, new_area.getNorthWest().lng],
-				]
-			]
-		);
-
-		/**
-		polygon = turf.polygon([[[-5, 52], [-4, 56], [-2, 51], [-7, 54], [-5, 52]]], { name: 'poly1' });
-		polygon_child =  turf.polygon([[[-6, 52], [-4, 56], [-2, 51], [-7, 54], [-6, 52]]], { name: 'poly2' });
-		JSON.stringify(polygon)
-		JSON.stringify(polygon_child)
-		turf.booleanContains(polygon, polygon_child)
-		
-		*/
-
-		let query_necessary;
-		// note: query_polygon is a class member, existing out of method call
-		if (query_polygon === null) {
-			query_polygon = new_polygon;
-			query_polygon = turf.transformScale(query_polygon, 2);
-			query_necessary = true;
+		// a single atm
+		else if (node.tags.amenity == "atm") {
+			addSingleAtmToMap(node);
 		}
-		else {
-			console.log("#1: " + JSON.stringify(query_polygon));
-
-			if (turf.booleanContains(query_polygon, new_polygon)) {
-				query_necessary = false;
+		// banks without atm or unknow state
+		else if (node.tags.amenity == "bank") {
+			if (node.tags.atm == "no") {
+				addBankWithNoAtmToMap(node);
 			}
 			else {
-				query_polygon = turf.union(query_polygon, new_polygon);
-				query_necessary = true;
+				addBankWithUnknownAtmToMap(node);
 			}
-
-			console.log("#2: query_necessary set to " + query_necessary);
 		}
+	}
 
-		console.log("#2: " + JSON.stringify(query_polygon));
-		console.log("query_necessary=" + query_necessary);
+	let storeAtmNodesToMap = function (data) {
 
-		if (query_necessary) {
+		// overpass returns a list with elements, which contains the nodes
+		$.each(data.elements, function (index, node) {
 
-			// note: g in /{{bbox}}/g means replace all occurrences of
-			// {{bbox}} not just first occurrence
-			overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map
-				.getBounds()));
+			// Guardian condition: if node has no "tags" property no further processing is necessary.
+			if (!("tags" in node)) return;
+			// Guardian condition: If the node has already been processed before, a new processing is not necessary
+			if (node.is in nodeIds) return;
 
-			map.spin(true, {
-				color: '#0026FF',
-				radius: 20,
-				width: 7,
-				length: 20
-			});
+			nodeIds[node.id] = true;
 
-			// using JQuery executing overpass api
-			$.getJSON(overpassCall, function (data) {
+			addAtmNodeToMap(node);
+		});
+	}
 
-				// first store all node from any ways
-				$.each(data.elements, function (index, node) {
-
-					// all nodes of type "node", some tagged nodes are necessary for
-					// building ways, not all nodes here are stored are necessary
-					// for storing
-					if (node.type == "node") {
-						wayNodeIds[node.id] = node;
-					}
-
-				});
-
-				// overpass returns a list with elements, which contains the nodes
-				$.each(data.elements, function (index, node) {
-
-					// Guardian condition: if node has no "tags" property
-					// no further processing is necessary.
-					if (!("tags" in node)) return;
-
-					// Guardian condition: If the node has already been processed before,
-					// a new processing is not necessary
-					if (node.is in nodeIds) return;
-
-					nodeIds[node.id] = true;
-
-					// bank (or anything else) with atm
-					if (node.tags.atm == "yes") {
-						addNodeWithAtmToMap(node);
-					}
-					// a single atm
-					else if (node.tags.amenity == "atm") {
-						addSingleAtmToMap(node);
-					}
-					// banks without atm or unknow state
-					else if (node.tags.amenity == "bank") {
-
-						if (node.tags.atm == "no") {
-							addBankWithNoAtmToMap(node);
-							addBankWithUnknownAtmToMap(node);
-						}
-					}
-				});
-			}).always(function () {
-				map.spin(false);
-			}).fail(function(jqXHR, textStatus, errorThrown) {
-				console.error(textStatus);
-				console.error(errorThrown);
-				console.error(jqXHR);
-			});
+	let updateQueryBound = function newFunction(mapBounds) {
+		if (query_bound === null) {
+			query_bound = L.bounds(mapBounds.getTopLeft(), mapBounds.getBottomRight());
 		}
-	};
+		else {
+			query_bound.extend(mapBounds.getTopLeft(), mapBounds.getBottomRight());
+		}
+	}
+
+	let callOverpassApi = function (overpassCall) {
+		map.spin(true, { color: '#0026FF', radius: 20, width: 7, length: 20 });
+
+		// using JQuery executing overpass api
+		$.getJSON(overpassCall, function (data) {
+			saveAllNodes(data);
+			storeAtmNodesToMap(data);
+		}).always(function () {
+			map.spin(false);
+		}).fail(function (jqXHR, textStatus, errorThrown) {
+			console.error(textStatus);
+			console.error(errorThrown);
+			console.error(jqXHR);
+		});
+	}
+
+	let query_bound = null;
+
+	let loadPois = function () {
+
+		if (map.getZoom() < 15) {
+			setupSmallZoom();
+		} 
+		else {
+			setupLargeZoom();
+
+			let mapBounds = utils.latLngBoundsToBounds(map.getBounds());
+			if (!ATMMAP.test_query_necessary(mapBounds, query_bound)) return;
+
+			updateQueryBound(mapBounds);
+
+			// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence
+			let overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map.getBounds()));
+
+			callOverpassApi(overpassCall);
+		}
+	}
+
+	let setupLargeZoom = function () {
+		otherBanks.remove();
+		cooperativBanks.remove();
+	}
+
+	let setupSmallZoom = function () {
+		otherBanks.addTo(map);
+		cooperativBanks.addTo(map);
+
+		for (let l of layerBuilder.namedGroup) {
+			l.clearLayers();
+		}
+		query_bound = null;
+		nodeIds = {};
+	}
 
 	let addBankWithNoAtmToMap = function (bank) {
 		let name, marker;
@@ -318,54 +277,53 @@ let ATMMAP = {};
 
 		if (node.tags.amenity == "bank") {
 			marker = createMarker(node, name, utils.yesAtm);
-		} else {
+		}
+		else {
 			marker = createMarker(node, name, utils.atm);
 		}
 
 		addToNamedGroups(node, marker);
 	};
 
+	let createMarkerForNode = function (node, name, atmIcon) {
+		let marker = L.marker([node.lat, node.lon], {
+			icon: atmIcon
+		});
+
+		marker.bindPopup(name);
+
+		return marker;
+	}
+
+	let createMarkerForWay = function (node, wayNodeIds, atmIcon, name) {
+		let areaNodes = new Array();
+		let bankArea;
+		let marker = null;
+		let bounds;
+		let center;
+
+		$.each(node.nodes, function (index, nodeId) {
+			areaNodes.push(L.latLng(wayNodeIds[nodeId].lat, wayNodeIds[nodeId].lon));
+		});
+
+		bankArea = L.polygon(areaNodes, { clickable: false });
+		bounds = bankArea.getBounds();
+		center = bounds.getCenter();
+
+		marker = L.marker([center.lat, center.lng], { icon: atmIcon });
+
+		marker.bindPopup(name);
+
+		return L.layerGroup([bankArea, marker]);
+	}
+
 	let createMarker = function (node, name, atmIcon) {
 
 		if (node.type == "node") {
-			let marker = L.marker([node.lat, node.lon], {
-				icon: atmIcon
-			});
-
-			marker.bindPopup(name);
-
-			return marker;
-
-		} else if (node.type == "way") {
-			let areaNodes = new Array();
-			let bankArea;
-			let marker = null;
-			let bounds;
-			let center;
-
-			$.each(node.nodes, function (index, nodeId) {
-
-				if (wayNodeIds[nodeId] == undefined) {
-					console.log("wayNodeIds for " + nodeId);
-				}
-
-				areaNodes.push(L.latLng(wayNodeIds[nodeId].lat,
-					wayNodeIds[nodeId].lon));
-			});
-
-			bankArea = L.polygon(areaNodes, {
-				clickable: false
-			});
-			bounds = bankArea.getBounds();
-			center = bounds.getCenter();
-
-			marker = L.marker([center.lat, center.lng], {
-				icon: atmIcon
-			});
-
-			marker.bindPopup(name);
-
-			return L.layerGroup([bankArea, marker]);
+			return createMarkerForNode(node, name, atmIcon);
+		}
+		else if (node.type == "way") {
+			return createMarkerForWay(node, wayNodeIds, atmIcon, name);
 		}
 	};
 
@@ -373,9 +331,7 @@ let ATMMAP = {};
 		let name, marker;
 
 		name = utils.createDescriptionFromeTags(atm);
-		marker = L.marker([atm.lat, atm.lon], {
-			icon: utils.atm
-		}).bindPopup(name);
+		marker = L.marker([atm.lat, atm.lon], { icon: utils.atm }).bindPopup(name);
 
 		addToNamedGroups(atm, marker);
 	};
@@ -389,7 +345,7 @@ let ATMMAP = {};
 	};
 
 	let moveEnd = function () {
-		//loadPois();
+		loadPois();
 	};
 
 })();

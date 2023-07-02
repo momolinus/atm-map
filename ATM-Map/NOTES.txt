@@ -1,0 +1,33 @@
+// https://alexbol99.github.io/flatten-js/index.html
+
+		// könnte auch gehen: http://turfjs.org/getting-started
+
+		// leaflet-Methoden: pad, contains, distanceTo
+		// flatten-js-Methoden: addFace
+
+		let new_area = map.getBounds();
+		let new_polygon = turf.polygon(
+			[
+				[
+					[new_area.getNorthWest().lat, new_area.getNorthWest().lng],
+					[new_area.getNorthEast().lat, new_area.getNorthEast().lng],
+					[new_area.getSouthEast().lat, new_area.getSouthEast().lng],
+					[new_area.getSouthWest().lat, new_area.getSouthWest().lng],
+					[new_area.getNorthWest().lat, new_area.getNorthWest().lng],
+				]
+			]
+		);
+
+		/**
+		polygon = turf.polygon([[[-5, 52], [-4, 56], [-2, 51], [-7, 54], [-5, 52]]], { name: 'poly1' });
+		polygon_child =  turf.polygon([[[-6, 52], [-4, 56], [-2, 51], [-7, 54], [-6, 52]]], { name: 'poly2' });
+		JSON.stringify(polygon)
+		JSON.stringify(polygon_child)
+		turf.booleanContains(polygon, polygon_child)
+		
+		*/
+
+		let query_necessary = true;
+		//query_necessary = ATMMAP.test_query_necessary(query_polygon);
+
+		if (query_necessary) {
