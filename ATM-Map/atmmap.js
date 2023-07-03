@@ -189,12 +189,13 @@ let ATMMAP = {};
 		});
 	}
 
-	let updateQueryBound = function newFunction(mapBounds) {
-		if (query_bound === null) {
-			query_bound = L.bounds(mapBounds.getTopLeft(), mapBounds.getBottomRight());
+	ATMMAP.query_bound = null;
+	ATMMAP.updateQueryBound = function newFunction(mapBounds) {
+		if (ATMMAP.query_bound === null) {
+			ATMMAP.query_bound = L.bounds(mapBounds.getTopLeft(), mapBounds.getBottomRight());
 		}
 		else {
-			query_bound.extend(mapBounds.getTopLeft(), mapBounds.getBottomRight());
+			ATMMAP.query_bound.extend(mapBounds.getTopLeft(), mapBounds.getBottomRight());
 		}
 	}
 
@@ -214,8 +215,6 @@ let ATMMAP = {};
 		});
 	}
 
-	let query_bound = null;
-
 	let loadPois = function () {
 
 		if (map.getZoom() < 15) {
@@ -227,7 +226,7 @@ let ATMMAP = {};
 			let mapBounds = utils.latLngBoundsToBounds(map.getBounds());
 			if (!ATMMAP.test_query_necessary(mapBounds, query_bound)) return;
 
-			updateQueryBound(mapBounds);
+			ATMMAP.updateQueryBound(mapBounds);
 
 			// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence
 			let overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map.getBounds()));

@@ -14,7 +14,30 @@ QUnit.test("Test Query-Optimizer", function (assert) {
     assert.notOk(query_necessary)
 });
 
-QUnit.test("set name", function (assert) {
+QUnit.test("test of ATMMAP.updateQueryBound with smaller areas", function (assert) {
+    let bound1 = L.bounds(L.point(5, 4), L.point(7, 8));
+    ATMMAP.updateQueryBound(bound1);
+    assert.equal(ATMMAP.query_bound.getTopLeft().x, 5);
+    assert.equal(ATMMAP.query_bound.getTopLeft().y, 4);
+    assert.equal(ATMMAP.query_bound.getBottomRight().x, 7);
+    assert.equal(ATMMAP.query_bound.getBottomRight().y, 8);
+
+    let bound2 = L.bounds(L.point(6, 5), L.point(6, 7));
+    ATMMAP.updateQueryBound(bound2);
+    assert.equal(ATMMAP.query_bound.getTopLeft().x, 5);
+    assert.equal(ATMMAP.query_bound.getTopLeft().y, 4);
+    assert.equal(ATMMAP.query_bound.getBottomRight().x, 7);
+    assert.equal(ATMMAP.query_bound.getBottomRight().y, 8);
+
+    let bound3 = L.bounds(L.point(7, 5.5), L.point(6, 6));
+    ATMMAP.updateQueryBound(bound3);
+    assert.equal(ATMMAP.query_bound.getTopLeft().x, 5);
+    assert.equal(ATMMAP.query_bound.getTopLeft().y, 4);
+    assert.equal(ATMMAP.query_bound.getBottomRight().x, 7);
+    assert.equal(ATMMAP.query_bound.getBottomRight().y, 8);
+});
+
+QUnit.test("test of ATMMAP.test_query_necessary", function (assert) {
     let query_necessary;
 
     let first_query = L.bounds(L.point(5, 5), L.point(10, 10));
