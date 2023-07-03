@@ -28,7 +28,7 @@ let UTILS = {};
 
 	UTILS.latLngBoundsToBounds = function(latLngBounds) {
 		let point1 = L.point(latLngBounds.getNorthWest().lat, latLngBounds.getNorthWest().lng);
-		let point2 = L.point(latLngBounds.getSouthEast().lat, latLngBounds.getSouthWest().lng);
+		let point2 = L.point(latLngBounds.getSouthEast().lat, latLngBounds.getSouthEast().lng);
 
 		return L.bounds(point1, point2);
 	}

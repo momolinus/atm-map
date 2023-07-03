@@ -134,12 +134,14 @@ let ATMMAP = {};
 		else {
 			if (previous_polygon.contains(next_polygon)) {
 				query_necessary = false;
-			}
+				}
 			else {
 				query_necessary = true;
 			}
+			console.debug("query nec: " + query_necessary);
+			console.debug("next_p:" + JSON.stringify(next_polygon));
+			console.debug("prev_p:" + JSON.stringify(previous_polygon));
 		}
-
 		return query_necessary;
 	}
 
@@ -219,19 +221,22 @@ let ATMMAP = {};
 
 		if (map.getZoom() < 15) {
 			setupSmallZoom();
-		} 
+		}
 		else {
 			setupLargeZoom();
 
 			let mapBounds = utils.latLngBoundsToBounds(map.getBounds());
-			if (!ATMMAP.test_query_necessary(mapBounds, ATMMAP.query_bound)) return;
+			let query_necessary = ATMMAP.test_query_necessary(mapBounds, ATMMAP.query_bound);
 
-			ATMMAP.updateQueryBound(mapBounds);
+			if (query_necessary) {
 
-			// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence
-			let overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map.getBounds()));
+				ATMMAP.updateQueryBound(mapBounds);
 
-			callOverpassApi(overpassCall);
+				// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence
+				let overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map.getBounds()));
+
+				callOverpassApi(overpassCall);
+			}
 		}
 	}
 
