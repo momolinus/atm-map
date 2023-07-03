@@ -224,7 +224,7 @@ let ATMMAP = {};
 			setupLargeZoom();
 
 			let mapBounds = utils.latLngBoundsToBounds(map.getBounds());
-			if (!ATMMAP.test_query_necessary(mapBounds, query_bound)) return;
+			if (!ATMMAP.test_query_necessary(mapBounds, ATMMAP.query_bound)) return;
 
 			ATMMAP.updateQueryBound(mapBounds);
 
@@ -247,7 +247,7 @@ let ATMMAP = {};
 		for (let l of layerBuilder.namedGroup) {
 			l.clearLayers();
 		}
-		query_bound = null;
+		ATMMAP.query_bound = null;
 		nodeIds = {};
 	}
 
