@@ -49,6 +49,22 @@ let UTILS = {};
 		return result;
 	};
 
+	UTILS.boundToString = function (bounds) {
+
+		/* The coordinate order is (lower lat, lower lon, upper lat, upper lon) */
+		let result;
+		let lowerLat, lowerLng, upperLat, upperLng;
+
+		lowerLat = bounds.getBottomLeft().y;
+		lowerLng = bounds.getBottomLeft().x;
+		upperLat = bounds.getTopRight().y;
+		upperLng = bounds.getTopRight().x;
+
+		result = lowerLat + "," + lowerLng + "," + upperLat + "," + upperLng;
+
+		return result;
+	};
+
 	UTILS.createDescriptionFromeTags = function (node) {
 
 		let description = '<p class="bank_name">???</p>';
