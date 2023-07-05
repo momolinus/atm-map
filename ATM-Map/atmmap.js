@@ -234,6 +234,7 @@ let ATMMAP = {};
 				ATMMAP.updateQueryBound(mapBounds);
 
 				// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence
+				//FIXME das ist her falsch, wenn oben der Suchbereich verdoppelt wird
 				let overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map.getBounds()));
 
 				callOverpassApi(overpassCall);
