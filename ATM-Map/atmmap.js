@@ -197,7 +197,7 @@ let ATMMAP = {};
 			ATMMAP.query_bound = L.bounds(mapBounds.getTopLeft(), mapBounds.getBottomRight());
 		}
 		else {
-			ATMMAP.query_bound.extend(mapBounds.getTopLeft(), mapBounds.getBottomRight());
+			ATMMAP.query_bound.extend(mapBounds);
 		}
 	}
 
@@ -226,6 +226,7 @@ let ATMMAP = {};
 			setupLargeZoom();
 
 			let mapBounds = utils.latLngBoundsToBounds(map.getBounds());
+			mapBounds = mapBounds.pad(2);
 			let query_necessary = ATMMAP.test_query_necessary(mapBounds, ATMMAP.query_bound);
 
 			if (query_necessary) {
