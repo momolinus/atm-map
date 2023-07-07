@@ -26,13 +26,11 @@ let UTILS = {};
 	UTILS.unknownAtm = buildAtmIcon('bank_euro_atm_unknow.png');
 	UTILS.noAtm = buildAtmIcon('bank_icon_atm_no.png');
 
-	UTILS.latLngBoundsToBounds = function(latLngBounds) {
-		let point1 = L.point(latLngBounds.getNorthWest().lat, latLngBounds.getNorthWest().lng);
-		let point2 = L.point(latLngBounds.getSouthEast().lat, latLngBounds.getSouthEast().lng);
-
-		return L.bounds(point1, point2);
-	}
-
+	/**
+	 * Builds a bound string for passed LatLngBounds (https://leafletjs.com/reference.html#latlngbounds).
+	 * @param {*} bounds 
+	 * @returns lowerLat + "," + lowerLng + "," + upperLat + "," + upperLng
+	 */
 	UTILS.latLongToString = function (bounds) {
 
 		/* The coordinate order is (lower lat, lower lon, upper lat, upper lon) */
@@ -43,22 +41,6 @@ let UTILS = {};
 		lowerLng = bounds.getSouthWest().lng;
 		upperLat = bounds.getNorthEast().lat;
 		upperLng = bounds.getNorthEast().lng;
-
-		result = lowerLat + "," + lowerLng + "," + upperLat + "," + upperLng;
-
-		return result;
-	};
-
-	UTILS.boundToString = function (bounds) {
-
-		/* The coordinate order is (lower lat, lower lon, upper lat, upper lon) */
-		let result;
-		let lowerLat, lowerLng, upperLat, upperLng;
-
-		lowerLat = bounds.getBottomLeft().y;
-		lowerLng = bounds.getBottomLeft().x;
-		upperLat = bounds.getTopRight().y;
-		upperLng = bounds.getTopRight().x;
 
 		result = lowerLat + "," + lowerLng + "," + upperLat + "," + upperLng;
 
@@ -78,7 +60,7 @@ let UTILS = {};
 			if (node.tags.name) {
 				description += '<br><span class="bank_subname">(';
 				description += node.tags.name + ')</span></p>';
-			} 
+			}
 			else {
 				description += '</p>';
 			}
@@ -101,7 +83,7 @@ let UTILS = {};
 		if (node.tags.opening_hours) {
 			description += '<p class="opening_hour">';
 			description += node.tags.opening_hours + '</p>';
-		} 
+		}
 		else {
 			description += '<p class="opening_hour">';
 			description += 'keine Öffnungszeiten angegeben</p>';

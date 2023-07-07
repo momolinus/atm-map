@@ -194,7 +194,7 @@ let ATMMAP = {};
 	ATMMAP.query_bound = null;
 	ATMMAP.updateQueryBound = function newFunction(mapBounds) {
 		if (ATMMAP.query_bound === null) {
-			ATMMAP.query_bound = L.bounds(mapBounds.getTopLeft(), mapBounds.getBottomRight());
+			ATMMAP.query_bound = L.latLngBounds(mapBounds.getNorthWest(), mapBounds.getSouthEast());
 		}
 		else {
 			ATMMAP.query_bound.extend(mapBounds);
@@ -219,14 +219,13 @@ let ATMMAP = {};
 
 	let loadPois = function () {
 
-		if (map.getZoom() < 15) {
+		if (map.getZoom() < 14) {
 			setupSmallZoom();
 		}
 		else {
 			setupLargeZoom();
 
-			let mapBounds = utils.latLngBoundsToBounds(map.getBounds());
-			mapBounds = mapBounds.pad(2);
+			let mapBounds = map.getBounds();
 			let query_necessary = ATMMAP.test_query_necessary(mapBounds, ATMMAP.query_bound);
 
 			if (query_necessary) {
@@ -234,7 +233,7 @@ let ATMMAP = {};
 				ATMMAP.updateQueryBound(mapBounds);
 
 				// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence
-				let overpassCall = ovpCall.replace(/{{bbox}}/g, utils.boundToString(mapBounds));
+				let overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(mapBounds));
 
 				callOverpassApi(overpassCall);
 			}
