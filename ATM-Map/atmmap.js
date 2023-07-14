@@ -138,9 +138,13 @@ let ATMMAP = {};
 			else {
 				query_necessary = true;
 			}
-			console.debug("query nec: " + query_necessary);
+			
+			
+			console.debug("query_necessary: " + query_necessary);
+			/*
 			console.debug("next_p:" + JSON.stringify(next_polygon));
 			console.debug("prev_p:" + JSON.stringify(previous_polygon));
+			*/
 		}
 		return query_necessary;
 	}
