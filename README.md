@@ -9,6 +9,18 @@ check out <a href="https://geldautomaten-suche.org/">geldautomaten-suche.org</a>
 
 # Releases
 
+## Version 5.0
+
+published 16.07.2023
+
+- intelligent area search
+- new WMS service
+- JQuery update
+- leaflet update
+- source code refactoring
+	- reduce size of methods
+ 	- eliminate the warning messages of ESLint  
+
 ## Version 4.0.0
 
 published 02.02.2021
