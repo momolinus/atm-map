@@ -49,7 +49,7 @@ let ATMMAP = {};
 
 	// building the api call for atms (automated teller machine)
 	// the overpass api URL
-	let ovpCall = 'http://overpass-api.de/api/interpreter?data=';
+	let ovpCall = 'https://overpass-api.de/api/interpreter?data=';
 	// setting the output format to json and timeout of 60 s
 	ovpCall += '[out:json][timeout:60];';
 	// nodes and ways with "amenity"="bank"
@@ -134,12 +134,18 @@ let ATMMAP = {};
 		else {
 			if (previous_polygon.contains(next_polygon)) {
 				query_necessary = false;
-			}
+				}
 			else {
 				query_necessary = true;
 			}
+			
+			
+			console.debug("query_necessary: " + query_necessary);
+			/*
+			console.debug("next_p:" + JSON.stringify(next_polygon));
+			console.debug("prev_p:" + JSON.stringify(previous_polygon));
+			*/
 		}
-
 		return query_necessary;
 	}
 
@@ -189,12 +195,13 @@ let ATMMAP = {};
 		});
 	}
 
-	let updateQueryBound = function newFunction(mapBounds) {
-		if (query_bound === null) {
-			query_bound = L.bounds(mapBounds.getTopLeft(), mapBounds.getBottomRight());
+	ATMMAP.query_bound = null;
+	ATMMAP.updateQueryBound = function newFunction(mapBounds) {
+		if (ATMMAP.query_bound === null) {
+			ATMMAP.query_bound = L.latLngBounds(mapBounds.getNorthWest(), mapBounds.getSouthEast());
 		}
 		else {
-			query_bound.extend(mapBounds.getTopLeft(), mapBounds.getBottomRight());
+			ATMMAP.query_bound.extend(mapBounds);
 		}
 	}
 
@@ -214,25 +221,26 @@ let ATMMAP = {};
 		});
 	}
 
-	let query_bound = null;
-
 	let loadPois = function () {
 
-		if (map.getZoom() < 15) {
+		if (map.getZoom() < 14) {
 			setupSmallZoom();
-		} 
+		}
 		else {
 			setupLargeZoom();
 
-			let mapBounds = utils.latLngBoundsToBounds(map.getBounds());
-			if (!ATMMAP.test_query_necessary(mapBounds, query_bound)) return;
+			let mapBounds = map.getBounds();
+			let query_necessary = ATMMAP.test_query_necessary(mapBounds, ATMMAP.query_bound);
 
-			updateQueryBound(mapBounds);
+			if (query_necessary) {
 
-			// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence
-			let overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(map.getBounds()));
+				ATMMAP.updateQueryBound(mapBounds);
 
-			callOverpassApi(overpassCall);
+				// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence
+				let overpassCall = ovpCall.replace(/{{bbox}}/g, utils.latLongToString(mapBounds));
+
+				callOverpassApi(overpassCall);
+			}
 		}
 	}
 
@@ -248,7 +256,7 @@ let ATMMAP = {};
 		for (let l of layerBuilder.namedGroup) {
 			l.clearLayers();
 		}
-		query_bound = null;
+		ATMMAP.query_bound = null;
 		nodeIds = {};
 	}
 
