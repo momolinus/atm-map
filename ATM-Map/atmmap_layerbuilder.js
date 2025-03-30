@@ -25,7 +25,7 @@
 /*global L*/
 
 /**
- * @author Marcus Bleil, www.marcusbleil.de
+ * @author Marcus Bleil
  */
 let LAYER_BUILDER = {};
 LAYER_BUILDER.namedGroup = [];

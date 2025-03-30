@@ -1,6 +1,6 @@
 "use strict"
 /**
- * @author Marcus Bleil, www.marcusbleil.de
+ * @author Marcus Bleil
  */
 
 // eslint settings
