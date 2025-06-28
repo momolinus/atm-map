@@ -15,14 +15,9 @@ let ATMMAP = {};
 	// see atmmap_layerbuilder.js
 	let layerBuilder = LAYER_BUILDER;
 
-	let cooperativBanks = null;
-	let otherBanks = null;
-
 	ATMMAP.initMap = function () {
 
 		map = buildMap();
-
-		buildAtmWmsLayers();
 
 		let osmGeocoder = buildOsmGeocoderAndAddToMap(map);
 
@@ -84,18 +79,6 @@ let ATMMAP = {};
 	/** private methods */
 	/** *************** */
 
-	let buildAtmWmsLayers = function () {
-		cooperativBanks = L.tileLayer('https://mymapnik.rudzick.it/MeinMapnikWMS/tiles/geldautomaten_genossenschaftsbanken_hq/webmercator_hq/{z}/{x}/{y}.png?origin=nw', {
-			maxZoom: 19,
-			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-		});
-
-		otherBanks = L.tileLayer('https://mymapnik.rudzick.it/MeinMapnikWMS/tiles/geldautomaten_weiterebanken_hq/webmercator_hq/{z}/{x}/{y}.png?origin=nw', {
-			maxZoom: 19,
-			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-		});
-	}
-
 	let buildMap = function () {
 		let osm_layer = new L.TileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png');
 
@@ -139,12 +122,7 @@ let ATMMAP = {};
 				query_necessary = true;
 			}
 			
-			
 			console.debug("query_necessary: " + query_necessary);
-			/*
-			console.debug("next_p:" + JSON.stringify(next_polygon));
-			console.debug("prev_p:" + JSON.stringify(previous_polygon));
-			*/
 		}
 		return query_necessary;
 	}
@@ -221,14 +199,15 @@ let ATMMAP = {};
 		});
 	}
 
+	/**
+	 * The method is currently (June 2025) called twice: when the card is
+	 * generated (buildMap()) and when the card is moved in any way (moveEnd()).
+	 * The method empties the ATM layers, retrieves the ATMs of the current
+	 * display area and fills the layers again with these current ATMs.
+	 */
 	let loadPois = function () {
 
-		if (map.getZoom() < 14) {
-			setupSmallZoom();
-		}
-		else {
-			setupLargeZoom();
-
+		if (map.getZoom() >= 14) {
 			let mapBounds = map.getBounds();
 			let query_necessary = ATMMAP.test_query_necessary(mapBounds, ATMMAP.query_bound);
 
@@ -242,22 +221,6 @@ let ATMMAP = {};
 				callOverpassApi(overpassCall);
 			}
 		}
-	}
-
-	let setupLargeZoom = function () {
-		otherBanks.remove();
-		cooperativBanks.remove();
-	}
-
-	let setupSmallZoom = function () {
-		otherBanks.addTo(map);
-		cooperativBanks.addTo(map);
-
-		for (let l of layerBuilder.namedGroup) {
-			l.clearLayers();
-		}
-		ATMMAP.query_bound = null;
-		nodeIds = {};
 	}
 
 	let addBankWithNoAtmToMap = function (bank) {
