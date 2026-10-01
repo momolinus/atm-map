@@ -80,8 +80,12 @@ let ATMMAP = {};
 	/** *************** */
 
 	let buildMap = function () {
-		let osm_layer = new L.TileLayer('https://tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png');
-
+		let osm_layer = new L.TileLayer(
+			'https://tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png',
+			{
+				attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>-Mitwirkende'
+			}
+		);
 		let map = L.map('map', {
 			center: new L.LatLng(52.516, 13.379),
 			zoom: 15,
