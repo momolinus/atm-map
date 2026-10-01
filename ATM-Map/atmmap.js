@@ -80,7 +80,7 @@ let ATMMAP = {};
 	/** *************** */
 
 	let buildMap = function () {
-		let osm_layer = new L.TileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png');
+		let osm_layer = new L.TileLayer('https://tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png');
 
 		let map = L.map('map', {
 			center: new L.LatLng(52.516, 13.379),
