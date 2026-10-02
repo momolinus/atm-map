@@ -200,6 +200,43 @@ let ATMMAP = {};
 			console.error(textStatus);
 			console.error(errorThrown);
 			console.error(jqXHR);
+
+			let message;
+			if (textStatus === "timeout") {
+				message = "Die Anfrage an die Overpass API hat zu lange gedauert. Bitte versuchen Sie es später erneut.";
+			}
+			else if (textStatus === "parsererror") {
+				message = "Die Antwort der Overpass API konnte nicht gelesen werden. Bitte versuchen Sie es später erneut.";
+			}
+			else if (textStatus === "abort") {
+				message = "Die Anfrage an die Overpass API wurde abgebrochen.";
+			}
+			else if (jqXHR.status === 400) {
+				message = "Die Overpass API hat die Anfrage abgelehnt. Möglicherweise ist die Abfrage ungültig.";
+			}
+			else if (jqXHR.status === 403) {
+				message = "Die Overpass API hat den Zugriff verweigert.";
+			}
+			else if (jqXHR.status === 404) {
+				message = "Der Overpass API-Endpunkt wurde nicht gefunden.";
+			}
+			else if (jqXHR.status === 408 || jqXHR.status === 504) {
+				message = "Die Overpass API hat die Anfrage wegen einer Zeitüberschreitung abgebrochen. Bitte versuchen Sie es später erneut.";
+			}
+			else if (jqXHR.status === 429) {
+				message = "Zu viele Anfragen an die Overpass API. Bitte warten Sie kurz und versuchen Sie es erneut.";
+			}
+			else if (jqXHR.status >= 500) {
+				message = "Die Overpass API ist derzeit nicht verfügbar. Bitte versuchen Sie es später erneut.";
+			}
+			else if (jqXHR.status === 0) {
+				message = "Die Overpass API ist nicht erreichbar. Prüfen Sie Ihre Internetverbindung und ob der Browser die Anfrage blockiert (CORS).";
+			}
+			else {
+				message = "Beim Abrufen der Daten von der Overpass API ist ein unerwarteter Fehler aufgetreten (" + textStatus + ").";
+			}
+
+			alert(message);
 		});
 	}
 
