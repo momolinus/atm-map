@@ -9,6 +9,14 @@ check out <a href="https://geldautomaten-suche.org/">geldautomaten-suche.org</a>
 
 # Releases
 
+## Version 5.3
+
+published 02.10.2026
+
+- improved error handling when overpass api has an error
+- placed copyright on right bottom edge
+
+
 ## Version 5.0
 
 published 16.07.2023
