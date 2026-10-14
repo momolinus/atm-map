@@ -190,6 +190,11 @@ let ATMMAP = {};
 	let callOverpassApi = function (overpassCall) {
 		map.spin(true, { color: '#0026FF', radius: 20, width: 7, length: 20 });
 
+		//TODO es scheint, dass es möglich ist, während einer 
+		// laufenden Anfrage eine neue Anfrage zu starten.
+		// das sollte vermieden werden, um Konflikte oder unnötige Last auf der Overpass API zu verhindern.
+	
+
 		// using JQuery executing overpass api
 		$.getJSON(overpassCall, function (data) {
 			saveAllNodes(data);
