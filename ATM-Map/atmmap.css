@@ -46,6 +46,23 @@
 	margin: 0.25em 0;
 }
 
+#data_source_control label.sub_option {
+	margin-left: 1.5em;
+}
+
+/* hand cursor only over clickable vector tile icons, normal arrow elsewhere */
+.leaflet-container.leaflet-grab {
+	cursor: default;
+}
+
+.leaflet-dragging .leaflet-container.leaflet-grab {
+	cursor: grabbing;
+}
+
+.leaflet-tile-container svg image {
+	cursor: pointer;
+}
+
 #bank_layer_control .leaflet-control-layers {
 	border: none;
 }

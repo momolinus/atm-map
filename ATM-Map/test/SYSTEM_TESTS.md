@@ -40,6 +40,13 @@ Test successful, no anomalies
 - Move and zoom the map; verify tiles update and the category filters continue to work.
 - Select Overpass and verify ATMs appear at zoom 14 or higher, verify the tile features disappear and Overpass results load for the current area without duplicates. Switch back to vector tiles and verify the Overpass markers disappear.
 
+# ST10 Cash withdrawal shops
+
+## Unreleased
+- In vector tile mode verify green supermarket icons appear (e.g. Berlin Mitte, zoom 16) and clicking one opens a popup with name, opening hours, cash withdrawal note and OSM link.
+- Untick "Supermärkte mit Bargeldauszahlung" and verify the green icons disappear; tick again and verify they return.
+- Select Overpass and verify the checkbox is disabled and no green icons are shown.
+
 # ST9 Use ATM vector tiles below zoom 14
 
 ## Unreleased

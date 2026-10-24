@@ -20,9 +20,13 @@ ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 	let dataSourceGeneration = 0;
 	let overpassRequests = [];
 	let vectorTileLayer = null;
+	let cashWithdrawalLayer = null;
+	let cashWithdrawalEnabled = true;
 	let vectorTileErrorShown = false;
 	let vectorTileUrl = "https://sbtiles.obstbaumkarte.de/table.public.alle_geldautomaten.geom/{z}/{x}/{y}.pbf";
 	let vectorTileLayerName = "table.public.alle_geldautomaten.geom";
+	let cashWithdrawalUrl = "https://sbtiles.obstbaumkarte.de/table.public.alle_cash_withdrawal.geom/{z}/{x}/{y}.pbf";
+	let cashWithdrawalLayerName = "table.public.alle_cash_withdrawal.geom";
 
 	ATMMAP.initMap = function () {
 
@@ -48,8 +52,7 @@ ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 			loadPois();
 		}
 		else {
-			vectorTileLayer = createVectorTileLayer();
-			vectorTileLayer.addTo(map);
+			addVectorTileLayers();
 		}
 	};
 
@@ -76,18 +79,14 @@ ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 		wayNodeIds = {};
 		ATMMAP.query_bound = null;
 
-		if (vectorTileLayer) {
-			map.removeLayer(vectorTileLayer);
-			vectorTileLayer = null;
-		}
+		removeVectorTileLayers();
 
 		if (dataSource === ATMMAP.SOURCE_OVERPASS) {
 			loadPois();
 		}
 		else {
 			vectorTileErrorShown = false;
-			vectorTileLayer = createVectorTileLayer();
-			vectorTileLayer.addTo(map);
+			addVectorTileLayers();
 		}
 	};
 
@@ -172,6 +171,22 @@ ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 	}
 
 	let addDataSourceControl = function () {
+		let toggle = document.getElementById("cash_withdrawal_toggle");
+		toggle.addEventListener("change", function () {
+			cashWithdrawalEnabled = toggle.checked;
+			if (dataSource !== ATMMAP.SOURCE_VECTOR_TILES) {
+				return;
+			}
+			if (cashWithdrawalLayer) {
+				map.removeLayer(cashWithdrawalLayer);
+				cashWithdrawalLayer = null;
+			}
+			if (cashWithdrawalEnabled) {
+				cashWithdrawalLayer = createCashWithdrawalLayer();
+				cashWithdrawalLayer.addTo(map);
+			}
+		});
+
 		document.querySelectorAll('input[name="data-source"]').forEach(function (input) {
 			input.addEventListener("change", function () {
 				if (input.checked) {
@@ -280,6 +295,74 @@ ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 	};
 	ATMMAP.getVectorTileStyle = getVectorTileStyle;
 
+	let addVectorTileLayers = function () {
+		vectorTileLayer = createVectorTileLayer();
+		vectorTileLayer.addTo(map);
+		if (cashWithdrawalEnabled) {
+			cashWithdrawalLayer = createCashWithdrawalLayer();
+			cashWithdrawalLayer.addTo(map);
+		}
+		updateCashWithdrawalControl();
+	};
+
+	let removeVectorTileLayers = function () {
+		[vectorTileLayer, cashWithdrawalLayer].forEach(function (layer) {
+			if (layer) {
+				map.removeLayer(layer);
+			}
+		});
+		vectorTileLayer = null;
+		cashWithdrawalLayer = null;
+		updateCashWithdrawalControl();
+	};
+
+	let updateCashWithdrawalControl = function () {
+		let toggle = document.getElementById("cash_withdrawal_toggle");
+		if (toggle) {
+			toggle.disabled = dataSource !== ATMMAP.SOURCE_VECTOR_TILES;
+		}
+	};
+
+	let showVectorTilePopup = function (event, extraHtml) {
+		if (!event.layer || !event.layer.properties) {
+			console.error("Clicked vector tile feature has no properties.", event);
+			return;
+		}
+		// the tiles carry no OSM id, so the link points to the clicked position
+		let osmUrl = "https://www.openstreetmap.org/?mlat=" + event.latlng.lat.toFixed(6) +
+			"&mlon=" + event.latlng.lng.toFixed(6) +
+			"#map=19/" + event.latlng.lat.toFixed(6) + "/" + event.latlng.lng.toFixed(6);
+		let content = utils.createDescriptionFromeTags({ tags: event.layer.properties }) +
+			extraHtml +
+			'<p class="osm_link"><a href="' + osmUrl + '" target="_blank" rel="noopener">In OpenStreetMap ansehen</a></p>';
+		L.popup().setLatLng(event.latlng).setContent(content).openOn(map);
+	};
+
+	ATMMAP.getCashWithdrawalStyle = function () {
+		// radius > 10 keeps Leaflet 1.9 from reading the missing latlng of tile points on click
+		return { icon: utils.cashWithdrawal, radius: 16 };
+	};
+
+	let createCashWithdrawalLayer = function () {
+		let styles = {};
+		styles[cashWithdrawalLayerName] = ATMMAP.getCashWithdrawalStyle;
+		let tileLayer = L.vectorGrid.protobuf(cashWithdrawalUrl, {
+			interactive: true,
+			vectorTileLayerStyles: styles
+		});
+
+		tileLayer.on("click", function (event) {
+			let properties = event.layer && event.layer.properties;
+			let note = '<p class="cash_withdrawal_note">Bargeldauszahlung an der Kasse';
+			if (properties && properties["cash_withdrawal:purchase_required"] === "yes") {
+				note += ' (nur mit Einkauf)';
+			}
+			showVectorTilePopup(event, note + '</p>');
+		});
+
+		return tileLayer;
+	};
+
 	let createVectorTileLayer = function () {
 		let vectorTileLayerStyles = {};
 		vectorTileLayerStyles[vectorTileLayerName] = getVectorTileStyle;
@@ -290,17 +373,7 @@ ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 		});
 
 		tileLayer.on("click", function (event) {
-			if (!event.layer || !event.layer.properties) {
-				console.error("Clicked vector tile feature has no properties.", event);
-				return;
-			}
-			// the tiles carry no OSM id, so the link points to the clicked position
-			let osmUrl = "https://www.openstreetmap.org/?mlat=" + event.latlng.lat.toFixed(6) +
-				"&mlon=" + event.latlng.lng.toFixed(6) +
-				"#map=19/" + event.latlng.lat.toFixed(6) + "/" + event.latlng.lng.toFixed(6);
-			let content = utils.createDescriptionFromeTags({ tags: event.layer.properties }) +
-				'<p class="osm_link"><a href="' + osmUrl + '" target="_blank" rel="noopener">In OpenStreetMap ansehen</a></p>';
-			L.popup().setLatLng(event.latlng).setContent(content).openOn(map);
+			showVectorTilePopup(event, "");
 		});
 		tileLayer.on("tileerror", function (event) {
 			console.error("ATM vector tile could not be loaded.", event);

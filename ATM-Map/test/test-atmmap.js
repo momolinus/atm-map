@@ -8,6 +8,11 @@ QUnit.test("ATM vector tiles are the default data source", function (assert) {
 	assert.strictEqual(ATMMAP.setDataSource(ATMMAP.SOURCE_VECTOR_TILES), undefined);
 });
 
+QUnit.test("Cash withdrawal shops use the green supermarket icon", function (assert) {
+	assert.strictEqual(ATMMAP.getCashWithdrawalStyle().icon, UTILS.cashWithdrawal);
+	assert.ok(UTILS.cashWithdrawal.options.iconUrl.indexOf("supermarket") > -1);
+});
+
 QUnit.test("Unknown data sources are rejected", function (assert) {
 	assert.throws(function () {
 		ATMMAP.setDataSource("unknown");

@@ -13,6 +13,7 @@ check out <a href="https://geldautomaten-suche.org/">geldautomaten-suche.org</a>
 
 - added an alternative ATM data source using locally bundled Leaflet.VectorGrid and PBF vector tiles
 - the sidebar lets users switch exclusively between Overpass API and ATM vector tiles; ATM vector tiles are the default, Overpass stays available
+- vector tile mode also shows shops with cash withdrawal (`alle_cash_withdrawal` layer, e.g. supermarkets) with a green supermarket icon (Nicolas Mollet, CC BY-SA 3.0, Map Icons Collection); they can be switched off in the sidebar
 - ATM category filters and status icons are also applied to vector tile features
 
 ## Version 5.3
