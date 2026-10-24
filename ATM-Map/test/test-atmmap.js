@@ -22,8 +22,8 @@ QUnit.test("Cash withdrawal shops use the green supermarket icon", function (ass
 	assert.ok(UTILS.cashWithdrawal.options.iconUrl.indexOf("supermarket") > -1);
 });
 
-QUnit.test("Minimum zoom for ATMs is 12", function (assert) {
-	assert.equal(ATMMAP.MIN_ZOOM, 12);
+QUnit.test("Minimum zoom for ATMs is 13", function (assert) {
+	assert.equal(ATMMAP.MIN_ZOOM, 13);
 });
 
 QUnit.test("Unknown data sources are rejected", function (assert) {
