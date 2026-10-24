@@ -169,7 +169,7 @@ let ATMMAP = {};
 			// Guardian condition: if node has no "tags" property no further processing is necessary.
 			if (!("tags" in node)) return;
 			// Guardian condition: If the node has already been processed before, a new processing is not necessary
-			if (node.is in nodeIds) return;
+			if (node.id in nodeIds) return;
 
 			nodeIds[node.id] = true;
 
