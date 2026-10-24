@@ -38,7 +38,7 @@ Test successful, no anomalies
 ## Unreleased
 - Start the map and verify ATM vector tiles are selected and show ATM/bank features with the expected status icons and popup details.
 - Move and zoom the map; verify tiles update and the category filters continue to work.
-- Select Overpass and verify ATMs appear at zoom 14 or higher, verify the tile features disappear and Overpass results load for the current area without duplicates. Switch back to vector tiles and verify the Overpass markers disappear.
+- Select Overpass and verify ATMs appear at zoom 12 or higher, verify the tile features disappear and Overpass results load for the current area without duplicates. Switch back to vector tiles and verify the Overpass markers disappear.
 
 # ST10 Cash withdrawal shops
 
@@ -50,5 +50,5 @@ Test successful, no anomalies
 # ST9 Zoom limit of ATM vector tiles
 
 ## Unreleased
-- Select ATM vector tiles and zoom out below 14; verify no ATM or supermarket icons are shown and no tiles are requested. Zoom to 14 or higher and verify the icons appear.
-- Switch to Overpass below zoom 14; verify no Overpass request is made until zooming back to 14 or higher.
+- Select ATM vector tiles and zoom out below 12; verify no ATM or supermarket icons are shown and no tiles are requested. Zoom to 12 or higher and verify the icons appear.
+- Switch to Overpass below zoom 12; verify no Overpass request is made until zooming back to 12 or higher.

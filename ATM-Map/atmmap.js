@@ -14,7 +14,7 @@ let ATMMAP = {};
 ATMMAP.SOURCE_OVERPASS = "overpass";
 ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 // from this zoom level on ATMs are shown, for Overpass and for vector tiles
-ATMMAP.MIN_ZOOM = 14;
+ATMMAP.MIN_ZOOM = 12;
 
 (function () {
 	// see atmmap_layerbuilder.js
