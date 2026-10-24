@@ -17,6 +17,7 @@ Geldautomaten haben. Zusätzlich werden Geldautomaten dargestellt,
 	<script src="./jquery/jquery-3.7.0.min.js"></script>
 
 	<script src="./leaflet/leaflet.js"></script>
+	<script src="./leaflet/Leaflet.VectorGrid.bundled.min.js"></script>
 
 	<link href="./locator/L.Control.Locate.css" rel="stylesheet" />
 	<script src="./locator/L.Control.Locate.min.js"></script>
@@ -31,6 +32,8 @@ Geldautomaten haben. Zusätzlich werden Geldautomaten dargestellt,
 	<script src="./atmmap_layerbuilder.js"></script>
 	<script src="./atmmaputils.js"></script>
 	<script src="./atmmap.js"></script>
+	<script src="./atmmap_vectortiles.js"></script>
+	<script src="./atmmap_overpass.js"></script>
 
 	<link rel="stylesheet" href="./leaflet/leaflet.css" />
 	<link rel="stylesheet" href="atmmap.css" />
@@ -64,7 +67,7 @@ Geldautomaten haben. Zusätzlich werden Geldautomaten dargestellt,
 		<!-- Nav tabs -->
 		<div class="sidebar-tabs">
 			<ul role="tablist">
-				<li><a href="#home" role="tab"><i class="fa fa-filter"></i></a></li>
+				<li><a href="#home" role="tab"><i class="fa fa-sliders"></i></a></li>
 				<li><a href="#info" role="tab"><i class="fa fa-info"></i></a></li>
 				<li><a href="#search" role="tab"><i class="fa fa-search"></i></a></li>
 			</ul>
@@ -78,8 +81,23 @@ Geldautomaten haben. Zusätzlich werden Geldautomaten dargestellt,
 		<div class="sidebar-content">
 			<div class="sidebar-pane" id="home">
 				<h1 class="sidebar-header">
-					Auswahl der Banken <span class="sidebar-close"><i class="fa fa-caret-right"></i></span>
+					Auswahl der Banken und Layer <span class="sidebar-close"><i class="fa fa-caret-right"></i></span>
 				</h1>
+				<fieldset id="data_source_control">
+					<legend>Datenquelle</legend>
+					<label>
+						<input type="radio" name="data-source" value="vector-tiles" checked />
+						ATM-Vektorkacheln (obstbaumkarte.de)
+					</label>
+					<label class="sub_option">
+						<input type="checkbox" id="cash_withdrawal_toggle" checked />
+						Supermärkte mit Bargeldauszahlung
+					</label>
+					<label>
+						<input type="radio" name="data-source" value="overpass" />
+						Overpass API
+					</label>
+				</fieldset>
 				<p id="bank_layer_control"></p>
 			</div>
 			<div class="sidebar-pane" id="info">
@@ -119,7 +137,7 @@ Geldautomaten haben. Zusätzlich werden Geldautomaten dargestellt,
 				</h1>
 				<p>
 					<a href="https://github.com/momolinus/atm-map">Sourcecode der
-						Karte</a>, Version 5.3 (02.10.2026)
+						Karte</a>, Version 6.0 (24.10.2026)
 				</p>
 				<p>
 					<a href="impressum.html">Impressum
@@ -131,6 +149,9 @@ Geldautomaten haben. Zusätzlich werden Geldautomaten dargestellt,
 				</p>
 				<p>
 					POIs via <a href="http://www.overpass-api.de/">Overpass API</a>
+				</p>
+				<p>
+					ATM-Vektorkacheln via <a href="https://sbtiles.obstbaumkarte.de/">obstbaumkarte.de</a>
 				</p>
 				<p>
 					Icons by <a href="http://mapicons.nicolasmollet.com/">Nicolas

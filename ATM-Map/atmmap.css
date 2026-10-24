@@ -35,6 +35,39 @@
 #bank_layer_control .leaflet-control {
 	float: none;
 }
+
+#data_source_control {
+	margin: 0 0 1em;
+	padding: 0.5em;
+}
+
+#data_source_control label {
+	display: block;
+	margin: 0.25em 0;
+}
+
+#data_source_control label.sub_option {
+	margin-left: 1.5em;
+}
+
+/* hand cursor only over clickable vector tile icons, normal arrow elsewhere */
+.leaflet-container.leaflet-grab {
+	cursor: default;
+}
+
+.leaflet-dragging .leaflet-container.leaflet-grab {
+	cursor: grabbing;
+}
+
+/* icons near a tile border must not be clipped by the tile's own svg */
+.leaflet-tile-container svg.leaflet-tile {
+	overflow: visible;
+}
+
+.leaflet-tile-container svg image {
+	cursor: pointer;
+}
+
 #bank_layer_control .leaflet-control-layers {
 	border: none;
 }

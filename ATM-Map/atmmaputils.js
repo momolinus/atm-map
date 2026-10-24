@@ -25,6 +25,8 @@ let UTILS = {};
 	UTILS.atm = buildAtmIcon('atm_euro_yes.png');
 	UTILS.unknownAtm = buildAtmIcon('bank_euro_atm_unknow.png');
 	UTILS.noAtm = buildAtmIcon('bank_icon_atm_no.png');
+	// green supermarket icon: Nicolas Mollet, CC BY-SA 3.0, https://mapicons.mapsmarker.com
+	UTILS.cashWithdrawal = buildAtmIcon('supermarket_cash_withdrawal.svg');
 
 	/**
 	 * Builds a bound string for passed LatLngBounds (https://leafletjs.com/reference.html#latlngbounds).
@@ -47,7 +49,17 @@ let UTILS = {};
 		return result;
 	};
 
+	UTILS.escapeHtml = function (text) {
+		return String(text)
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#39;");
+	};
+
 	UTILS.createDescriptionFromeTags = function (node) {
+		let escape = UTILS.escapeHtml;
 
 		let description = '<p class="bank_name">???</p>';
 
@@ -55,11 +67,11 @@ let UTILS = {};
 		if (node.tags["atm:operator"]) {
 
 			description = '<p class="bank_name">';
-			description += node.tags["atm:operator"];
+			description += escape(node.tags["atm:operator"]);
 
 			if (node.tags.name) {
 				description += '<br><span class="bank_subname">(';
-				description += node.tags.name + ')</span></p>';
+				description += escape(node.tags.name) + ')</span></p>';
 			}
 			else {
 				description += '</p>';
@@ -68,21 +80,21 @@ let UTILS = {};
 		// usually a bank or an single atm
 		else if (node.tags.name) {
 			description = '<p class="bank_name">';
-			description += node.tags.name + '</p>';
+			description += escape(node.tags.name) + '</p>';
 		}
 		// "operator" often used instead of "name"
 		else if (node.tags.operator) {
 			description = '<p class="bank_name">';
-			description += node.tags.operator + '</p>';
+			description += escape(node.tags.operator) + '</p>';
 		}
 		else if (node.tags.network) {
 			description = '<p class="bank_name">';
-			description += node.tags.network + '</p>';
+			description += escape(node.tags.network) + '</p>';
 		}
 
 		if (node.tags.opening_hours) {
 			description += '<p class="opening_hour">';
-			description += node.tags.opening_hours + '</p>';
+			description += escape(node.tags.opening_hours) + '</p>';
 		}
 		else {
 			description += '<p class="opening_hour">';
@@ -142,7 +154,16 @@ let UTILS = {};
 			table += '<img src="bank_icon_atm_no.png" />';
 			table += '</td>';
 			table += '</tr>';
+			table += '<tr>';
+			table += '<td>';
+			table += 'Supermarkt mit<br />Bargeldauszahlung:';
+			table += '</td>';
+			table += '<td>';
+			table += '<img src="supermarket_cash_withdrawal.svg" width="32" height="37" />';
+			table += '</td>';
+			table += '</tr>';
 			table += '</table>';
+			table += '<p class="icon_credit">Supermarkt-Icon: Nicolas Mollet, <a href="https://mapicons.mapsmarker.com">Map Icons Collection</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a></p>';
 			table += '<p><a href="https://github.com/momolinus/atm-map">';
 			table += 'Sourcecode der Karte</a>, Version 2.0.0 RC4 (16.12.17)</p>';
 			table += '<p style="text-align: center;"><a href="impressum.html">Impressum</a></p>';

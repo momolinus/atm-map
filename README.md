@@ -9,6 +9,19 @@ check out <a href="https://geldautomaten-suche.org/">geldautomaten-suche.org</a>
 
 # Releases
 
+## Version 6.0
+
+published 24.10.2026
+
+- added an alternative ATM data source using locally bundled Leaflet.VectorGrid and PBF vector tiles
+- the sidebar lets users switch exclusively between Overpass API and ATM vector tiles; ATM vector tiles are the default, Overpass stays available
+- vector tile mode also shows shops with cash withdrawal (`alle_cash_withdrawal` layer, e.g. supermarkets) with a green supermarket icon (Nicolas Mollet, CC BY-SA 3.0, Map Icons Collection); they can be switched off in the sidebar
+- ATM category filters and status icons are also applied to vector tile features
+- OSM tag values are now HTML-escaped in popups
+- refactored `atmmap.js` into a core (`atmmap.js`) and one module per data source (`atmmap_vectortiles.js`, `atmmap_overpass.js`) without changing behavior
+
+-- all build with AI
+
 ## Version 5.3
 
 published 02.10.2026
