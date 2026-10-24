@@ -59,6 +59,11 @@
 	cursor: grabbing;
 }
 
+/* icons near a tile border must not be clipped by the tile's own svg */
+.leaflet-tile-container svg.leaflet-tile {
+	overflow: visible;
+}
+
 .leaflet-tile-container svg image {
 	cursor: pointer;
 }
