@@ -7,6 +7,17 @@ check out <a href="https://geldautomaten-suche.org/">geldautomaten-suche.org</a>
 - map framework: http://leafletjs.com/
 - JavaScript framework: https://jquery.com/
 
+# Run locally
+
+The page uses ES modules, so it must be served by a web server (opening `index.html` via `file://` does not work).
+
+1. Open a terminal in the folder `ATM-Map`.
+2. Start a web server, e.g. `python3 -m http.server 8000`.
+3. Open http://localhost:8000/index.html in the browser.
+4. The unit tests run at http://localhost:8000/test/TestRunner.html.
+
+In VS Code the extension "Live Server" works as well (right click on `index.html`, "Open with Live Server").
+
 # Releases
 
 ## Version 6.0
