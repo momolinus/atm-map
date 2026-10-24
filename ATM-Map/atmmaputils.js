@@ -7,9 +7,7 @@
 // eslint settings
 /*global L, $*/
 
-let UTILS = {};
-
-(function () {
+export const UTILS = {};
 
 	let buildAtmIcon = function (iconPic) {
 		return L.icon({
@@ -182,4 +180,4 @@ let UTILS = {};
 
 		$('#legend_table').toggle();
 	};
-})();
+

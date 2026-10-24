@@ -3,7 +3,9 @@
  */
 
 // eslint settings
-/*global LAYER_BUILDER, QUnit*/
+/*global QUnit*/
+
+import { LAYER_BUILDER } from "../atmmap_layerbuilder.js";
 
 QUnit.test("Brandenburger Bank", function(assert) {
 	var bankName = "Brandenburger Bank";

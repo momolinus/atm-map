@@ -27,12 +27,10 @@
 /**
  * @author Marcus Bleil
  */
-let LAYER_BUILDER = {};
+export const LAYER_BUILDER = {};
 LAYER_BUILDER.namedGroup = [];
 LAYER_BUILDER.operatorLayers = null;
 LAYER_BUILDER.enabledCategories = [];
-
-(function () {
 
 	let operatorCategories = [
 		"Genossenschaftsbanken<br /><span class=\"details\">Bankcard-Servicenetz, Volksbanken, usw.</span>",
@@ -244,5 +242,3 @@ LAYER_BUILDER.enabledCategories = [];
 			categoriesChangedHandler();
 		}
 	};
-
-})();

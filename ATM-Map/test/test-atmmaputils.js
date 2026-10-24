@@ -1,6 +1,8 @@
 // eslint settings
 /*global QUnit*/
 
+import { UTILS } from "../atmmaputils.js";
+
 QUnit.test("Test of UTILS.latLongToString", function (assert) {
     let corner1 = L.latLng(50, 13);
     let corner2 = L.latLng(50.7, 13.5);

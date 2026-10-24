@@ -29,12 +29,6 @@ Geldautomaten haben. Zusätzlich werden Geldautomaten dargestellt,
 
 	<script src="./sidebar-v2/leaflet-sidebar.js"></script>
 
-	<script src="./atmmap_layerbuilder.js"></script>
-	<script src="./atmmaputils.js"></script>
-	<script src="./atmmap.js"></script>
-	<script src="./atmmap_vectortiles.js"></script>
-	<script src="./atmmap_overpass.js"></script>
-
 	<link rel="stylesheet" href="./leaflet/leaflet.css" />
 	<link rel="stylesheet" href="atmmap.css" />
 	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
@@ -164,8 +158,9 @@ Geldautomaten haben. Zusätzlich werden Geldautomaten dargestellt,
 
 	<div id="map">&nbsp;</div>
 
-	<script type="text/javascript">
-		$(document).ready(ATMMAP.initMap());
+	<script type="module">
+		import { ATMMAP } from "./atmmap.js";
+		ATMMAP.initMap();
 	</script>
 </body>
 

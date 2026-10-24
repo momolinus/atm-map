@@ -1,15 +1,17 @@
 "use strict"
 /**
  * ATM data from the vector tiles of obstbaumkarte.de: ATMs, banks and shops with cash withdrawal.
- * Must be loaded after atmmap.js, which defines ATMMAP.
  */
 
 // eslint settings
-/*global L, UTILS, LAYER_BUILDER, ATMMAP */
+/*global L */
 
-ATMMAP.vectorTiles = {};
+import { UTILS } from "./atmmaputils.js";
+import { LAYER_BUILDER } from "./atmmap_layerbuilder.js";
+import { MIN_ZOOM } from "./atmmap_config.js";
 
-(function () {
+export const vectorTiles = {};
+
 	let utils = UTILS;
 	let layerBuilder = LAYER_BUILDER;
 
@@ -28,7 +30,7 @@ ATMMAP.vectorTiles = {};
 	/**
 	 * Connects the module to the map and to the controls, must be called once.
 	 */
-	ATMMAP.vectorTiles.init = function (mapToUse) {
+	vectorTiles.init = function (mapToUse) {
 		map = mapToUse;
 		layerBuilder.onCategoriesChanged(function () {
 			if (atmLayer) {
@@ -38,25 +40,25 @@ ATMMAP.vectorTiles = {};
 		initCashWithdrawalToggle();
 	};
 
-	ATMMAP.vectorTiles.activate = function () {
+	vectorTiles.activate = function () {
 		active = true;
 		errorShown = false;
 		addLayers();
 	};
 
-	ATMMAP.vectorTiles.deactivate = function () {
+	vectorTiles.deactivate = function () {
 		active = false;
 		removeLayers();
 	};
 
 	/**
-	 * Layers exist only from ATMMAP.MIN_ZOOM on, so they are added or removed when the zoom level crosses the limit.
+	 * Layers exist only from MIN_ZOOM on, so they are added or removed when the zoom level crosses the limit.
 	 */
-	ATMMAP.vectorTiles.syncZoom = function () {
+	vectorTiles.syncZoom = function () {
 		if (!active) {
 			return;
 		}
-		let zoomedIn = map.getZoom() >= ATMMAP.MIN_ZOOM;
+		let zoomedIn = map.getZoom() >= MIN_ZOOM;
 		if (zoomedIn !== (atmLayer !== null)) {
 			removeLayers();
 			addLayers();
@@ -97,14 +99,14 @@ ATMMAP.vectorTiles = {};
 		}
 		return { icon: icon, radius: ICON_CLICK_RADIUS };
 	};
-	ATMMAP.getVectorTileStyle = getAtmStyle;
+	vectorTiles.getVectorTileStyle = getAtmStyle;
 
-	ATMMAP.getCashWithdrawalStyle = function () {
+	vectorTiles.getCashWithdrawalStyle = function () {
 		return { icon: utils.cashWithdrawal, radius: ICON_CLICK_RADIUS };
 	};
 
 	let addLayers = function () {
-		if (map.getZoom() >= ATMMAP.MIN_ZOOM) {
+		if (map.getZoom() >= MIN_ZOOM) {
 			atmLayer = createAtmLayer();
 			atmLayer.addTo(map);
 			if (cashWithdrawalEnabled) {
@@ -166,7 +168,7 @@ ATMMAP.vectorTiles = {};
 
 	let createCashWithdrawalLayer = function () {
 		let styles = {};
-		styles[cashWithdrawalLayerName] = ATMMAP.getCashWithdrawalStyle;
+		styles[cashWithdrawalLayerName] = vectorTiles.getCashWithdrawalStyle;
 		let tileLayer = L.vectorGrid.protobuf(cashWithdrawalUrl, {
 			interactive: true,
 			vectorTileLayerStyles: styles
@@ -206,4 +208,4 @@ ATMMAP.vectorTiles = {};
 
 		return tileLayer;
 	};
-})();
+

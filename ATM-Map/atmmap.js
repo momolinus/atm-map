@@ -1,4 +1,3 @@
-"use strict"
 /**
  * @author Marcus Bleil
  *
@@ -7,120 +6,112 @@
  */
 
 // eslint settings
-/*global L, UTILS, LAYER_BUILDER */
+/*global L */
 
-// constructs the module ATMMAP
-let ATMMAP = {};
-ATMMAP.SOURCE_OVERPASS = "overpass";
-ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
-// from this zoom level on ATMs are shown, for Overpass and for vector tiles
-ATMMAP.MIN_ZOOM = 13;
+import { LAYER_BUILDER } from "./atmmap_layerbuilder.js";
+import { vectorTiles } from "./atmmap_vectortiles.js";
+import { overpass } from "./atmmap_overpass.js";
+import { SOURCE_OVERPASS, SOURCE_VECTOR_TILES, MIN_ZOOM } from "./atmmap_config.js";
 
-(function () {
-	// see atmmap_layerbuilder.js
-	let layerBuilder = LAYER_BUILDER;
-	let dataSource = ATMMAP.SOURCE_VECTOR_TILES;
-	let map = null;
+export const ATMMAP = {};
+ATMMAP.SOURCE_OVERPASS = SOURCE_OVERPASS;
+ATMMAP.SOURCE_VECTOR_TILES = SOURCE_VECTOR_TILES;
+ATMMAP.MIN_ZOOM = MIN_ZOOM;
 
-	let sourceModules = function () {
-		let modules = {};
-		modules[ATMMAP.SOURCE_OVERPASS] = ATMMAP.overpass;
-		modules[ATMMAP.SOURCE_VECTOR_TILES] = ATMMAP.vectorTiles;
-		return modules;
-	};
+let dataSource = SOURCE_VECTOR_TILES;
+let map = null;
 
-	ATMMAP.initMap = function () {
+const sourceModules = {
+	[SOURCE_OVERPASS]: overpass,
+	[SOURCE_VECTOR_TILES]: vectorTiles
+};
 
-		map = buildMap();
+ATMMAP.initMap = function () {
 
-		let osmGeocoder = buildOsmGeocoderAndAddToMap(map);
+	map = buildMap();
 
-		L.control.locate({ strings: { title: "Gehe zum meinem Standort!" } }).addTo(map);
+	let osmGeocoder = buildOsmGeocoderAndAddToMap(map);
 
-		L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
+	L.control.locate({ strings: { title: "Gehe zum meinem Standort!" } }).addTo(map);
 
-		layerBuilder.buildLayers(map);
+	L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
 
-		ATMMAP.overpass.init(map);
-		ATMMAP.vectorTiles.init(map);
+	LAYER_BUILDER.buildLayers(map);
 
-		addSearchToSidebar(osmGeocoder);
-		addDataSourceControl();
+	overpass.init(map);
+	vectorTiles.init(map);
 
-		sourceModules()[dataSource].activate();
-	};
+	addSearchToSidebar(osmGeocoder);
+	addDataSourceControl();
 
-	ATMMAP.getDataSource = function () {
-		return dataSource;
-	};
+	sourceModules[dataSource].activate();
+};
 
-	ATMMAP.setDataSource = function (source) {
-		let modules = sourceModules();
-		if (!(source in modules)) {
-			throw new Error("Unknown ATM data source: " + source);
+ATMMAP.getDataSource = function () {
+	return dataSource;
+};
+
+ATMMAP.setDataSource = function (source) {
+	if (!(source in sourceModules)) {
+		throw new Error("Unknown ATM data source: " + source);
+	}
+	if (source === dataSource) {
+		return;
+	}
+	if (!map) {
+		throw new Error("The map must be initialized before changing the data source.");
+	}
+
+	sourceModules[dataSource].deactivate();
+	LAYER_BUILDER.clearLayers();
+	dataSource = source;
+	sourceModules[dataSource].activate();
+};
+
+let buildMap = function () {
+	let osm_layer = new L.TileLayer(
+		'https://tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png',
+		{
+			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>-Mitwirkende'
 		}
-		if (source === dataSource) {
-			return;
+	);
+	let map = L.map('map', {
+		center: new L.LatLng(52.516, 13.379),
+		zoom: 15,
+		layers: osm_layer
+	});
+	map.on('moveend', function () {
+		if (dataSource === SOURCE_OVERPASS) {
+			overpass.loadPois();
 		}
-		if (!map) {
-			throw new Error("The map must be initialized before changing the data source.");
-		}
+	});
+	map.on('zoomend', vectorTiles.syncZoom);
 
-		modules[dataSource].deactivate();
-		layerBuilder.clearLayers();
-		dataSource = source;
-		modules[dataSource].activate();
-	};
+	return map;
+}
 
-	/** *************** */
-	/** private methods */
-	/** *************** */
+let buildOsmGeocoderAndAddToMap = function (map) {
+	let geocoder = new L.Control.OSMGeocoder({
+		position: 'topright',
+		text: 'Suchen'
+	});
+	geocoder.addTo(map);
+	return geocoder;
+}
 
-	let buildMap = function () {
-		let osm_layer = new L.TileLayer(
-			'https://tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png',
-			{
-				attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>-Mitwirkende'
+let addSearchToSidebar = function (osmGeocoder) {
+	// see: https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
+	let htmlObject = osmGeocoder.getContainer();
+	let searchdiv = document.getElementById("search_control");
+	searchdiv.appendChild(htmlObject);
+}
+
+let addDataSourceControl = function () {
+	document.querySelectorAll('input[name="data-source"]').forEach(function (input) {
+		input.addEventListener("change", function () {
+			if (input.checked) {
+				ATMMAP.setDataSource(input.value);
 			}
-		);
-		let map = L.map('map', {
-			center: new L.LatLng(52.516, 13.379),
-			zoom: 15,
-			layers: osm_layer
 		});
-		map.on('moveend', function () {
-			if (dataSource === ATMMAP.SOURCE_OVERPASS) {
-				ATMMAP.overpass.loadPois();
-			}
-		});
-		map.on('zoomend', ATMMAP.vectorTiles.syncZoom);
-
-		return map;
-	}
-
-	let buildOsmGeocoderAndAddToMap = function (map) {
-		let geocoder = new L.Control.OSMGeocoder({
-			position: 'topright',
-			text: 'Suchen'
-		});
-		geocoder.addTo(map);
-		return geocoder;
-	}
-
-	let addSearchToSidebar = function (osmGeocoder) {
-		// see: https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
-		let htmlObject = osmGeocoder.getContainer();
-		let searchdiv = document.getElementById("search_control");
-		searchdiv.appendChild(htmlObject);
-	}
-
-	let addDataSourceControl = function () {
-		document.querySelectorAll('input[name="data-source"]').forEach(function (input) {
-			input.addEventListener("change", function () {
-				if (input.checked) {
-					ATMMAP.setDataSource(input.value);
-				}
-			});
-		});
-	};
-})();
+	});
+};

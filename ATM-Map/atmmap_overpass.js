@@ -1,15 +1,17 @@
 "use strict"
 /**
  * ATM data from the Overpass API: query, markers for banks and ATMs.
- * Must be loaded after atmmap.js, which defines ATMMAP.
  */
 
 // eslint settings
-/*global L, $, UTILS, LAYER_BUILDER, ATMMAP */
+/*global L, $ */
 
-ATMMAP.overpass = {};
+import { UTILS } from "./atmmaputils.js";
+import { LAYER_BUILDER } from "./atmmap_layerbuilder.js";
+import { MIN_ZOOM } from "./atmmap_config.js";
 
-(function () {
+export const overpass = {};
+
 	let utils = UTILS;
 	let layerBuilder = LAYER_BUILDER;
 
@@ -60,25 +62,25 @@ ATMMAP.overpass = {};
 	/**
 	 * Connects the module to the map, must be called once.
 	 */
-	ATMMAP.overpass.init = function (mapToUse) {
+	overpass.init = function (mapToUse) {
 		map = mapToUse;
 	};
 
-	ATMMAP.overpass.activate = function () {
+	overpass.activate = function () {
 		active = true;
-		ATMMAP.overpass.loadPois();
+		overpass.loadPois();
 	};
 
-	ATMMAP.overpass.deactivate = function () {
+	overpass.deactivate = function () {
 		active = false;
 		generation++;
 		abortRequests();
 		nodeIds = {};
 		wayNodeIds = {};
-		ATMMAP.query_bound = null;
+		queryBound = null;
 	};
 
-	ATMMAP.test_query_necessary = function (next_polygon, previous_polygon = null) {
+	overpass.test_query_necessary = function (next_polygon, previous_polygon = null) {
 		let query_necessary;
 
 		if (previous_polygon === null) {
@@ -97,13 +99,14 @@ ATMMAP.overpass = {};
 		return query_necessary;
 	}
 
-	ATMMAP.query_bound = null;
-	ATMMAP.updateQueryBound = function (mapBounds) {
-		if (ATMMAP.query_bound === null) {
-			ATMMAP.query_bound = L.latLngBounds(mapBounds.getNorthWest(), mapBounds.getSouthEast());
+	// area for which ATMs were already requested
+	let queryBound = null;
+	let updateQueryBound = function (mapBounds) {
+		if (queryBound === null) {
+			queryBound = L.latLngBounds(mapBounds.getNorthWest(), mapBounds.getSouthEast());
 		}
 		else {
-			ATMMAP.query_bound.extend(mapBounds);
+			queryBound.extend(mapBounds);
 		}
 	}
 
@@ -111,15 +114,15 @@ ATMMAP.overpass = {};
 	 * Called when the map is created and whenever it is moved. Retrieves the ATMs
 	 * of the current display area, if this area was not loaded before.
 	 */
-	ATMMAP.overpass.loadPois = function () {
-		if (!active || map.getZoom() < ATMMAP.MIN_ZOOM) {
+	overpass.loadPois = function () {
+		if (!active || map.getZoom() < MIN_ZOOM) {
 			return;
 		}
 		let mapBounds = map.getBounds();
-		if (!ATMMAP.test_query_necessary(mapBounds, ATMMAP.query_bound)) {
+		if (!overpass.test_query_necessary(mapBounds, queryBound)) {
 			return;
 		}
-		ATMMAP.updateQueryBound(mapBounds);
+		updateQueryBound(mapBounds);
 
 		// note: g in /{{bbox}}/g means replace all occurrences of {{bbox}} not just first occurrence
 		callOverpassApi(queryTemplate.replace(/{{bbox}}/g, utils.latLongToString(mapBounds)));
@@ -136,7 +139,7 @@ ATMMAP.overpass = {};
 		}
 	};
 
-	ATMMAP.overpass.describeError = function (jqXHR, textStatus) {
+	overpass.describeError = function (jqXHR, textStatus) {
 		if (textStatus === "timeout") {
 			return "Die Anfrage an die Overpass API hat zu lange gedauert. Bitte versuchen Sie es später erneut.";
 		}
@@ -191,7 +194,7 @@ ATMMAP.overpass = {};
 			console.error(textStatus);
 			console.error(errorThrown);
 			console.error(jqXHR);
-			alert(ATMMAP.overpass.describeError(jqXHR, textStatus));
+			alert(overpass.describeError(jqXHR, textStatus));
 		}).always(function () {
 			requests = requests.filter(function (activeRequest) {
 				return activeRequest !== request;
@@ -339,4 +342,4 @@ ATMMAP.overpass = {};
 			console.debug(e);
 		}
 	};
-})();
+
