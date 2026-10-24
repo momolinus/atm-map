@@ -3,6 +3,15 @@
 
 QUnit.module("ATM data sources");
 
+QUnit.test("Overpass errors are described by status and text status", function (assert) {
+	let describe = ATMMAP.overpass.describeError;
+	assert.ok(describe({ status: 0 }, "error").indexOf("nicht erreichbar") >= 0);
+	assert.ok(describe({ status: 429 }, "error").indexOf("Zu viele Anfragen") >= 0);
+	assert.ok(describe({ status: 503 }, "error").indexOf("nicht verfügbar") >= 0);
+	assert.ok(describe({ status: 200 }, "timeout").indexOf("zu lange") >= 0);
+	assert.ok(describe({ status: 418 }, "error").indexOf("unerwarteter Fehler") >= 0);
+});
+
 QUnit.test("ATM vector tiles are the default data source", function (assert) {
 	assert.equal(ATMMAP.getDataSource(), ATMMAP.SOURCE_VECTOR_TILES);
 	assert.strictEqual(ATMMAP.setDataSource(ATMMAP.SOURCE_VECTOR_TILES), undefined);
