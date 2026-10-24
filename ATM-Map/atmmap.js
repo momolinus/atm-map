@@ -16,7 +16,7 @@ ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 	let utils = UTILS;
 	// see atmmap_layerbuilder.js
 	let layerBuilder = LAYER_BUILDER;
-	let dataSource = ATMMAP.SOURCE_OVERPASS;
+	let dataSource = ATMMAP.SOURCE_VECTOR_TILES;
 	let dataSourceGeneration = 0;
 	let overpassRequests = [];
 	let vectorTileLayer = null;
@@ -44,7 +44,13 @@ ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 		addSearchToSidebar(osmGeocoder);
 		addDataSourceControl();
 
-		loadPois();
+		if (dataSource === ATMMAP.SOURCE_OVERPASS) {
+			loadPois();
+		}
+		else {
+			vectorTileLayer = createVectorTileLayer();
+			vectorTileLayer.addTo(map);
+		}
 	};
 
 	ATMMAP.getDataSource = function () {
@@ -269,7 +275,8 @@ ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 		if (!icon || !categoryEnabled) {
 			return [];
 		}
-		return { icon: icon };
+		// radius > 10 keeps Leaflet 1.9 from reading the missing latlng of tile points on click
+		return { icon: icon, radius: 16 };
 	};
 	ATMMAP.getVectorTileStyle = getVectorTileStyle;
 
@@ -287,10 +294,13 @@ ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 				console.error("Clicked vector tile feature has no properties.", event);
 				return;
 			}
-			map.openPopup(
-				utils.createDescriptionFromeTags({ tags: event.layer.properties }),
-				event.latlng
-			);
+			// the tiles carry no OSM id, so the link points to the clicked position
+			let osmUrl = "https://www.openstreetmap.org/?mlat=" + event.latlng.lat.toFixed(6) +
+				"&mlon=" + event.latlng.lng.toFixed(6) +
+				"#map=19/" + event.latlng.lat.toFixed(6) + "/" + event.latlng.lng.toFixed(6);
+			let content = utils.createDescriptionFromeTags({ tags: event.layer.properties }) +
+				'<p class="osm_link"><a href="' + osmUrl + '" target="_blank" rel="noopener">In OpenStreetMap ansehen</a></p>';
+			L.popup().setLatLng(event.latlng).setContent(content).openOn(map);
 		});
 		tileLayer.on("tileerror", function (event) {
 			console.error("ATM vector tile could not be loaded.", event);

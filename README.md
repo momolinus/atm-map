@@ -12,7 +12,7 @@ check out <a href="https://geldautomaten-suche.org/">geldautomaten-suche.org</a>
 ## Unreleased
 
 - added an alternative ATM data source using locally bundled Leaflet.VectorGrid and PBF vector tiles
-- the sidebar lets users switch exclusively between Overpass API and ATM vector tiles; Overpass remains the default
+- the sidebar lets users switch exclusively between Overpass API and ATM vector tiles; ATM vector tiles are the default, Overpass stays available
 - ATM category filters and status icons are also applied to vector tile features
 
 ## Version 5.3

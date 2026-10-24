@@ -3,9 +3,9 @@
 
 QUnit.module("ATM data sources");
 
-QUnit.test("Overpass is the default data source", function (assert) {
-	assert.equal(ATMMAP.getDataSource(), ATMMAP.SOURCE_OVERPASS);
-	assert.strictEqual(ATMMAP.setDataSource(ATMMAP.SOURCE_OVERPASS), undefined);
+QUnit.test("ATM vector tiles are the default data source", function (assert) {
+	assert.equal(ATMMAP.getDataSource(), ATMMAP.SOURCE_VECTOR_TILES);
+	assert.strictEqual(ATMMAP.setDataSource(ATMMAP.SOURCE_VECTOR_TILES), undefined);
 });
 
 QUnit.test("Unknown data sources are rejected", function (assert) {
