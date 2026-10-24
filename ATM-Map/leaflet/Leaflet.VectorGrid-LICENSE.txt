@@ -1,0 +1,22 @@
+Leaflet.VectorGrid v1.3.0
+
+"THE BEER-WARE LICENSE" (Revision 42):
+<ivan@sanchezortega.es> wrote this file. As long as you retain this notice
+you can do whatever you want with this stuff. If we meet some day, and you
+think this stuff is worth it, you can buy me a beer in return.
+
+The bundled distribution includes dependencies under their respective
+licenses:
+- geojson-vt (ISC)
+- pbf (BSD-3-Clause)
+- topojson-client (BSD-3-Clause)
+- @mapbox/vector-tile (BSD-3-Clause)
+- whatwg-fetch (MIT)
+
+Sources:
+- https://github.com/Leaflet/Leaflet.VectorGrid
+- https://github.com/mapbox/geojson-vt
+- https://github.com/mapbox/pbf
+- https://github.com/topojson/topojson
+- https://github.com/mapbox/vector-tile
+- https://github.com/github/fetch

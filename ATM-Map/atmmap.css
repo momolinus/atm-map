@@ -35,6 +35,17 @@
 #bank_layer_control .leaflet-control {
 	float: none;
 }
+
+#data_source_control {
+	margin: 0 0 1em;
+	padding: 0.5em;
+}
+
+#data_source_control label {
+	display: block;
+	margin: 0.25em 0;
+}
+
 #bank_layer_control .leaflet-control-layers {
 	border: none;
 }

@@ -30,6 +30,7 @@
 let LAYER_BUILDER = {};
 LAYER_BUILDER.namedGroup = [];
 LAYER_BUILDER.operatorLayers = null;
+LAYER_BUILDER.enabledCategories = [];
 
 (function () {
 
@@ -39,6 +40,7 @@ LAYER_BUILDER.operatorLayers = null;
 		"CashPool<br /><span class=\"details\">Santander, Sparda, usw.</span>",
 		"Cash Group<br /><span class=\"details\">Deutsche Bank, Postbank, usw.</span>",
 		"weitere Banken<br /><span class=\"details\">Banken, die sich nicht zuordnen lassen</span>"];
+	let categoriesChangedHandler = null;
 
 	LAYER_BUILDER.buildLayers = function (map) {
 		let group;
@@ -53,7 +55,15 @@ LAYER_BUILDER.operatorLayers = null;
 			LAYER_BUILDER.operatorLayers.addOverlay(group, operatorCategories[i]);
 
 			LAYER_BUILDER.namedGroup[i] = group;
+			LAYER_BUILDER.enabledCategories[i] = true;
 		}
+
+		map.on("overlayadd", function (event) {
+			updateCategoryState(event.layer, true);
+		});
+		map.on("overlayremove", function (event) {
+			updateCategoryState(event.layer, false);
+		});
 
 		/**
 		 * see:
@@ -64,35 +74,51 @@ LAYER_BUILDER.operatorLayers = null;
 		a.appendChild(htmlObject);
 	};
 
-	LAYER_BUILDER.addToNamedGroups = function (node, marker) {
-		let name, matched;
+	LAYER_BUILDER.clearLayers = function () {
+		LAYER_BUILDER.namedGroup.forEach(function (group) {
+			group.clearLayers();
+		});
+	};
 
-		matched = false;
-		name = createNameFromeTags(node);
+	LAYER_BUILDER.onCategoriesChanged = function (handler) {
+		categoriesChangedHandler = handler;
+	};
+
+	LAYER_BUILDER.isCategoryEnabled = function (categoryIndex) {
+		return typeof LAYER_BUILDER.enabledCategories[categoryIndex] === "undefined" ||
+			LAYER_BUILDER.enabledCategories[categoryIndex] === true;
+	};
+
+	LAYER_BUILDER.getCategoryIndex = function (node) {
+		return LAYER_BUILDER.getCategoryIndexes(node)[0];
+	};
+
+	LAYER_BUILDER.getCategoryIndexes = function (node) {
+		let name = createNameFromTags(node);
+		let categories = [];
 
 		if (LAYER_BUILDER.matchingCooperativeBank(name)) {
-			LAYER_BUILDER.namedGroup[0].addLayer(marker);
-			matched = true;
+			categories.push(0);
 		}
-
 		if (LAYER_BUILDER.matchingSavingsBank(name)) {
-			LAYER_BUILDER.namedGroup[1].addLayer(marker);
-			matched = true;
+			categories.push(1);
 		}
-
 		if (LAYER_BUILDER.matchingCashPool(name)) {
-			LAYER_BUILDER.namedGroup[2].addLayer(marker);
-			matched = true;
+			categories.push(2);
 		}
-
 		if (LAYER_BUILDER.matchingCashGroup(name)) {
-			LAYER_BUILDER.namedGroup[3].addLayer(marker);
-			matched = true;
+			categories.push(3);
 		}
+		if (categories.length === 0) {
+			categories.push(4);
+		}
+		return categories;
+	};
 
-		if (!matched) {
-			LAYER_BUILDER.namedGroup[4].addLayer(marker);
-		}
+	LAYER_BUILDER.addToNamedGroups = function (node, marker) {
+		LAYER_BUILDER.getCategoryIndexes(node).forEach(function (categoryIndex) {
+			LAYER_BUILDER.namedGroup[categoryIndex].addLayer(marker);
+		});
 	};
 
 	LAYER_BUILDER.matchingCooperativeBank = function (name) {
@@ -183,24 +209,40 @@ LAYER_BUILDER.operatorLayers = null;
 		return false;
 	};
 
-	let createNameFromeTags = function (node) {
+	let createNameFromTags = function (node) {
 
 		let name = 'xxxxxxxxxxxxxxxxxxxx';
+		let tags = node.tags || node.properties || {};
 
 		// atm usually not in bank
-		if (node.tags["atm:operator"]) {
-			name = node.tags["atm:operator"];
+		if (tags["atm:operator"]) {
+			name = tags["atm:operator"];
 		}
 		// usually a bank or an single atm
-		else if (node.tags.name) {
-			name = node.tags.name;
+		else if (tags.name) {
+			name = tags.name;
 		}
 		// "operator" often used instead of "name"
-		else if (node.tags.operator) {
-			name = node.tags.operator;
+		else if (tags.operator) {
+			name = tags.operator;
+		}
+		else if (tags.network) {
+			name = tags.network;
 		}
 
 		return name;
+	};
+
+	let updateCategoryState = function (layer, enabled) {
+		let categoryIndex = LAYER_BUILDER.namedGroup.indexOf(layer);
+		if (categoryIndex === -1) {
+			return;
+		}
+
+		LAYER_BUILDER.enabledCategories[categoryIndex] = enabled;
+		if (categoriesChangedHandler) {
+			categoriesChangedHandler();
+		}
 	};
 
 })();

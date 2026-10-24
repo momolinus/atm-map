@@ -8,12 +8,21 @@
 
 // constructs the module ATMMAP
 let ATMMAP = {};
+ATMMAP.SOURCE_OVERPASS = "overpass";
+ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 
 (function () {
 	// dependencies, see atmmaputils.js
 	let utils = UTILS;
 	// see atmmap_layerbuilder.js
 	let layerBuilder = LAYER_BUILDER;
+	let dataSource = ATMMAP.SOURCE_OVERPASS;
+	let dataSourceGeneration = 0;
+	let overpassRequests = [];
+	let vectorTileLayer = null;
+	let vectorTileErrorShown = false;
+	let vectorTileUrl = "https://sbtiles.obstbaumkarte.de/table.public.alle_geldautomaten.geom/{z}/{x}/{y}.pbf";
+	let vectorTileLayerName = "table.public.alle_geldautomaten.geom";
 
 	ATMMAP.initMap = function () {
 
@@ -26,10 +35,54 @@ let ATMMAP = {};
 		L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
 
 		layerBuilder.buildLayers(map);
+		layerBuilder.onCategoriesChanged(function () {
+			if (vectorTileLayer) {
+				vectorTileLayer.redraw();
+			}
+		});
 
 		addSearchToSidebar(osmGeocoder);
+		addDataSourceControl();
 
 		loadPois();
+	};
+
+	ATMMAP.getDataSource = function () {
+		return dataSource;
+	};
+
+	ATMMAP.setDataSource = function (source) {
+		if (source !== ATMMAP.SOURCE_OVERPASS && source !== ATMMAP.SOURCE_VECTOR_TILES) {
+			throw new Error("Unknown ATM data source: " + source);
+		}
+		if (source === dataSource) {
+			return;
+		}
+		if (!map) {
+			throw new Error("The map must be initialized before changing the data source.");
+		}
+
+		dataSource = source;
+		dataSourceGeneration++;
+		abortOverpassRequests();
+		layerBuilder.clearLayers();
+		nodeIds = {};
+		wayNodeIds = {};
+		ATMMAP.query_bound = null;
+
+		if (vectorTileLayer) {
+			map.removeLayer(vectorTileLayer);
+			vectorTileLayer = null;
+		}
+
+		if (dataSource === ATMMAP.SOURCE_OVERPASS) {
+			loadPois();
+		}
+		else {
+			vectorTileErrorShown = false;
+			vectorTileLayer = createVectorTileLayer();
+			vectorTileLayer.addTo(map);
+		}
 	};
 
 	/* ****************** */
@@ -112,6 +165,16 @@ let ATMMAP = {};
 		searchdiv.appendChild(htmlObject);
 	}
 
+	let addDataSourceControl = function () {
+		document.querySelectorAll('input[name="data-source"]').forEach(function (input) {
+			input.addEventListener("change", function () {
+				if (input.checked) {
+					ATMMAP.setDataSource(input.value);
+				}
+			});
+		});
+	};
+
 	ATMMAP.test_query_necessary = function (next_polygon, previous_polygon = null) {
 		let query_necessary;
 
@@ -177,6 +240,80 @@ let ATMMAP = {};
 		});
 	}
 
+	let getVectorTileIcon = function (properties) {
+		if (properties.amenity === "atm") {
+			return utils.atm;
+		}
+		if (properties.amenity === "bank") {
+			if (properties.atm === "yes") {
+				return utils.yesAtm;
+			}
+			if (properties.atm === "no") {
+				return utils.noAtm;
+			}
+			return utils.unknownAtm;
+		}
+		if (properties.atm === "yes") {
+			return utils.atm;
+		}
+		return null;
+	};
+
+	let getVectorTileStyle = function (properties, zoom) {
+		let categoryIndices = layerBuilder.getCategoryIndexes({ properties: properties });
+		let icon = getVectorTileIcon(properties);
+		let categoryEnabled = categoryIndices.some(function (categoryIndex) {
+			return layerBuilder.isCategoryEnabled(categoryIndex);
+		});
+
+		if (!icon || !categoryEnabled) {
+			return [];
+		}
+		return { icon: icon };
+	};
+	ATMMAP.getVectorTileStyle = getVectorTileStyle;
+
+	let createVectorTileLayer = function () {
+		let vectorTileLayerStyles = {};
+		vectorTileLayerStyles[vectorTileLayerName] = getVectorTileStyle;
+		let tileLayer = L.vectorGrid.protobuf(vectorTileUrl, {
+			attribution: 'ATM-Daten &copy; OpenStreetMap-Mitwirkende, via <a href="https://sbtiles.obstbaumkarte.de/">obstbaumkarte.de</a>',
+			interactive: true,
+			vectorTileLayerStyles: vectorTileLayerStyles
+		});
+
+		tileLayer.on("click", function (event) {
+			if (!event.layer || !event.layer.properties) {
+				console.error("Clicked vector tile feature has no properties.", event);
+				return;
+			}
+			map.openPopup(
+				utils.createDescriptionFromeTags({ tags: event.layer.properties }),
+				event.latlng
+			);
+		});
+		tileLayer.on("tileerror", function (event) {
+			console.error("ATM vector tile could not be loaded.", event);
+			if (!vectorTileErrorShown) {
+				vectorTileErrorShown = true;
+				alert("Die ATM-Vektorkacheln konnten nicht geladen werden. Bitte prüfen Sie Ihre Internetverbindung und versuchen Sie es später erneut.");
+			}
+		});
+
+		return tileLayer;
+	};
+
+	let abortOverpassRequests = function () {
+		if (overpassRequests.length > 0) {
+			let requests = overpassRequests;
+			overpassRequests = [];
+			requests.forEach(function (request) {
+				request.abort();
+			});
+			map.spin(false);
+		}
+	};
+
 	ATMMAP.query_bound = null;
 	ATMMAP.updateQueryBound = function newFunction(mapBounds) {
 		if (ATMMAP.query_bound === null) {
@@ -195,13 +332,20 @@ let ATMMAP = {};
 		// das sollte vermieden werden, um Konflikte oder unnötige Last auf der Overpass API zu verhindern.
 	
 
-		// using JQuery executing overpass api
-		$.getJSON(overpassCall, function (data) {
+		let requestSourceGeneration = dataSourceGeneration;
+		let request = $.getJSON(overpassCall);
+		overpassRequests.push(request);
+		request.done(function (data) {
+			if (dataSource !== ATMMAP.SOURCE_OVERPASS || requestSourceGeneration !== dataSourceGeneration) {
+				return;
+			}
 			saveAllNodes(data);
 			storeAtmNodesToMap(data);
-		}).always(function () {
-			map.spin(false);
 		}).fail(function (jqXHR, textStatus, errorThrown) {
+			if (textStatus === "abort" || dataSource !== ATMMAP.SOURCE_OVERPASS ||
+				requestSourceGeneration !== dataSourceGeneration) {
+				return;
+			}
 			console.error(textStatus);
 			console.error(errorThrown);
 			console.error(jqXHR);
@@ -242,6 +386,13 @@ let ATMMAP = {};
 			}
 
 			alert(message);
+		}).always(function () {
+			overpassRequests = overpassRequests.filter(function (activeRequest) {
+				return activeRequest !== request;
+			});
+			if (overpassRequests.length === 0) {
+				map.spin(false);
+			}
 		});
 	}
 
@@ -253,7 +404,7 @@ let ATMMAP = {};
 	 */
 	let loadPois = function () {
 
-		if (map.getZoom() >= 14) {
+		if (dataSource === ATMMAP.SOURCE_OVERPASS && map.getZoom() >= 14) {
 			let mapBounds = map.getBounds();
 			let query_necessary = ATMMAP.test_query_necessary(mapBounds, ATMMAP.query_bound);
 

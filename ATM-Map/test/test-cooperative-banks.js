@@ -21,3 +21,30 @@ QUnit.test("Brandenburger Bank", function(assert) {
 	assert.notOk(isCashCroup, bankName + " is not a CashGroup-Bank");
 
 });
+
+QUnit.test("Vector tile properties are used for bank categories", function(assert) {
+	assert.equal(
+		LAYER_BUILDER.getCategoryIndex({
+			properties: { operator: "Volksbank Berlin" }
+		}),
+		0
+	);
+	assert.equal(
+		LAYER_BUILDER.getCategoryIndex({
+			properties: { name: "Sparkasse Berlin" }
+		}),
+		1
+	);
+	assert.deepEqual(
+		LAYER_BUILDER.getCategoryIndexes({
+			properties: { name: "Santander", network: "CashPool" }
+		}),
+		[2]
+	);
+	assert.deepEqual(
+		LAYER_BUILDER.getCategoryIndexes({
+			properties: { name: "Sparkasse Santander" }
+		}),
+		[1, 2]
+	);
+});

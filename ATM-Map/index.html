@@ -17,6 +17,7 @@ Geldautomaten haben. Zusätzlich werden Geldautomaten dargestellt,
 	<script src="./jquery/jquery-3.7.0.min.js"></script>
 
 	<script src="./leaflet/leaflet.js"></script>
+	<script src="./leaflet/Leaflet.VectorGrid.bundled.min.js"></script>
 
 	<link href="./locator/L.Control.Locate.css" rel="stylesheet" />
 	<script src="./locator/L.Control.Locate.min.js"></script>
@@ -80,6 +81,17 @@ Geldautomaten haben. Zusätzlich werden Geldautomaten dargestellt,
 				<h1 class="sidebar-header">
 					Auswahl der Banken <span class="sidebar-close"><i class="fa fa-caret-right"></i></span>
 				</h1>
+				<fieldset id="data_source_control">
+					<legend>Datenquelle</legend>
+					<label>
+						<input type="radio" name="data-source" value="overpass" checked />
+						Overpass API
+					</label>
+					<label>
+						<input type="radio" name="data-source" value="vector-tiles" />
+						ATM-Vektorkacheln (obstbaumkarte.de)
+					</label>
+				</fieldset>
 				<p id="bank_layer_control"></p>
 			</div>
 			<div class="sidebar-pane" id="info">
