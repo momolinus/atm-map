@@ -10,6 +10,8 @@
 let ATMMAP = {};
 ATMMAP.SOURCE_OVERPASS = "overpass";
 ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
+// from this zoom level on ATMs are shown, for Overpass and for vector tiles
+ATMMAP.MIN_ZOOM = 14;
 
 (function () {
 	// dependencies, see atmmaputils.js
@@ -150,6 +152,7 @@ ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 			layers: osm_layer
 		});
 		map.on('moveend', moveEnd);
+		map.on('zoomend', syncVectorTileLayers);
 
 		return map;
 	}
@@ -181,7 +184,7 @@ ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 				map.removeLayer(cashWithdrawalLayer);
 				cashWithdrawalLayer = null;
 			}
-			if (cashWithdrawalEnabled) {
+			if (cashWithdrawalEnabled && vectorTileLayer) {
 				cashWithdrawalLayer = createCashWithdrawalLayer();
 				cashWithdrawalLayer.addTo(map);
 			}
@@ -296,13 +299,27 @@ ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 	ATMMAP.getVectorTileStyle = getVectorTileStyle;
 
 	let addVectorTileLayers = function () {
-		vectorTileLayer = createVectorTileLayer();
-		vectorTileLayer.addTo(map);
-		if (cashWithdrawalEnabled) {
-			cashWithdrawalLayer = createCashWithdrawalLayer();
-			cashWithdrawalLayer.addTo(map);
+		// layers exist only from MIN_ZOOM on, so they are built fresh when zooming back in
+		if (map.getZoom() >= ATMMAP.MIN_ZOOM) {
+			vectorTileLayer = createVectorTileLayer();
+			vectorTileLayer.addTo(map);
+			if (cashWithdrawalEnabled) {
+				cashWithdrawalLayer = createCashWithdrawalLayer();
+				cashWithdrawalLayer.addTo(map);
+			}
 		}
 		updateCashWithdrawalControl();
+	};
+
+	let syncVectorTileLayers = function () {
+		if (dataSource !== ATMMAP.SOURCE_VECTOR_TILES) {
+			return;
+		}
+		let zoomedIn = map.getZoom() >= ATMMAP.MIN_ZOOM;
+		if (zoomedIn !== (vectorTileLayer !== null)) {
+			removeVectorTileLayers();
+			addVectorTileLayers();
+		}
 	};
 
 	let removeVectorTileLayers = function () {
@@ -328,13 +345,8 @@ ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 			console.error("Clicked vector tile feature has no properties.", event);
 			return;
 		}
-		// the tiles carry no OSM id, so the link points to the clicked position
-		let osmUrl = "https://www.openstreetmap.org/?mlat=" + event.latlng.lat.toFixed(6) +
-			"&mlon=" + event.latlng.lng.toFixed(6) +
-			"#map=19/" + event.latlng.lat.toFixed(6) + "/" + event.latlng.lng.toFixed(6);
 		let content = utils.createDescriptionFromeTags({ tags: event.layer.properties }) +
-			extraHtml +
-			'<p class="osm_link"><a href="' + osmUrl + '" target="_blank" rel="noopener">In OpenStreetMap ansehen</a></p>';
+			extraHtml;
 		L.popup().setLatLng(event.latlng).setContent(content).openOn(map);
 	};
 
@@ -487,7 +499,7 @@ ATMMAP.SOURCE_VECTOR_TILES = "vector-tiles";
 	 */
 	let loadPois = function () {
 
-		if (dataSource === ATMMAP.SOURCE_OVERPASS && map.getZoom() >= 14) {
+		if (dataSource === ATMMAP.SOURCE_OVERPASS && map.getZoom() >= ATMMAP.MIN_ZOOM) {
 			let mapBounds = map.getBounds();
 			let query_necessary = ATMMAP.test_query_necessary(mapBounds, ATMMAP.query_bound);
 

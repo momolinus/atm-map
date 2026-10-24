@@ -43,12 +43,12 @@ Test successful, no anomalies
 # ST10 Cash withdrawal shops
 
 ## Unreleased
-- In vector tile mode verify green supermarket icons appear (e.g. Berlin Mitte, zoom 16) and clicking one opens a popup with name, opening hours, cash withdrawal note and OSM link.
+- In vector tile mode verify green supermarket icons appear (e.g. Berlin Mitte, zoom 16) and clicking one opens a popup with name, opening hours, and cash withdrawal note.
 - Untick "Supermärkte mit Bargeldauszahlung" and verify the green icons disappear; tick again and verify they return.
 - Select Overpass and verify the checkbox is disabled and no green icons are shown.
 
-# ST9 Use ATM vector tiles below zoom 14
+# ST9 Zoom limit of ATM vector tiles
 
 ## Unreleased
-- Select ATM vector tiles and zoom below 14; verify vector tiles remain visible.
+- Select ATM vector tiles and zoom out below 14; verify no ATM or supermarket icons are shown and no tiles are requested. Zoom to 14 or higher and verify the icons appear.
 - Switch to Overpass below zoom 14; verify no Overpass request is made until zooming back to 14 or higher.
