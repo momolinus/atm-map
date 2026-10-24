@@ -49,7 +49,17 @@ let UTILS = {};
 		return result;
 	};
 
+	UTILS.escapeHtml = function (text) {
+		return String(text)
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#39;");
+	};
+
 	UTILS.createDescriptionFromeTags = function (node) {
+		let escape = UTILS.escapeHtml;
 
 		let description = '<p class="bank_name">???</p>';
 
@@ -57,11 +67,11 @@ let UTILS = {};
 		if (node.tags["atm:operator"]) {
 
 			description = '<p class="bank_name">';
-			description += node.tags["atm:operator"];
+			description += escape(node.tags["atm:operator"]);
 
 			if (node.tags.name) {
 				description += '<br><span class="bank_subname">(';
-				description += node.tags.name + ')</span></p>';
+				description += escape(node.tags.name) + ')</span></p>';
 			}
 			else {
 				description += '</p>';
@@ -70,21 +80,21 @@ let UTILS = {};
 		// usually a bank or an single atm
 		else if (node.tags.name) {
 			description = '<p class="bank_name">';
-			description += node.tags.name + '</p>';
+			description += escape(node.tags.name) + '</p>';
 		}
 		// "operator" often used instead of "name"
 		else if (node.tags.operator) {
 			description = '<p class="bank_name">';
-			description += node.tags.operator + '</p>';
+			description += escape(node.tags.operator) + '</p>';
 		}
 		else if (node.tags.network) {
 			description = '<p class="bank_name">';
-			description += node.tags.network + '</p>';
+			description += escape(node.tags.network) + '</p>';
 		}
 
 		if (node.tags.opening_hours) {
 			description += '<p class="opening_hour">';
-			description += node.tags.opening_hours + '</p>';
+			description += escape(node.tags.opening_hours) + '</p>';
 		}
 		else {
 			description += '<p class="opening_hour">';
