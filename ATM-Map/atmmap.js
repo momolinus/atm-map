@@ -14,7 +14,7 @@ import { overpass } from "./atmmap_overpass.js";
 import { SOURCE_OVERPASS, SOURCE_VECTOR_TILES, MIN_ZOOM } from "./atmmap_config.js";
 
 export const atmMap = {};
-// Die öffentliche Konfiguration auch über das Hauptmodul bereitstellen.
+// Expose the public configuration through the main map module as well.
 atmMap.SOURCE_OVERPASS = SOURCE_OVERPASS;
 atmMap.SOURCE_VECTOR_TILES = SOURCE_VECTOR_TILES;
 atmMap.MIN_ZOOM = MIN_ZOOM;
@@ -27,7 +27,7 @@ const sourceModules = {
 	[SOURCE_VECTOR_TILES]: vectorTiles
 };
 
-// Gemeinsame Bedienelemente und beide Anbieter initialisieren, bevor die Quelle aktiviert wird.
+// Initialize the shared controls and both providers before activating the selected source.
 atmMap.initMap = function () {
 
 	map = buildMap();
@@ -64,7 +64,7 @@ atmMap.setDataSource = function (source) {
 		throw new Error("The map must be initialized before changing the data source.");
 	}
 
-	// Erst deaktivieren, damit der bisherige Anbieter Layer entfernen und Anfragen abbrechen kann.
+	// Deactivate first so the previous provider can remove its layers and cancel pending requests.
 	sourceModules[dataSource].deactivate();
 	layerBuilder.clearLayers();
 	dataSource = source;
@@ -84,12 +84,12 @@ let buildMap = function () {
 		layers: osm_layer
 	});
 	map.on('moveend', function () {
-		// Overpass liefert Daten für den sichtbaren Kartenausschnitt; Vektorkacheln laden sich selbst nach.
+		// Overpass returns data for the visible map area; vector tiles reload themselves.
 		if (dataSource === SOURCE_OVERPASS) {
 			overpass.loadPois();
 		}
 	});
-	// Der Vektorkachel-Anbieter fügt seine Layer ab der Mindestzoomstufe hinzu bzw. entfernt sie.
+	// The vector tile provider adds or removes its layers when the minimum zoom level is crossed.
 	map.on('zoomend', vectorTiles.syncZoom);
 
 	return map;

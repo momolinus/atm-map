@@ -12,7 +12,7 @@ import { MIN_ZOOM } from "./atmmap_config.js";
 
 export const vectorTiles = {};
 
-	// Getrennte Layer erlauben, Geschäfte mit Bargeldauszahlung unabhängig ein- und auszublenden.
+	// Separate layers allow shops with cash withdrawal to be shown or hidden independently.
 	let atmUrl = "https://sbtiles.obstbaumkarte.de/table.public.alle_geldautomaten.geom/{z}/{x}/{y}.pbf";
 	let atmLayerName = "table.public.alle_geldautomaten.geom";
 	let cashWithdrawalUrl = "https://sbtiles.obstbaumkarte.de/table.public.alle_cash_withdrawal.geom/{z}/{x}/{y}.pbf";
@@ -30,7 +30,7 @@ export const vectorTiles = {};
 	 */
 	vectorTiles.init = function (mapToUse) {
 		map = mapToUse;
-		// Bei einer geänderten Bankkategorie die Darstellung der Geldautomaten neu berechnen.
+		// Recompute the ATM styling when a bank category changes.
 		layerBuilder.onCategoriesChanged(function () {
 			if (atmLayer) {
 				atmLayer.redraw();
@@ -93,7 +93,7 @@ export const vectorTiles = {};
 			return layerBuilder.isCategoryEnabled(categoryIndex);
 		});
 
-		// Ohne Stil werden nicht unterstützte oder vom Nutzer ausgeblendete Objekte nicht angezeigt.
+		// Without a style, unsupported features and features hidden by the user are not drawn.
 		if (!icon || !categoryEnabled) {
 			return [];
 		}
@@ -136,7 +136,7 @@ export const vectorTiles = {};
 		let toggle = document.getElementById("cash_withdrawal_toggle");
 		toggle.addEventListener("change", function () {
 			cashWithdrawalEnabled = toggle.checked;
-			// Auswahl merken, solange dieser Datenanbieter nicht aktiv ist.
+			// Remember the selection while this provider is not active.
 			if (!active) {
 				return;
 			}
@@ -167,7 +167,7 @@ export const vectorTiles = {};
 		L.popup().setLatLng(event.latlng).setContent(content).openOn(map);
 	};
 
-	// Der Popup-Hinweis des Bargeldauszahlungs-Layers nennt gegebenenfalls die Einkaufspflicht.
+	// The popup note of the cash withdrawal layer mentions a purchase requirement, if there is one.
 	let createCashWithdrawalLayer = function () {
 		let styles = {};
 		styles[cashWithdrawalLayerName] = vectorTiles.getCashWithdrawalStyle;

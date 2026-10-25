@@ -1,12 +1,12 @@
 "use strict"
 /**
- * *** Geldautomaten-Verbünde **********************************************
+ * *** ATM networks (Geldautomaten-Verbünde) *******************************
  *
- * Genossenschaften: https://de.wikipedia.org/wiki/Bankcard-Servicenetz
+ * Cooperative banks: https://de.wikipedia.org/wiki/Bankcard-Servicenetz
  *
- * Webseite: www.cashpool.de Partner: (1)
- * http://www.cashpool.de/Presentation/CashPool/Home/Pressemitteilung im
- * einzelnen, Stand 15.10.2016:
+ * Website: www.cashpool.de Partners: (1)
+ * http://www.cashpool.de/Presentation/CashPool/Home/Pressemitteilung in
+ * detail, as of 15.10.2016:
  *
  * TARGOBANK, Santander Consumer Bank, NATIONAL-BANK, Sparda Banken, Wüstenrot
  * Bank AG, MERKUR BANK KGaA, Südwestbank, BBBank
@@ -17,7 +17,7 @@
  *
  * https://de.wikipedia.org/wiki/Sparkasse (4)
  *
- * unbekannt (5)
+ * unknown (5)
  *
  */
 
@@ -28,7 +28,7 @@
  * @author Marcus Bleil
  */
 export const layerBuilder = {};
-// Die Reihenfolge muss zu den unten zurückgegebenen Kategorie-Indizes passen.
+// The order must match the category indices returned below.
 layerBuilder.namedGroup = [];
 layerBuilder.operatorLayers = null;
 layerBuilder.enabledCategories = [];
@@ -96,7 +96,7 @@ layerBuilder.enabledCategories = [];
 		let name = createNameFromTags(node);
 		let categories = [];
 
-		// Eine Bank kann mehreren Verbünden angehören; deshalb werden alle Treffer gesammelt.
+		// A bank can belong to several networks, so all matches are collected.
 		if (layerBuilder.matchingCooperativeBank(name)) {
 			categories.push(0);
 		}
@@ -110,7 +110,7 @@ layerBuilder.enabledCategories = [];
 			categories.push(3);
 		}
 		if (categories.length === 0) {
-			// Nicht zugeordnete Banken erscheinen in der Sammelkategorie.
+			// Banks that cannot be assigned appear in the catch-all category.
 			categories.push(4);
 		}
 		return categories;
@@ -241,7 +241,7 @@ layerBuilder.enabledCategories = [];
 		}
 
 		layerBuilder.enabledCategories[categoryIndex] = enabled;
-		// Vektorkachel-Stile werden bei Bedarf berechnet; der Anbieter muss daher neu zeichnen.
+		// Vector tile styles are computed on demand, so the provider has to redraw.
 		if (categoriesChangedHandler) {
 			categoriesChangedHandler();
 		}

@@ -14,7 +14,7 @@ export const overpass = {};
 
 	let map = null;
 	let active = false;
-	// Wird beim Deaktivieren erhöht, damit Antworten älterer Anfragen ignoriert werden.
+	// Incremented on deactivation so responses of older requests are ignored.
 	let generation = 0;
 	let requests = [];
 	// contains the node id of the OSM objects
@@ -96,7 +96,7 @@ export const overpass = {};
 		return query_necessary;
 	}
 
-	// Umfasst bereits abgefragte Gebiete; vollständig enthaltene Kartenausschnitte brauchen keine neue Anfrage.
+	// Covers the areas already requested; map areas fully contained in it need no new request.
 	let queryBound = null;
 	let updateQueryBound = function (mapBounds) {
 		if (queryBound === null) {
@@ -169,15 +169,14 @@ export const overpass = {};
 	let callOverpassApi = function (overpassCall) {
 		map.spin(true, { color: '#0026FF', radius: 20, width: 7, length: 20 });
 
-		//TODO es scheint, dass es möglich ist, während einer 
-		// laufenden Anfrage eine neue Anfrage zu starten.
-		// das sollte vermieden werden, um Konflikte oder unnötige Last auf der Overpass API zu verhindern.
+		//TODO it seems to be possible to start a new request while another one is running.
+		// This should be avoided to prevent conflicts or unnecessary load on the Overpass API.
 
 		let requestGeneration = generation;
 		let isOutdated = function () {
 			return !active || requestGeneration !== generation;
 		};
-		// Die Generation verhindert, dass verspätete Antworten nach einem Quellenwechsel Layer neu befüllen.
+		// The generation prevents late responses from refilling layers after the data source was switched.
 		let request = $.getJSON(overpassCall);
 		requests.push(request);
 		request.done(function (data) {
@@ -205,7 +204,7 @@ export const overpass = {};
 
 	let saveAllNodes = function (data) {
 		$.each(data.elements, function (index, node) {
-			// Overpass liefert Weg-Knoten mit, damit Bankgebäude als Umriss gezeichnet werden können.
+			// Overpass also returns the nodes of ways, so bank buildings can be drawn as outlines.
 			if (node.type == "node") {
 				wayNodeIds[node.id] = node;
 			}
@@ -306,7 +305,7 @@ export const overpass = {};
 		bounds = bankArea.getBounds();
 		center = bounds.getCenter();
 
-		// Der anklickbare Marker liegt mittig im Gebäudeumriss.
+		// The clickable marker is placed in the center of the building outline.
 		marker = L.marker([center.lat, center.lng], { icon: atmIcon });
 
 		marker.bindPopup(name);
