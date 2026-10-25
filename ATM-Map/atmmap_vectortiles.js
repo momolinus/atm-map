@@ -192,7 +192,7 @@ export const vectorTiles = {};
 		let styles = {};
 		styles[atmLayerName] = getAtmStyle;
 		let tileLayer = L.vectorGrid.protobuf(atmUrl, {
-			attribution: 'ATM-Daten &copy; OpenStreetMap-Mitwirkende, via <a href="https://sbtiles.obstbaumkarte.de/">obstbaumkarte.de</a>',
+			attribution: 'ATM-Daten &copy; OpenStreetMap-Mitwirkende, via <a href="https://obstbaumkarte.de/">obstbaumkarte.de</a>',
 			interactive: true,
 			vectorTileLayerStyles: styles
 		});
