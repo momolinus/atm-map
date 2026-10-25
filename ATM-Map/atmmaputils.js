@@ -9,6 +9,7 @@
 
 export const utils = {};
 
+	// Gemeinsame Leaflet-Symbole sorgen für ein einheitliches Aussehen beider Datenquellen.
 	let buildAtmIcon = function (iconPic) {
 		return L.icon({
 			iconUrl: iconPic,
@@ -57,6 +58,7 @@ export const utils = {};
 	};
 
 	utils.createDescriptionFromeTags = function (node) {
+		// OSM-Tagwerte werden in Popup-HTML eingesetzt und deshalb vorher maskiert.
 		let escape = utils.escapeHtml;
 
 		let description = '<p class="bank_name">???</p>';

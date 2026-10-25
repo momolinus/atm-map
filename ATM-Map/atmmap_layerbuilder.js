@@ -28,6 +28,7 @@
  * @author Marcus Bleil
  */
 export const layerBuilder = {};
+// Die Reihenfolge muss zu den unten zurückgegebenen Kategorie-Indizes passen.
 layerBuilder.namedGroup = [];
 layerBuilder.operatorLayers = null;
 layerBuilder.enabledCategories = [];
@@ -95,6 +96,7 @@ layerBuilder.enabledCategories = [];
 		let name = createNameFromTags(node);
 		let categories = [];
 
+		// Eine Bank kann mehreren Verbünden angehören; deshalb werden alle Treffer gesammelt.
 		if (layerBuilder.matchingCooperativeBank(name)) {
 			categories.push(0);
 		}
@@ -108,6 +110,7 @@ layerBuilder.enabledCategories = [];
 			categories.push(3);
 		}
 		if (categories.length === 0) {
+			// Nicht zugeordnete Banken erscheinen in der Sammelkategorie.
 			categories.push(4);
 		}
 		return categories;
@@ -238,6 +241,7 @@ layerBuilder.enabledCategories = [];
 		}
 
 		layerBuilder.enabledCategories[categoryIndex] = enabled;
+		// Vektorkachel-Stile werden bei Bedarf berechnet; der Anbieter muss daher neu zeichnen.
 		if (categoriesChangedHandler) {
 			categoriesChangedHandler();
 		}

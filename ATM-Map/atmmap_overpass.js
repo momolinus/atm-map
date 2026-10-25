@@ -14,7 +14,7 @@ export const overpass = {};
 
 	let map = null;
 	let active = false;
-	// increased on every deactivation, so answers of older requests are ignored
+	// Wird beim Deaktivieren erhöht, damit Antworten älterer Anfragen ignoriert werden.
 	let generation = 0;
 	let requests = [];
 	// contains the node id of the OSM objects
@@ -96,7 +96,7 @@ export const overpass = {};
 		return query_necessary;
 	}
 
-	// area for which ATMs were already requested
+	// Umfasst bereits abgefragte Gebiete; vollständig enthaltene Kartenausschnitte brauchen keine neue Anfrage.
 	let queryBound = null;
 	let updateQueryBound = function (mapBounds) {
 		if (queryBound === null) {
@@ -177,6 +177,7 @@ export const overpass = {};
 		let isOutdated = function () {
 			return !active || requestGeneration !== generation;
 		};
+		// Die Generation verhindert, dass verspätete Antworten nach einem Quellenwechsel Layer neu befüllen.
 		let request = $.getJSON(overpassCall);
 		requests.push(request);
 		request.done(function (data) {
@@ -204,8 +205,7 @@ export const overpass = {};
 
 	let saveAllNodes = function (data) {
 		$.each(data.elements, function (index, node) {
-			// all nodes of type "node", some tagged nodes are necessary for
-			// building ways, not all nodes here are stored are necessary for storing
+			// Overpass liefert Weg-Knoten mit, damit Bankgebäude als Umriss gezeichnet werden können.
 			if (node.type == "node") {
 				wayNodeIds[node.id] = node;
 			}
@@ -306,6 +306,7 @@ export const overpass = {};
 		bounds = bankArea.getBounds();
 		center = bounds.getCenter();
 
+		// Der anklickbare Marker liegt mittig im Gebäudeumriss.
 		marker = L.marker([center.lat, center.lng], { icon: atmIcon });
 
 		marker.bindPopup(name);
