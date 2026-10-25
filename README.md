@@ -20,6 +20,17 @@ In VS Code the extension "Live Server" works as well (right click on `index.html
 
 # Releases
 
+## Version 6.1
+
+published 25.10.2026
+
+- opening hours are shown as a readable weekly table in popups using the locally bundled opening_hours.js (LGPL-3.0) and SunCalc; today is highlighted, invalid values fall back to the raw text
+- unified naming of the module objects (`layerBuilder`, `atmMap`, `utils` instead of upper case names); constants like `SOURCE_OVERPASS` stay upper case
+- documented the `atm*.js` modules and translated all code comments to English
+- fixed the attribution link to `https://obstbaumkarte.de/` (the certificate is not valid for `www.`)
+- the cash withdrawal note ("nur mit Einkauf") is shown on its own line and centered
+- cleaned up whitespace and indentation, removed unused ESLint global comments
+
 ## Version 6.0
 
 published 24.10.2026
@@ -29,7 +40,6 @@ published 24.10.2026
 - vector tile mode also shows shops with cash withdrawal (`alle_cash_withdrawal` layer, e.g. supermarkets) with a green supermarket icon (Nicolas Mollet, CC BY-SA 3.0, Map Icons Collection); they can be switched off in the sidebar
 - ATM category filters and status icons are also applied to vector tile features
 - OSM tag values are now HTML-escaped in popups
-- opening hours are shown as a readable weekly table in popups using the locally bundled opening_hours.js (LGPL-3.0) and SunCalc; invalid values fall back to the raw text
 - replaced the IIFE wrappers by ES modules (`import`/`export`, new `atmmap_config.js`); the page and the tests must now be served by a web server (e.g. `python3 -m http.server` in `ATM-Map`), opening the files via `file://` no longer works
 - refactored `atmmap.js` into a core (`atmmap.js`) and one module per data source (`atmmap_vectortiles.js`, `atmmap_overpass.js`) without changing behavior
 
