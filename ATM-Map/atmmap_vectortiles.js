@@ -177,7 +177,7 @@ export const vectorTiles = {};
 			let properties = event.layer && event.layer.properties;
 			let note = '<p class="cash_withdrawal_note">Bargeldauszahlung an der Kasse';
 			if (properties && properties["cash_withdrawal:purchase_required"] === "yes") {
-				note += ' (nur mit Einkauf)';
+				note += '<br />(nur mit Einkauf)';
 			}
 			showPopup(event, note + '</p>');
 		});
