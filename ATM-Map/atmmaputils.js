@@ -54,6 +54,57 @@ export const utils = {};
 			.replace(/'/g, "&#39;");
 	};
 
+	const DAY_NAMES = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
+
+	let formatTime = function (date, dayStart, dayEnd) {
+		if (date.getTime() >= dayEnd.getTime()) {
+			return "24:00";
+		}
+		return date.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+	};
+
+	/**
+	 * Builds an HTML table with the opening hours of the current week (Monday to Sunday).
+	 * @param {string} openingHours value of the OSM tag opening_hours
+	 * @param {Date} [now] reference date, defaults to the current date
+	 * @returns the HTML table or null if the value cannot be parsed (or opening_hours.js is not loaded)
+	 */
+	utils.openingHoursToTable = function (openingHours, now) {
+		if (typeof opening_hours === "undefined") {
+			return null;
+		}
+
+		try {
+			let oh = new opening_hours(openingHours, { address: { country_code: "de" } });
+
+			now = now || new Date();
+			let monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((now.getDay() + 6) % 7));
+			let today = (now.getDay() + 6) % 7;
+			let rows = "";
+
+			for (let i = 0; i < 7; i++) {
+				let dayStart = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+				let dayEnd = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i + 1);
+				let times = [];
+
+				oh.getOpenIntervals(dayStart, dayEnd).forEach(function (interval) {
+					let from = interval[0];
+					let to = interval[1];
+					times.push(formatTime(from, dayStart, dayEnd) + " - " + formatTime(to, dayStart, dayEnd));
+				});
+
+				rows += '<tr' + (i === today ? ' class="today"' : '') + '><th>' + DAY_NAMES[i] + '</th><td>';
+				rows += times.length ? times.join("<br>") + " Uhr" : "geschlossen";
+				rows += '</td></tr>';
+			}
+
+			return '<table class="opening_hours_table">' + rows + '</table>';
+		}
+		catch (e) {
+			return null;
+		}
+	};
+
 	utils.createDescriptionFromeTags = function (node) {
 		// OSM tag values are inserted into popup HTML, so they are escaped first.
 		let escape = utils.escapeHtml;
@@ -90,8 +141,14 @@ export const utils = {};
 		}
 
 		if (node.tags.opening_hours) {
-			description += '<p class="opening_hour">';
-			description += escape(node.tags.opening_hours) + '</p>';
+			let table = utils.openingHoursToTable(node.tags.opening_hours);
+			if (table) {
+				description += table;
+			}
+			else {
+				description += '<p class="opening_hour">';
+				description += escape(node.tags.opening_hours) + '</p>';
+			}
 		}
 		else {
 			description += '<p class="opening_hour">';

@@ -30,6 +30,18 @@ QUnit.test("Inspection of LatLngBounds", function(assert) {
 	assert.equal(bounds.getWest(), 13);
 	assert.equal(bounds.getNorth(), 50.7);
 })
+QUnit.test("Opening hours are shown as a weekly table", function (assert) {
+	// Wednesday 2026-10-21
+	let html = utils.openingHoursToTable("Mo-Fr 08:00-18:00", new Date(2026, 9, 21, 12, 0));
+	assert.ok(html.indexOf("<th>Montag</th><td>08:00 - 18:00 Uhr</td>") >= 0);
+	assert.ok(html.indexOf('<tr class="today"><th>Mittwoch</th>') >= 0);
+	assert.ok(html.indexOf("<th>Sonntag</th><td>geschlossen</td>") >= 0);
+});
+QUnit.test("Invalid opening hours fall back to the raw text", function (assert) {
+	assert.equal(utils.openingHoursToTable("das ist kein Wert"), null);
+	let html = utils.createDescriptionFromeTags({ tags: { name: "X", opening_hours: "das ist kein Wert" } });
+	assert.ok(html.indexOf("das ist kein Wert") >= 0);
+});
 QUnit.test("Popup text escapes HTML from OSM tags", function (assert) {
 	let html = utils.createDescriptionFromeTags({
 		tags: { name: '<img src=x onerror=alert(1)>', opening_hours: 'Mo "9" & Di' }

@@ -29,6 +29,7 @@ published 24.10.2026
 - vector tile mode also shows shops with cash withdrawal (`alle_cash_withdrawal` layer, e.g. supermarkets) with a green supermarket icon (Nicolas Mollet, CC BY-SA 3.0, Map Icons Collection); they can be switched off in the sidebar
 - ATM category filters and status icons are also applied to vector tile features
 - OSM tag values are now HTML-escaped in popups
+- opening hours are shown as a readable weekly table in popups using the locally bundled opening_hours.js (LGPL-3.0) and SunCalc; invalid values fall back to the raw text
 - replaced the IIFE wrappers by ES modules (`import`/`export`, new `atmmap_config.js`); the page and the tests must now be served by a web server (e.g. `python3 -m http.server` in `ATM-Map`), opening the files via `file://` no longer works
 - refactored `atmmap.js` into a core (`atmmap.js`) and one module per data source (`atmmap_vectortiles.js`, `atmmap_overpass.js`) without changing behavior
 

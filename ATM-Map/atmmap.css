@@ -26,6 +26,22 @@
 	font-size: small;
 }
 
+.opening_hours_table {
+	margin: 0 auto;
+	font-size: small;
+	border-collapse: collapse;
+}
+
+.opening_hours_table th {
+	text-align: left;
+	padding-right: 10px;
+	font-weight: normal;
+}
+
+.opening_hours_table tr.today {
+	font-weight: bold;
+}
+
 .cash_withdrawal_note {
 	text-align: center;
 }
