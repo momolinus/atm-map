@@ -32,7 +32,7 @@ published 24.10.2026
 - replaced the IIFE wrappers by ES modules (`import`/`export`, new `atmmap_config.js`); the page and the tests must now be served by a web server (e.g. `python3 -m http.server` in `ATM-Map`), opening the files via `file://` no longer works
 - refactored `atmmap.js` into a core (`atmmap.js`) and one module per data source (`atmmap_vectortiles.js`, `atmmap_overpass.js`) without changing behavior
 
--- all build with AI
+- all vibe coding
 
 ## Version 5.3
 
