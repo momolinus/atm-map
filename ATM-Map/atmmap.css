@@ -26,6 +26,10 @@
 	font-size: small;
 }
 
+.cash_withdrawal_note {
+	text-align: center;
+}
+
 .details {
 	font-style: italic;
 	font-size: smaller;
