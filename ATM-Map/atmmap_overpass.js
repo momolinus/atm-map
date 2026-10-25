@@ -86,11 +86,11 @@ export const overpass = {};
 		else {
 			if (previous_polygon.contains(next_polygon)) {
 				query_necessary = false;
-				}
+			}
 			else {
 				query_necessary = true;
 			}
-			
+
 			console.debug("query_necessary: " + query_necessary);
 		}
 		return query_necessary;

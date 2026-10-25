@@ -1,7 +1,7 @@
 "use strict"
 /**
  * @author Marcus Bleil
- * 
+ *
  */
 
 // eslint settings
@@ -29,7 +29,7 @@ export const utils = {};
 
 	/**
 	 * Builds a bound string for passed LatLngBounds (https://leafletjs.com/reference.html#latlngbounds).
-	 * @param {*} bounds 
+	 * @param {*} bounds
 	 * @returns lowerLat + "," + lowerLng + "," + upperLat + "," + upperLng
 	 */
 	utils.latLongToString = function (bounds) {
