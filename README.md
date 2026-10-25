@@ -20,6 +20,12 @@ In VS Code the extension "Live Server" works as well (right click on `index.html
 
 # Releases
 
+## Version 6.2
+
+published 25.10.2026
+
+- forgot version note
+
 ## Version 6.1
 
 published 25.10.2026
