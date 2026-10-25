@@ -27,10 +27,10 @@
 /**
  * @author Marcus Bleil
  */
-export const LAYER_BUILDER = {};
-LAYER_BUILDER.namedGroup = [];
-LAYER_BUILDER.operatorLayers = null;
-LAYER_BUILDER.enabledCategories = [];
+export const layerBuilder = {};
+layerBuilder.namedGroup = [];
+layerBuilder.operatorLayers = null;
+layerBuilder.enabledCategories = [];
 
 	let operatorCategories = [
 		"Genossenschaftsbanken<br /><span class=\"details\">Bankcard-Servicenetz, Volksbanken, usw.</span>",
@@ -40,20 +40,20 @@ LAYER_BUILDER.enabledCategories = [];
 		"weitere Banken<br /><span class=\"details\">Banken, die sich nicht zuordnen lassen</span>"];
 	let categoriesChangedHandler = null;
 
-	LAYER_BUILDER.buildLayers = function (map) {
+	layerBuilder.buildLayers = function (map) {
 		let group;
 
-		LAYER_BUILDER.operatorLayers = L.control.layers(null, null, {
+		layerBuilder.operatorLayers = L.control.layers(null, null, {
 			collapsed: false
 		}).addTo(map);
 
 		for (let i = 0; i < operatorCategories.length; i++) {
 			group = L.layerGroup();
 			group.addTo(map);
-			LAYER_BUILDER.operatorLayers.addOverlay(group, operatorCategories[i]);
+			layerBuilder.operatorLayers.addOverlay(group, operatorCategories[i]);
 
-			LAYER_BUILDER.namedGroup[i] = group;
-			LAYER_BUILDER.enabledCategories[i] = true;
+			layerBuilder.namedGroup[i] = group;
+			layerBuilder.enabledCategories[i] = true;
 		}
 
 		map.on("overlayadd", function (event) {
@@ -67,44 +67,44 @@ LAYER_BUILDER.enabledCategories = [];
 		 * see:
 		 * https://stackoverflow.com/questions/41475855/adding-leaflet-layer-control-to-sidebar
 		 */
-		let htmlObject = LAYER_BUILDER.operatorLayers.getContainer();
+		let htmlObject = layerBuilder.operatorLayers.getContainer();
 		let a = document.getElementById("bank_layer_control")
 		a.appendChild(htmlObject);
 	};
 
-	LAYER_BUILDER.clearLayers = function () {
-		LAYER_BUILDER.namedGroup.forEach(function (group) {
+	layerBuilder.clearLayers = function () {
+		layerBuilder.namedGroup.forEach(function (group) {
 			group.clearLayers();
 		});
 	};
 
-	LAYER_BUILDER.onCategoriesChanged = function (handler) {
+	layerBuilder.onCategoriesChanged = function (handler) {
 		categoriesChangedHandler = handler;
 	};
 
-	LAYER_BUILDER.isCategoryEnabled = function (categoryIndex) {
-		return typeof LAYER_BUILDER.enabledCategories[categoryIndex] === "undefined" ||
-			LAYER_BUILDER.enabledCategories[categoryIndex] === true;
+	layerBuilder.isCategoryEnabled = function (categoryIndex) {
+		return typeof layerBuilder.enabledCategories[categoryIndex] === "undefined" ||
+			layerBuilder.enabledCategories[categoryIndex] === true;
 	};
 
-	LAYER_BUILDER.getCategoryIndex = function (node) {
-		return LAYER_BUILDER.getCategoryIndexes(node)[0];
+	layerBuilder.getCategoryIndex = function (node) {
+		return layerBuilder.getCategoryIndexes(node)[0];
 	};
 
-	LAYER_BUILDER.getCategoryIndexes = function (node) {
+	layerBuilder.getCategoryIndexes = function (node) {
 		let name = createNameFromTags(node);
 		let categories = [];
 
-		if (LAYER_BUILDER.matchingCooperativeBank(name)) {
+		if (layerBuilder.matchingCooperativeBank(name)) {
 			categories.push(0);
 		}
-		if (LAYER_BUILDER.matchingSavingsBank(name)) {
+		if (layerBuilder.matchingSavingsBank(name)) {
 			categories.push(1);
 		}
-		if (LAYER_BUILDER.matchingCashPool(name)) {
+		if (layerBuilder.matchingCashPool(name)) {
 			categories.push(2);
 		}
-		if (LAYER_BUILDER.matchingCashGroup(name)) {
+		if (layerBuilder.matchingCashGroup(name)) {
 			categories.push(3);
 		}
 		if (categories.length === 0) {
@@ -113,13 +113,13 @@ LAYER_BUILDER.enabledCategories = [];
 		return categories;
 	};
 
-	LAYER_BUILDER.addToNamedGroups = function (node, marker) {
-		LAYER_BUILDER.getCategoryIndexes(node).forEach(function (categoryIndex) {
-			LAYER_BUILDER.namedGroup[categoryIndex].addLayer(marker);
+	layerBuilder.addToNamedGroups = function (node, marker) {
+		layerBuilder.getCategoryIndexes(node).forEach(function (categoryIndex) {
+			layerBuilder.namedGroup[categoryIndex].addLayer(marker);
 		});
 	};
 
-	LAYER_BUILDER.matchingCooperativeBank = function (name) {
+	layerBuilder.matchingCooperativeBank = function (name) {
 
 		if (name.search(/Volksbank/i) > -1) {
 			return true;
@@ -144,7 +144,7 @@ LAYER_BUILDER.enabledCategories = [];
 		return false;
 	};
 
-	LAYER_BUILDER.matchingSavingsBank = function (name) {
+	layerBuilder.matchingSavingsBank = function (name) {
 
 		if (name.search(/Sparkasse/i) > -1) {
 			return true;
@@ -153,7 +153,7 @@ LAYER_BUILDER.enabledCategories = [];
 		return false;
 	};
 
-	LAYER_BUILDER.matchingCashPool = function (name) {
+	layerBuilder.matchingCashPool = function (name) {
 
 		if (name.search(/Sparda-Bank/i) > -1) {
 			return true;
@@ -170,7 +170,7 @@ LAYER_BUILDER.enabledCategories = [];
 		return false;
 	};
 
-	LAYER_BUILDER.matchingCashGroup = function (name) {
+	layerBuilder.matchingCashGroup = function (name) {
 
 		if (name.search(/Commerzbank/i) > -1) {
 			return true;
@@ -232,12 +232,12 @@ LAYER_BUILDER.enabledCategories = [];
 	};
 
 	let updateCategoryState = function (layer, enabled) {
-		let categoryIndex = LAYER_BUILDER.namedGroup.indexOf(layer);
+		let categoryIndex = layerBuilder.namedGroup.indexOf(layer);
 		if (categoryIndex === -1) {
 			return;
 		}
 
-		LAYER_BUILDER.enabledCategories[categoryIndex] = enabled;
+		layerBuilder.enabledCategories[categoryIndex] = enabled;
 		if (categoriesChangedHandler) {
 			categoriesChangedHandler();
 		}

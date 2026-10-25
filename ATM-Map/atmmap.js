@@ -8,15 +8,15 @@
 // eslint settings
 /*global L */
 
-import { LAYER_BUILDER } from "./atmmap_layerbuilder.js";
+import { layerBuilder } from "./atmmap_layerbuilder.js";
 import { vectorTiles } from "./atmmap_vectortiles.js";
 import { overpass } from "./atmmap_overpass.js";
 import { SOURCE_OVERPASS, SOURCE_VECTOR_TILES, MIN_ZOOM } from "./atmmap_config.js";
 
-export const ATMMAP = {};
-ATMMAP.SOURCE_OVERPASS = SOURCE_OVERPASS;
-ATMMAP.SOURCE_VECTOR_TILES = SOURCE_VECTOR_TILES;
-ATMMAP.MIN_ZOOM = MIN_ZOOM;
+export const atmMap = {};
+atmMap.SOURCE_OVERPASS = SOURCE_OVERPASS;
+atmMap.SOURCE_VECTOR_TILES = SOURCE_VECTOR_TILES;
+atmMap.MIN_ZOOM = MIN_ZOOM;
 
 let dataSource = SOURCE_VECTOR_TILES;
 let map = null;
@@ -26,7 +26,7 @@ const sourceModules = {
 	[SOURCE_VECTOR_TILES]: vectorTiles
 };
 
-ATMMAP.initMap = function () {
+atmMap.initMap = function () {
 
 	map = buildMap();
 
@@ -36,7 +36,7 @@ ATMMAP.initMap = function () {
 
 	L.control.sidebar('sidebar', { position: 'right' }).addTo(map);
 
-	LAYER_BUILDER.buildLayers(map);
+	layerBuilder.buildLayers(map);
 
 	overpass.init(map);
 	vectorTiles.init(map);
@@ -47,11 +47,11 @@ ATMMAP.initMap = function () {
 	sourceModules[dataSource].activate();
 };
 
-ATMMAP.getDataSource = function () {
+atmMap.getDataSource = function () {
 	return dataSource;
 };
 
-ATMMAP.setDataSource = function (source) {
+atmMap.setDataSource = function (source) {
 	if (!(source in sourceModules)) {
 		throw new Error("Unknown ATM data source: " + source);
 	}
@@ -63,7 +63,7 @@ ATMMAP.setDataSource = function (source) {
 	}
 
 	sourceModules[dataSource].deactivate();
-	LAYER_BUILDER.clearLayers();
+	layerBuilder.clearLayers();
 	dataSource = source;
 	sourceModules[dataSource].activate();
 };
@@ -110,7 +110,7 @@ let addDataSourceControl = function () {
 	document.querySelectorAll('input[name="data-source"]').forEach(function (input) {
 		input.addEventListener("change", function () {
 			if (input.checked) {
-				ATMMAP.setDataSource(input.value);
+				atmMap.setDataSource(input.value);
 			}
 		});
 	});

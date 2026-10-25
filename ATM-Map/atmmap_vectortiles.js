@@ -6,14 +6,11 @@
 // eslint settings
 /*global L */
 
-import { UTILS } from "./atmmaputils.js";
-import { LAYER_BUILDER } from "./atmmap_layerbuilder.js";
+import { utils } from "./atmmaputils.js";
+import { layerBuilder } from "./atmmap_layerbuilder.js";
 import { MIN_ZOOM } from "./atmmap_config.js";
 
 export const vectorTiles = {};
-
-	let utils = UTILS;
-	let layerBuilder = LAYER_BUILDER;
 
 	let atmUrl = "https://sbtiles.obstbaumkarte.de/table.public.alle_geldautomaten.geom/{z}/{x}/{y}.pbf";
 	let atmLayerName = "table.public.alle_geldautomaten.geom";
@@ -208,4 +205,3 @@ export const vectorTiles = {};
 
 		return tileLayer;
 	};
-

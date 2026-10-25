@@ -6,14 +6,11 @@
 // eslint settings
 /*global L, $ */
 
-import { UTILS } from "./atmmaputils.js";
-import { LAYER_BUILDER } from "./atmmap_layerbuilder.js";
+import { utils } from "./atmmaputils.js";
+import { layerBuilder } from "./atmmap_layerbuilder.js";
 import { MIN_ZOOM } from "./atmmap_config.js";
 
 export const overpass = {};
-
-	let utils = UTILS;
-	let layerBuilder = LAYER_BUILDER;
 
 	let map = null;
 	let active = false;
@@ -342,4 +339,3 @@ export const overpass = {};
 			console.debug(e);
 		}
 	};
-

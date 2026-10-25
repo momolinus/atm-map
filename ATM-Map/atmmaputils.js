@@ -7,7 +7,7 @@
 // eslint settings
 /*global L, $*/
 
-export const UTILS = {};
+export const utils = {};
 
 	let buildAtmIcon = function (iconPic) {
 		return L.icon({
@@ -19,19 +19,19 @@ export const UTILS = {};
 		});
 	};
 
-	UTILS.yesAtm = buildAtmIcon('bank_euro_atm_yes.png');
-	UTILS.atm = buildAtmIcon('atm_euro_yes.png');
-	UTILS.unknownAtm = buildAtmIcon('bank_euro_atm_unknow.png');
-	UTILS.noAtm = buildAtmIcon('bank_icon_atm_no.png');
+	utils.yesAtm = buildAtmIcon('bank_euro_atm_yes.png');
+	utils.atm = buildAtmIcon('atm_euro_yes.png');
+	utils.unknownAtm = buildAtmIcon('bank_euro_atm_unknow.png');
+	utils.noAtm = buildAtmIcon('bank_icon_atm_no.png');
 	// green supermarket icon: Nicolas Mollet, CC BY-SA 3.0, https://mapicons.mapsmarker.com
-	UTILS.cashWithdrawal = buildAtmIcon('supermarket_cash_withdrawal.svg');
+	utils.cashWithdrawal = buildAtmIcon('supermarket_cash_withdrawal.svg');
 
 	/**
 	 * Builds a bound string for passed LatLngBounds (https://leafletjs.com/reference.html#latlngbounds).
 	 * @param {*} bounds 
 	 * @returns lowerLat + "," + lowerLng + "," + upperLat + "," + upperLng
 	 */
-	UTILS.latLongToString = function (bounds) {
+	utils.latLongToString = function (bounds) {
 
 		/* The coordinate order is (lower lat, lower lon, upper lat, upper lon) */
 		let result;
@@ -47,7 +47,7 @@ export const UTILS = {};
 		return result;
 	};
 
-	UTILS.escapeHtml = function (text) {
+	utils.escapeHtml = function (text) {
 		return String(text)
 			.replace(/&/g, "&amp;")
 			.replace(/</g, "&lt;")
@@ -56,8 +56,8 @@ export const UTILS = {};
 			.replace(/'/g, "&#39;");
 	};
 
-	UTILS.createDescriptionFromeTags = function (node) {
-		let escape = UTILS.escapeHtml;
+	utils.createDescriptionFromeTags = function (node) {
+		let escape = utils.escapeHtml;
 
 		let description = '<p class="bank_name">???</p>';
 
@@ -102,7 +102,7 @@ export const UTILS = {};
 		return description;
 	};
 
-	UTILS.addLegendTo = function (map) {
+	utils.addLegendTo = function (map) {
 
 		let legend = L.control({
 			position: 'topright',
@@ -180,4 +180,3 @@ export const UTILS = {};
 
 		$('#legend_table').toggle();
 	};
-

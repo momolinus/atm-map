@@ -1,9 +1,9 @@
 // eslint settings
 /*global QUnit*/
 
-import { ATMMAP } from "../atmmap.js";
-import { LAYER_BUILDER } from "../atmmap_layerbuilder.js";
-import { UTILS } from "../atmmaputils.js";
+import { atmMap } from "../atmmap.js";
+import { layerBuilder } from "../atmmap_layerbuilder.js";
+import { utils } from "../atmmaputils.js";
 import { vectorTiles } from "../atmmap_vectortiles.js";
 import { overpass } from "../atmmap_overpass.js";
 
@@ -19,41 +19,41 @@ QUnit.test("Overpass errors are described by status and text status", function (
 });
 
 QUnit.test("ATM vector tiles are the default data source", function (assert) {
-	assert.equal(ATMMAP.getDataSource(), ATMMAP.SOURCE_VECTOR_TILES);
-	assert.strictEqual(ATMMAP.setDataSource(ATMMAP.SOURCE_VECTOR_TILES), undefined);
+	assert.equal(atmMap.getDataSource(), atmMap.SOURCE_VECTOR_TILES);
+	assert.strictEqual(atmMap.setDataSource(atmMap.SOURCE_VECTOR_TILES), undefined);
 });
 
 QUnit.test("Cash withdrawal shops use the green supermarket icon", function (assert) {
-	assert.strictEqual(vectorTiles.getCashWithdrawalStyle().icon, UTILS.cashWithdrawal);
-	assert.ok(UTILS.cashWithdrawal.options.iconUrl.indexOf("supermarket") > -1);
+	assert.strictEqual(vectorTiles.getCashWithdrawalStyle().icon, utils.cashWithdrawal);
+	assert.ok(utils.cashWithdrawal.options.iconUrl.indexOf("supermarket") > -1);
 });
 
 QUnit.test("Minimum zoom for ATMs is 13", function (assert) {
-	assert.equal(ATMMAP.MIN_ZOOM, 13);
+	assert.equal(atmMap.MIN_ZOOM, 13);
 });
 
 QUnit.test("Unknown data sources are rejected", function (assert) {
 	assert.throws(function () {
-		ATMMAP.setDataSource("unknown");
+		atmMap.setDataSource("unknown");
 	}, /Unknown ATM data source/);
 });
 
 QUnit.test("Vector tile points use the existing ATM status icons", function (assert) {
 	assert.strictEqual(
 		vectorTiles.getVectorTileStyle({ amenity: "atm" }, 15).icon,
-		UTILS.atm
+		utils.atm
 	);
 	assert.strictEqual(
 		vectorTiles.getVectorTileStyle({ amenity: "bank", atm: "yes" }, 15).icon,
-		UTILS.yesAtm
+		utils.yesAtm
 	);
 	assert.strictEqual(
 		vectorTiles.getVectorTileStyle({ amenity: "bank", atm: "no" }, 15).icon,
-		UTILS.noAtm
+		utils.noAtm
 	);
 	assert.strictEqual(
 		vectorTiles.getVectorTileStyle({ amenity: "bank" }, 15).icon,
-		UTILS.unknownAtm
+		utils.unknownAtm
 	);
 });
 
@@ -63,8 +63,8 @@ QUnit.test("Vector tile styling filters unknown features and disabled categories
 		[]
 	);
 
-	let previousValue = LAYER_BUILDER.enabledCategories[0];
-	LAYER_BUILDER.enabledCategories[0] = false;
+	let previousValue = layerBuilder.enabledCategories[0];
+	layerBuilder.enabledCategories[0] = false;
 	assert.deepEqual(
 		vectorTiles.getVectorTileStyle({
 			amenity: "bank",
@@ -74,9 +74,9 @@ QUnit.test("Vector tile styling filters unknown features and disabled categories
 		[]
 	);
 	if (typeof previousValue === "undefined") {
-		delete LAYER_BUILDER.enabledCategories[0];
+		delete layerBuilder.enabledCategories[0];
 	}
 	else {
-		LAYER_BUILDER.enabledCategories[0] = previousValue;
+		layerBuilder.enabledCategories[0] = previousValue;
 	}
 });
