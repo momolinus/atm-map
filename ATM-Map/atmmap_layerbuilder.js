@@ -21,9 +21,6 @@
  *
  */
 
-// eslint settings
-/*global L*/
-
 /**
  * @author Marcus Bleil
  */

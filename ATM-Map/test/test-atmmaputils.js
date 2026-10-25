@@ -1,6 +1,3 @@
-// eslint settings
-/*global QUnit*/
-
 import { utils } from "../atmmaputils.js";
 
 QUnit.test("Test of utils.latLongToString", function (assert) {

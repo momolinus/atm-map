@@ -5,9 +5,6 @@
  * (see atmmap_vectortiles.js and atmmap_overpass.js).
  */
 
-// eslint settings
-/*global L */
-
 import { layerBuilder } from "./atmmap_layerbuilder.js";
 import { vectorTiles } from "./atmmap_vectortiles.js";
 import { overpass } from "./atmmap_overpass.js";

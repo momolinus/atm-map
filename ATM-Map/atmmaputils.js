@@ -4,9 +4,6 @@
  *
  */
 
-// eslint settings
-/*global L, $*/
-
 export const utils = {};
 
 	// Shared Leaflet icons give both data sources the same look.

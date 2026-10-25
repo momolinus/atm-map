@@ -1,6 +1,3 @@
-// eslint settings
-/*global QUnit*/
-
 import { atmMap } from "../atmmap.js";
 import { layerBuilder } from "../atmmap_layerbuilder.js";
 import { utils } from "../atmmaputils.js";

@@ -3,9 +3,6 @@
  * ATM data from the Overpass API: query, markers for banks and ATMs.
  */
 
-// eslint settings
-/*global L, $ */
-
 import { utils } from "./atmmaputils.js";
 import { layerBuilder } from "./atmmap_layerbuilder.js";
 import { MIN_ZOOM } from "./atmmap_config.js";

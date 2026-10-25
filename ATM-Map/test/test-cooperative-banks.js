@@ -2,9 +2,6 @@
  *
  */
 
-// eslint settings
-/*global QUnit*/
-
 import { layerBuilder } from "../atmmap_layerbuilder.js";
 
 QUnit.test("Brandenburger Bank", function(assert) {

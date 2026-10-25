@@ -3,9 +3,6 @@
  * ATM data from the vector tiles of obstbaumkarte.de: ATMs, banks and shops with cash withdrawal.
  */
 
-// eslint settings
-/*global L */
-
 import { utils } from "./atmmaputils.js";
 import { layerBuilder } from "./atmmap_layerbuilder.js";
 import { MIN_ZOOM } from "./atmmap_config.js";
